@@ -1,2 +1,10 @@
-build/
-*.fst
+*
+!vsrc/
+!vsrc/**
+!csrc/
+!csrc/**
+!.gitignore
+!Makefile
+!README.md
+!LICENSE
+!main.cc

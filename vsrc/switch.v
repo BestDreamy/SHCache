@@ -1,9 +1,8 @@
 module switch(
-    input a,
-    input b,
+    input clk,
     output f
 );
 
-assign f = a ^ b;
+assign f = clk;
 
 endmodule

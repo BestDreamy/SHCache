@@ -1,10 +1,6 @@
-#include "verilated.h"
 #include "verilated_fst_c.h"
 #include "Vswitch.h"
-#include <cstdint>
-#include <stdio.h>
-#include <stdlib.h>
-#include <assert.h>
+#include "csrc/utils.h"
 
 int main(int argc, char** argv) {
     Vswitch* dut = new Vswitch;
@@ -15,16 +11,15 @@ int main(int argc, char** argv) {
     tfp->open("wave.fst");
 
     uint time_counter = 0;
+    int clk = 0;
     while (!Verilated::gotFinish() and time_counter < 50) {
-        int a = rand() & 1;
-        int b = rand() & 1;
-        dut->a = a;
-        dut->b = b;
+        dut->clk = clk;
         dut->eval();
-        printf("a = %d, b = %d, f = %d\n", a, b, dut->f);
 
         tfp->dump(time_counter ++);
-        assert(dut->f == (a ^ b));
+        // assert(dut->f == (a ^ b));
+
+        clk = clk ^ 1;
     }
     tfp->close();
     delete dut;

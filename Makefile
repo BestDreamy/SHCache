@@ -9,11 +9,14 @@ BUILD_DIR = ./build
 OBJ_DIR = $(BUILD_DIR)/obj_dir
 BIN = $(BUILD_DIR)/$(TOP_NAME)
 
+# INCFLAGS = $(addprefix -I, $(INC_PATH))
+CXXFLAGS = -MMD -MP
+
 default: run
 
 $(BIN): $(CSRCS) $(VSRCS) | $(OBJ_DIR)
 	@rm -rf $(OBJ_DIR)
-	verilator $(VERILATOR_FLAGS) $^ \
+	verilator $(VERILATOR_FLAGS) $(CXXFLAGS) $^ \
 	--Mdir $(OBJ_DIR) -o $(abspath $(BIN))
 
 run: $(BIN)
