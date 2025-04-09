@@ -1,8 +1,9 @@
 module switch(
-    input clk,
+    input clock,
+    input reset,
     output f
 );
 
-assign f = clk;
+assign f = clock;
 
 endmodule

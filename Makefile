@@ -9,8 +9,12 @@ BUILD_DIR = ./build
 OBJ_DIR = $(BUILD_DIR)/obj_dir
 BIN = $(BUILD_DIR)/$(TOP_NAME)
 
-# INCFLAGS = $(addprefix -I, $(INC_PATH))
 CXXFLAGS = -MMD -MP
+
+# Just for testing
+TEST_DIR = $(abspath ./benchmark)
+TEST ?= allReduce
+TEST-SRC = $(TEST_DIR)/$(TEST).txt
 
 default: run
 
@@ -19,8 +23,8 @@ $(BIN): $(CSRCS) $(VSRCS) | $(OBJ_DIR)
 	verilator $(VERILATOR_FLAGS) $(CXXFLAGS) $^ \
 	--Mdir $(OBJ_DIR) -o $(abspath $(BIN))
 
-run: $(BIN)
-	@$^
+run: $(BIN) $(TEST-SRC)
+	@$(BIN) $(TEST-SRC)
 
 $(OBJ_DIR):
 	mkdir -p $(OBJ_DIR)
