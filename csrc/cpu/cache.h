@@ -12,7 +12,7 @@ struct Cache {
             tag_array[i] = 0;
             val_array[i] = 0;
             for (size_t j = 0; j < BlockSize; ++j) {
-                tag_array[i][j] = 0;
+                data_array[i][j] = 0;
             }
         }
     }

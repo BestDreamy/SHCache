@@ -25,6 +25,23 @@ struct CPU {
     void write_memory(uint32_t address, const uint32_t* data_block) {
         cache.update(address, data_block);
     }
+
+    void exec_once(const OperationType &op) {
+        // Execute the operation
+        switch (op) {
+            case OperationType::LOAD:
+                // Load operation
+                break;
+            case OperationType::STORE:
+                // Store operation
+                break;
+            case OperationType::COMPUTE:
+                // Compute operation
+                break;
+            default:
+                break;
+        }
+    }
 };
 
 #endif

@@ -1,6 +1,7 @@
 #include "sys.h"
 
 int32_t time_counter = 0;
+CPU<> cpu[NUMCORES];
 
 void sim(Vmodule *dut, VerilatedFstC *tfp, std::ifstream &file) {
     // Initialize the CPU
