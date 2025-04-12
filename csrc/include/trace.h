@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <optional>
+#include <iostream>
 
 enum OperationType {
     STORE,
@@ -11,14 +12,34 @@ enum OperationType {
     OTHER
 };
 
-// 通用数据结构
 struct Operation {
     int core;                          // core id (must)
     OperationType operation;           // (must)
     std::vector<std::string> rs;       // rs1 for load and store, rs1 and rs2 for compute (must)
     std::optional<uint32_t> address;   // Just for load and store (optional)
-    std::optional<std::string> result; // rd for compute (optional)
+    std::optional<std::string> result; // rd for compute and store (optional)
 };
+
+inline void dbg_operation(const Operation& op) {
+    std::cout << "core: " << op.core << ", operation: ";
+    switch (op.operation) {
+        case STORE: std::cout << "store"; break;
+        case LOAD: std::cout << "load"; break;
+        case COMPUTE: std::cout << "compute"; break;
+        default: std::cout << "other"; break;
+    }
+    std::cout << ", rs: ";
+    for (const auto& r : op.rs) {
+        std::cout << r << " ";
+    }
+    if (op.address) {
+        std::cout << ", address: 0x" << std::hex << *op.address;
+    }
+    if (op.result) {
+        std::cout << ", result: " << *op.result;
+    }
+    std::cout << std::endl;
+}
 
 // std::vector<Operation> operations = {
 //     {1, OperationType::STORE, "a0", 0x2000, std::nullopt, std::nullopt},

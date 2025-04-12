@@ -13,8 +13,8 @@ CXXFLAGS = -MMD -MP
 
 # Just for testing
 TEST_DIR = $(abspath ./benchmark)
-TEST ?= allReduce
-TEST-SRC = $(TEST_DIR)/$(TEST).txt
+test ?= allReduce
+TEST-SRC = $(TEST_DIR)/$(test).txt
 
 default: run
 
@@ -31,5 +31,11 @@ $(OBJ_DIR):
 
 clean:
 	rm -rf $(BUILD_DIR) wave.fst
+
+commit ?= update
+git:
+	git add .
+	git commit -m "$(commit)"
+	git push
 
 .PHONY: default all clean run

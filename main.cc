@@ -9,9 +9,7 @@ int main(int argc, char** argv) {
     tfp->open("wave.fst");
 
     std::ifstream file(argv[1]);
-    sys_init(dut, tfp, file);
-    
-    tfp->close();
-    delete dut;
+    sim(dut, tfp, file);
+
     return 0;
 }
