@@ -13,7 +13,7 @@ CXXFLAGS = -MMD -MP
 
 # Just for testing
 TEST_DIR = $(abspath ./benchmark)
-test ?= allReduce
+test ?= all-reduce
 TEST-SRC = $(TEST_DIR)/$(test).txt
 
 default: run
