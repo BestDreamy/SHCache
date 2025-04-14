@@ -27,7 +27,6 @@ enum ComputeType {
 };
 
 inline ComputeType stocompute_type(const std::string& str) {
-    std:: cout << str << std::endl;
     if (str == "add") return ComputeType::ADD;
     else if (str == "sub") return ComputeType::SUB;
     else if (str == "and") return ComputeType::AND;

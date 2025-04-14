@@ -8,8 +8,7 @@ int main(int argc, char** argv) {
     dut->trace(tfp, 0);
     tfp->open("wave.fst");
 
-    std::ifstream file(argv[1]);
-    sim(dut, tfp, file);
+    sim(dut, tfp, argv[1]);
 
     return 0;
 }

@@ -7,7 +7,7 @@
 
 extern int32_t time_counter;
 
-void sim(Vmodule* dut, VerilatedFstC* tfp, std::ifstream& file);
+void sim(Vmodule* dut, VerilatedFstC* tfp, const char *filepath);
 
 void sys_init(Vmodule* dut, VerilatedFstC* tfp);
 

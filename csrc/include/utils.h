@@ -33,7 +33,7 @@ inline Operation read_trace_one_line(std::string &line) {
             } else if (key == "result" || key == "value") {
                 op.result = value;
             } else { // Just for compute operation
-                op.compute_type = stocompute_type(value);
+                op.compute_type = stocompute_type(key);
 
                 std::stringstream rs_stream(value);
                 std::string rs;
@@ -55,7 +55,5 @@ inline Operation read_trace_one_line(std::string &line) {
 #include "verilated_fst_c.h"
 
 typedef Vswitch Vmodule;
-
-#define dbg(a) std::cout << #a << " : " << (a) << std::endl
 
 #endif
