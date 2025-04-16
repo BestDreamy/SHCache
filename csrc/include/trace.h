@@ -73,11 +73,4 @@ inline void dbg_operation(const Operation& op) {
     std::cout << std::endl;
 }
 
-// std::vector<Operation> operations = {
-//     {1, OperationType::STORE, "a0", 0x2000, std::nullopt, std::nullopt},
-//     {0, OperationType::LOAD, "a1", 0x2000, std::nullopt, std::nullopt},
-//     {1, OperationType::LOAD, "a1", 0x1000, std::nullopt, std::nullopt},
-//     {0, OperationType::COMPUTE, std::nullopt, std::nullopt, "a1 a0", "a0"}
-// };
-
 #endif // TRACE_H
