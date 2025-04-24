@@ -24,7 +24,6 @@ struct Cache {
     | Tag (21 bits)       | Index (7 bits)   | Block Offset (4 bits) |
     */
     bool access(const uint32_t &address, uint32_t& data) {
-        /*
         size_t index = (address / BlockSize) % NumSets; // Extract index from address
         uint32_t tag = address / (NumSets * BlockSize); // Extract tag from address
         
@@ -37,12 +36,13 @@ struct Cache {
         
         // Cache miss
         return false;
-        */
+
+        /*
         return mem.read_memory(address, data);
+        */
     }
 
     void update(const uint32_t &address, const uint32_t& new_data) {
-        /*
         size_t index = (address / BlockSize) % NumSets; // Extract index from address
         uint32_t tag = address / (NumSets * BlockSize); // Extract tag from address
         
@@ -50,8 +50,10 @@ struct Cache {
         tag_array[index] = tag;
         val_array[index] = true;
         memcpy(data_array[index], new_data, BlockSize * sizeof(uint32_t));
-        */
+        
+        /*
         mem.write_memory(address, new_data);
+        */
     }
 };
 
