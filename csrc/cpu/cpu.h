@@ -28,8 +28,10 @@ struct CPU {
         cache.update(address, data);
     }
 
-    void exec_once(const Operation &op) {
+    bool exec_once(const Operation &op) {
         OperationType opType = op.operation;
+        bool op_finished = false;
+
         dbg_operation(op);
         switch (opType) {
             case OperationType::LOAD: {
@@ -58,6 +60,8 @@ struct CPU {
                 break;
             }
             case OperationType::COMPUTE: {
+                op_finished = true;
+
                 std::string rs1 = op.rs[0];
                 std::string rs2 = op.rs[1];
                 assert(reg.find(rs1) != reg.end());
@@ -65,6 +69,7 @@ struct CPU {
                 uint32_t data1 = reg[rs1];
                 uint32_t data2 = reg[rs2];
                 assert(op.compute_type.has_value());
+                // -- Get data and check data.
                 switch (op.compute_type.value()) {
                     case ComputeType::ADD:
                         reg[op.result.value()] = data1 + data2;
