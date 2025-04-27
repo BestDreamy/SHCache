@@ -1,9 +1,10 @@
-TOP_NAME = switch
+TOP_NAME = shhl
 
-VERILATOR_FLAGS = -cc --exe --build --trace-fst --top-module $(TOP_NAME)
+VERILATOR_INC_PATH  = $(addprefix -I, $(abspath ./vsrc/chi) $(abspath ./vsrc/include) )
+VERILATOR_FLAGS = -cc --exe --build --trace-fst --top-module $(TOP_NAME) $(VERILATOR_INC_PATH)
 
-CSRCS = $(shell find $(abspath ./) -name "*.c" -or -name "*.cc" -or -name "*.cpp")
-VSRCS = $(shell find $(abspath ./vsrc) -name "*.v")
+CSRCS = $(shell find $(abspath ./csrc) -name "*.c" -or -name "*.cc" -or -name "*.cpp")
+VSRCS = $(shell find $(abspath ./vsrc) -name "shhl.sv")
 
 BUILD_DIR = ./build
 OBJ_DIR = $(BUILD_DIR)/obj_dir
@@ -30,7 +31,7 @@ $(OBJ_DIR):
 	mkdir -p $(OBJ_DIR)
 
 clean:
-	rm -rf $(BUILD_DIR) wave.fst
+	rm -rf $(BUILD_DIR) wave.fst*
 
 commit ?= update
 git:

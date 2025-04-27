@@ -51,9 +51,9 @@ inline Operation read_trace_one_line(std::string &line) {
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
-#include "Vswitch.h"
+#include "Vshhl.h"
 #include "verilated_fst_c.h"
 
-typedef Vswitch Vmodule;
+typedef Vshhl Vmodule;
 
 #endif

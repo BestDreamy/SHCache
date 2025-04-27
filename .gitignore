@@ -10,3 +10,4 @@
 !main.cc
 !benchmark/
 !benchmark/**
+!config.py
