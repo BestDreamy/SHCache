@@ -9,8 +9,6 @@
 
 #define FINISH_TIME 1e5
 
-extern int32_t time_counter;
-
 void sim(Vmodule* dut, VerilatedFstC* tfp, const char *filepath);
 
 void sys_init(Vmodule* dut, VerilatedFstC* tfp);
@@ -21,7 +19,7 @@ inline bool sys_exec_once(Vmodule* dut, VerilatedFstC* tfp, const Operation& op)
     tfp->dump(time_counter ++);
 
     int core_id = op.core;
-    bool op_finished = cpu[core_id].exec_once(op);
+    bool op_finished = cpu[core_id].exec_once(dut, tfp, op);
 
     dut->clock = 1 - dut->clock; // clock = 1
     dut->eval();

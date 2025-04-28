@@ -25,7 +25,7 @@ struct Cache {
         
         for (size_t i = 0; i < NumSets; ++i) {
             tag_array[i] = 0;
-            val_array[i] = 0;
+            val_array[i] = I;
             for (size_t j = 0; j < BlockSize; ++j) {
                 data_array[i][j] = 0;
             }
@@ -70,12 +70,15 @@ struct Cache {
         */
     }
 
-    void update(const uint32_t &address, const uint32_t& new_data) {
+    void update(
+        Vmodule* dut, VerilatedFstC* tfp,
+        const uint32_t &address, const uint32_t& new_data
+    ) {
         size_t index = (address / BlockSize) % NumSets; // Extract index from address
         uint32_t tag = address / (NumSets * BlockSize); // Extract tag from address
 
         if (!is_unique(address)) {
-            chi_read_unique(address);
+            chi_read_unique(dut, tfp, address);
         }
         
         // // Update the cache line

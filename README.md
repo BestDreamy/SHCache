@@ -1,0 +1,16 @@
+# Pre-Install
+```
+verilator 5.034
+make
+python 3.12
+c++
+gtkwave
+```
+
+# Run
+```
+# To generate csrc/include/autoconfig.h and vsrc/include/autoconfig.v
+python config.py
+
+make
+```
