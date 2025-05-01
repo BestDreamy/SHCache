@@ -12,7 +12,7 @@ struct Config {
     std::vector<uint32_t> numCreditsForHNReq = {4};
     std::vector<uint32_t> numCreditsForSNReq = {4};
 
-    std::vector<uint32_t> RNId = {0xc, 0x2c, 0x3c, 0x4c};
+    std::vector<uint32_t> RNId = {0x0, 0x1, 0x2, 0x3};
     std::vector<uint32_t> HNId = {0x28};
     std::vector<uint32_t> SNId = {0x24};
 };

@@ -26,12 +26,15 @@ struct CPU {
     // Write to memory (via cache)
     void write_memory(
         Vmodule* dut, VerilatedFstC* tfp, 
-        const uint32_t &address, const uint32_t& data
+        const int &coreId, const uint32_t &address, const uint32_t& data
     ) {
-        cache.update(dut, tfp, address, data);
+        cache.update(dut, tfp, coreId, address, data);
     }
 
-    bool exec_once(Vmodule* dut, VerilatedFstC* tfp, const Operation &op) {
+    bool exec_once(
+        Vmodule* dut, VerilatedFstC* tfp, 
+        const Operation &op
+    ) {
         OperationType opType = op.operation;
         bool op_finished = false;
 
@@ -59,7 +62,7 @@ struct CPU {
                     data = reg[rs];
                 }
                 // Store operation
-                this->write_memory(dut, tfp, address, data);
+                this->write_memory(dut, tfp, op.core, address, data);
                 break;
             }
             case OperationType::COMPUTE: {
