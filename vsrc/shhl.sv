@@ -1,5 +1,5 @@
 `include "chi_intf.sv"
-`include "autoconfig"
+`include "autoconfig.v"
 
 module shhl(
     input  reqflit_t rxreqflit, // rxreq channel
@@ -16,6 +16,7 @@ module shhl(
         .rxreqflitv(rxreqflitv),
         .rxreqflitpend(rxreqflitpend),
         .rxreqlcrdv(rxreqlcrdv),
+        .rxreq_pocq_first_entry(),
         .clock(clock),
         .reset(reset)
     );

@@ -1,6 +1,9 @@
 TOP_NAME = shhl
 
-VERILATOR_INC_PATH  = $(addprefix -I, $(abspath ./vsrc/chi) $(abspath ./vsrc/include) $(abspath ./vsrc/flow) )
+VERILATOR_INC_PATH  = $(addprefix -I, $(abspath ./vsrc/chi) \
+									  $(abspath ./vsrc/include) \
+									  $(abspath ./vsrc/flow) \
+									  $(abspath ./vsrc/cbb) )
 VERILATOR_FLAGS = -cc --exe --build --trace-fst --top-module $(TOP_NAME) $(VERILATOR_INC_PATH)
 
 CSRCS = $(shell find $(abspath .) -name "*.c" -or -name "*.cc" -or -name "*.cpp")
