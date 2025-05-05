@@ -1,9 +1,9 @@
 module sf(
-    input reqflit_t rxreq_pocq_first_entry,
-    input logic     rxreq_pocq_entry_v,
+    input reqflit_t                     rxreq_pocq_first_entry,
+    input logic                         rxreq_pocq_first_entry_v,
 
-    output          sf_hit,
-    output          sf_hit_state
+    output                              sf_hit,
+    output [`CHI_CACHE_STATE_RANGE]     sf_hit_state
 );
 
   //           |<------16 bytes---->| 
@@ -19,8 +19,8 @@ module sf(
   //   |     | |                    | |
   //   ⌊_____⌋ ⌊____________________⌋ --
 
-    localparam int ADDR_W = 48, BYTE_W = 8, STATE_W = 3, SET_W = 7;
-    localparam int OFFSET_W = RNsOFFSET, SET_NUM = 1 << SET_W;
+    localparam int ADDR_W = 48, BYTE_W = 8, STATE_W = `CHI_CACHE_STATE_W, SET_W = 7;
+    localparam int OFFSET_W = RNsOffset[0], SET_NUM = 1 << SET_W;
     localparam int TAG_W = ADDR_W - OFFSET_W - $clog2(SET_NUM);
     localparam int RNF_W = $clog2(numRNs);
     reg [TAG_W-1: 0]                    tagArray [SET_NUM];
@@ -34,10 +34,10 @@ module sf(
     `define SF_TAG_RANGE (ADDR_W-1) : (ADDR_W - TAG_W)
     `define SF_SET_RANGE (ADDR_W - TAG_W - 1) : (ADDR_W - TAG_W - SET_W)
     // Get the tag and set address from the incoming reqflit
-    wire [SET_W-1:0]    sf_set_addr    = rxreq_pocq_first_entry.Addr[`SF_SET_RANGE];
-    wire [TAG_W-1:0]    sf_tag         = rxreq_pocq_first_entry.Addr[`SF_TAG_RANGE];
-    wire                sf_hit         = (tagArray[sf_set_addr] == sf_tag);
-    wire [STATE_W-1:0]  sf_hit_state   = stateArray[sf_set_addr];
+    wire [SET_W-1:0]      sf_set_addr    = rxreq_pocq_first_entry.Addr[`SF_SET_RANGE];
+    wire [TAG_W-1:0]      sf_tag         = rxreq_pocq_first_entry.Addr[`SF_TAG_RANGE];
+    assign                sf_hit         = (tagArray[sf_set_addr] == sf_tag);
+    assign                sf_hit_state   = stateArray[sf_set_addr];
 
     
 endmodule

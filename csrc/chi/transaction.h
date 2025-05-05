@@ -38,7 +38,7 @@ inline void set_bits(uint64_t value, int width, uint64_t &bit_offset, uint32_t *
     bit_offset += width;
 }
 
-inline void bind_req_flit(Vmodule* dut, const reqFlit &req) {
+inline void bind_chi_req_flit(Vmodule* dut, const reqFlit &req) {
     uint32_t bits[7] = {0};
 
     uint64_t bit_offset = 0;
@@ -77,7 +77,7 @@ inline void bind_req_flit(Vmodule* dut, const reqFlit &req) {
     }
 }
 
-inline void chi_read_unique(
+inline void chi_issue_ReadUnique_req(
     Vmodule* dut, VerilatedFstC* tfp, 
     const int &srcID, const uint32_t &Addr, const uint32_t &Size
 ) {
@@ -89,7 +89,30 @@ inline void chi_read_unique(
 
             dut->rxreqflitpend = 0;
             dut->rxreqflitv = 1;
-            bind_req_flit(dut, req);
+            bind_chi_req_flit(dut, req);
+
+            sim_one_cycle(dut, tfp); // @posedge
+            dut->rxreqflitv = 0;
+            break;
+        } else {
+            sim_one_cycle(dut, tfp); // @posedge
+        }
+    }
+}
+
+inline void chi_recv_ReadNoSnp_req(
+    Vmodule* dut, VerilatedFstC* tfp, 
+    const int &srcID, const uint32_t &Addr, const uint32_t &Size
+) {
+    reqFlit req = createReadNoSnp(srcID, Addr, Size);
+    while (true) {
+        if (dut->rxreqlcrdv == 1) {
+            dut->rxreqflitpend = 1;
+            sim_one_cycle(dut, tfp); // @posedge
+
+            dut->rxreqflitpend = 0;
+            dut->rxreqflitv = 1;
+            bind_chi_req_flit(dut, req);
 
             sim_one_cycle(dut, tfp); // @posedge
             dut->rxreqflitv = 0;

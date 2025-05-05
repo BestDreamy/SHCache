@@ -79,7 +79,7 @@ struct Cache {
         uint32_t tag = address / (NumSets * numBlock); // Extract tag from address
 
         if (!is_unique(address)) {
-            chi_read_unique(dut, tfp, coreId, address, BlockSize);
+            chi_issue_ReadUnique_req(dut, tfp, coreId, address, BlockSize);
         }
         
         // // Update the cache line

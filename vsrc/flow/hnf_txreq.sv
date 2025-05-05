@@ -1,12 +1,12 @@
 `include "autoconfig.v"
 `include "chi_flit.vh"
 
-// Receive request flit from the RNF
-module hnf_rxreq(
-    input  reqflit_t rxreqflit, // rxreq channel
-    input  logic     rxreqflitv,
-    input  logic     rxreqflitpend,
-    output logic     rxreqlcrdv,
+// Transmit request flit to the SNF
+module hnf_txreq(
+    output reqflit_t txreqflit, // txreq channel
+    output logic     txreqflitv,
+    output logic     txreqflitpend,
+    input  logic     txreqlcrdv,
 
     output reqflit_t rxreq_pocq_first_entry,
     output logic     rxreq_pocq_first_entry_v,
@@ -70,8 +70,8 @@ module hnf_rxreq(
     wire [47:0] Addr               = rxreqflit.Addr;
     wire [2:0]  Size               = rxreqflit.Size;
     wire [5:0]  Opcode             = rxreqflit.Opcode;
-    // wire [7:0]  StashLPID          = rxreqflit.StashLPID;
-    // wire        StashNIDValid      = rxreqflit.StashNIDValid;
+    wire [7:0]  StashLPID          = rxreqflit.StashLPID;
+    wire        StashNIDValid      = rxreqflit.StashNIDValid;
     wire [6:0]  StashNID_ReturnNID = rxreqflit.StashNID_ReturnNID;
     wire [7:0]  TxnID              = rxreqflit.TxnID;
     wire [6:0]  SrcID              = rxreqflit.SrcID;
@@ -79,7 +79,7 @@ module hnf_rxreq(
     wire [3:0]  QoS                = rxreqflit.QoS;
 
     always_comb begin
-        assert(rxreqflit_recv_en & (TgtID[`CHI_MAX_SRCID_RANGE] == HNId[0][`CHI_MAX_SRCID_RANGE])) else
+        assert(rxreqflit_recv_en & (TgtID[CHI_MAX_SRCID_RANGE] == HNId[0][CHI_MAX_SRCID_RANGE])) else
             $error("HNF RXREQ: Received a request with TgtID != HNF");
     end
 

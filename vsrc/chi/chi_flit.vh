@@ -133,96 +133,106 @@
 
 
 typedef struct packed {
-    logic       [134 :129]          ldid;
-    logic       [128 :125]          SrcType;
-    logic       [124 :121]          RSVDC;
-    logic       [120 :120]          TraceTag;
-    logic       [119 :119]          ExpCompAck;
-    logic       [118 :118]          Excl;
-    logic       [117 :113]          LPID;
-    logic       [112 :112]          SnpAttr;
-    logic       [111 :108]          MemAttr;
-    logic       [107 :104]          PCrdType;
-    logic       [103 :102]          Order;
-    logic       [101 :101]          AllowRetry;
-    logic       [100 :100]          LikelyShared;
-    logic       [99  :99]           NS;
-    logic       [98  :51]           Addr;
-    logic       [50  :48]           Size;
-    logic       [47  :42]           Opcode;
-    logic       [41  :34]           ReturnTxnID;
-    logic       [33  :33]           StashNIDValid;
-    logic       [32  :26]           StashNID_ReturnNID;
-    logic       [25  :18]           TxnID;
-    logic       [17  :11]           SrcID;
-    logic       [10  :4]            TgtID;
-    logic       [3   :0]            QoS;
+    logic [5:0] ldid;
+    logic [3:0] SrcType;
+    logic [3:0] RSVDC;
+    logic TraceTag;
+    logic ExpCompAck;
+    logic Excl;
+    logic [4:0] LPID;
+    logic SnpAttr;
+    logic [3:0] MemAttr;
+    logic [3:0] PCrdType;
+    logic [1:0] Order;
+    logic AllowRetry;
+    logic LikelyShared;
+    logic NS;
+    logic [47:0] Addr;
+    logic [2:0] Size;
+    logic [5:0] Opcode;
+    logic [7:0] ReturnTxnID;
+    logic StashNIDValid;
+    logic [6:0] StashNID_ReturnNID;
+    logic [7:0] TxnID;
+    logic [6:0] SrcID;
+    logic [6:0] TgtID;
+    logic [3:0] QoS;
 } reqflit_t;
 
-
 typedef struct packed {
-    logic          [52 :51]              DevEvent;
-    logic          [50 :50]              TraceTag;
-    logic          [49 :46]              PCrdType;
-    logic          [45 :38]              DBID;
-    logic          [37 :35]              FwdState_DataPull;
-    logic          [34 :32]              Resp;
-    logic          [31 :30]              RespErr;
-    logic          [29 :26]              Opcode;
-    logic          [25 :18]              TxnID;
-    logic          [17 :11]              SrcID;
-    logic          [10 :4]               TgtID;
-    logic          [3  :0]               QoS;                
+    logic [1:0] DevEvent;
+    logic TraceTag;
+    logic [3:0] PCrdType;
+    logic [7:0] DBID;
+    logic [2:0] FwdState_DataPull;
+    logic [2:0] Resp;
+    logic [1:0] RespErr;
+    logic [3:0] Opcode;
+    logic [7:0] TxnID;
+    logic [6:0] SrcID;
+    logic [6:0] TgtID;
+    logic [3:0] QoS;
 } rspflit_t;
 
-
 typedef struct packed {
-    logic       [356 :355]             DevEvent;
-    logic       [354 :353]             ChunkV;
-    logic       [352 :349]             Poison;
-    logic       [348 :93]              Data;
-    logic       [92  :61]              BE;
-    logic       [60  :57]              RSVDC;
-    logic       [56  :56]              TraceTag;
-    logic       [55  :54]              DataID;
-    logic       [53  :52]              CCID;
-    logic       [51  :44]              DBID;
-    logic       [43  :41]              FwdState_DataPull;
-    logic       [40  :38]              Resp;
-    logic       [37  :36]              RespErr;
-    logic       [35  :33]              Opcode;
-    logic       [32  :26]              HomeNID;
-    logic       [25  :18]              TxnID;
-    logic       [17  :11]              SrcID;
-    logic       [10  :4]               TgtID;
-    logic       [3   :0]               QoS;
+    logic [1:0] DevEvent;
+    logic [1:0] ChunkV;
+    logic [3:0] Poison;
+    logic [255:0] Data;
+    logic [31:0] BE;
+    logic [3:0] RSVDC;
+    logic TraceTag;
+    logic [1:0] DataID;
+    logic [1:0] CCID;
+    logic [7:0] DBID;
+    logic [2:0] FwdState_DataPull;
+    logic [2:0] Resp;
+    logic [1:0] RespErr;
+    logic [2:0] Opcode;
+    logic [6:0] HomeNID;
+    logic [7:0] TxnID;
+    logic [6:0] SrcID;
+    logic [6:0] TgtID;
+    logic [3:0] QoS;
 } datflit_t;
 
-
 typedef struct packed {
-    logic       [93 :88]                 LDID;
-    logic       [87 :87]                 TraceTag;
-    logic       [86 :86]                 RetToSrc;
-    logic       [85 :85]                 DoNotDataPull;
-    logic       [84 :84]                 NS;
-    logic       [83 :39]                 Addr;
-    logic       [38 :34]                 Opcode;
-    logic       [33 :26]                 FwdTxnID;
-    logic       [25 :19]                 FwdNID;
-    logic       [18 :11]                 TxnID;
-    logic       [10 :4]                  SrcID;
-    logic       [3  :0]                  QoS;
+    logic [5:0] LDID;
+    logic TraceTag;
+    logic RetToSrc;
+    logic DoNotDataPull;
+    logic NS;
+    logic [44:0] Addr;
+    logic [4:0] Opcode;
+    logic [7:0] FwdTxnID;
+    logic [6:0] FwdNID;
+    logic [7:0] TxnID;
+    logic [6:0] SrcID;
+    logic [3:0] QoS;
 } snpflit_t;
 
 
-// CHI protocol just allow 1024 transactions in flight
-`define CHI_MAX_TXNID_W                  10   
+// CHI protocol just allow 1024 transactions in flight when txnid is 10 bits
+// In order to ensure the transaction ID is unique, {SrcID[3: 0], TxnID[3 :0]} is the real transaction ID
+`define CHI_MAX_TXNID_W                  4   
 `define CHI_MAX_TXNID                    1 << `CHI_MAX_TXNID_W
 `define CHI_MAX_TXNID_RANGE              `CHI_MAX_TXNID_W-1 :0
 
+`define CHI_MAX_SRCID_W                  4
+`define CHI_MAX_SRCID                    1 << `CHI_MAX_SRCID_W
+`define CHI_MAX_SRCID_RANGE              `CHI_MAX_SRCID_W-1 :0
+
 // Tgt fields in  reqflit_t
-`define CHI_TGT_W                        7
-`define CHI_TGT_RANGE                    `CHI_TGT_W-1 :0
+`define CHI_TGTID_W                        7
+`define CHI_TGTID_RANGE                    `CHI_TGTID_W-1 :0
+
+// Src fields in  reqflit_t
+`define CHI_SRCID_W                        `CHI_TGTID_W
+`define CHI_SRCID_RANGE                    `CHI_TGTID_W-1 :0
+
+// TxnID fields in  reqflit_t
+`define CHI_TXNID_W                      8
+`define CHI_TXNID_RANGE                  `CHI_TXNID_W-1 :0
 
 function reqflit_t CreateReadNoSnpReqFlit (
     logic       [47:0]   Addr,
@@ -230,8 +240,8 @@ function reqflit_t CreateReadNoSnpReqFlit (
     logic       [7:0]    ReturnTxnID,
     logic       [6:0]    StashNID_ReturnNID,
     logic       [7:0]    TxnID,
-    logic       [6:0]    SrcID,
-    logic       [6:0]    TgtID
+    logic       [6:0]    SrcID
+    // logic       [6:0]    TgtID
 );
     reqflit_t reqFlit;
 
@@ -243,7 +253,7 @@ function reqflit_t CreateReadNoSnpReqFlit (
     reqFlit.StashNID_ReturnNID = StashNID_ReturnNID;
     reqFlit.TxnID              = TxnID;
     reqFlit.SrcID              = SrcID;
-    reqFlit.TgtID              = TgtID;
+    // reqFlit.TgtID              = TgtID;
 
     return reqFlit;
 endfunction

@@ -82,4 +82,19 @@ inline reqFlit createReadUnique(
     return flit;
 }
 
+inline reqFlit createReadNoSnp(
+    const int &SrcID, const uint32_t &Addr, const uint32_t &Size
+) {
+    reqFlit flit;
+    flit.TgtID = config.HNId[0];
+    flit.SrcID = SrcID;
+    flit.TxnID = 0;
+    flit.Opcode = OP_ReadNoSnp;
+    flit.Addr = Addr;
+    flit.Size = Size;
+    flit.ExpCompAck = 1;
+
+    return flit;
+}
+
 #endif

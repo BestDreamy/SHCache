@@ -1,9 +1,9 @@
 module slc(
-    input reqflit_t rxreq_pocq_first_entry,
-    input logic     rxreq_pocq_entry_v,
+    input reqflit_t                     rxreq_pocq_first_entry,
+    input logic                         rxreq_pocq_first_entry_v,
 
-    input           sf_hit,
-    input           sf_hit_state
+    input                               sf_hit,
+    output [`CHI_CACHE_STATE_RANGE]     sf_hit_state
 );
 
   //           |<------16 bytes---->| 
@@ -19,7 +19,7 @@ module slc(
   //   |     | |                    | |
   //   ⌊_____⌋ ⌊____________________⌋ --
 
-    localparam int ADDR_W = 48, BYTE_W = 8, STATE_W = 3, SET_W = 7, OFFSET_W = 4;
+    localparam int ADDR_W = 48, BYTE_W = 8, STATE_W = `CHI_CACHE_STATE_W, SET_W = 7, OFFSET_W = 4;
     localparam int OFFSET_NUM = 1 << OFFSET_W, SET_NUM = 1 << SET_W;
     localparam int TAG_W = ADDR_W - $clog2(OFFSET_NUM) - $clog2(SET_NUM);
     reg [TAG_W-1: 0]                    tagArray [SET_NUM];
@@ -47,6 +47,11 @@ module slc(
     `define SLC_SC 3'b000
     `define SLC_SD 3'b010
     `define SLC_I  3'b001
+    `define SF_UC  `SLC_UC
+    `define SF_UD  `SLC_UC
+    `define SF_SC  `SLC_SC
+    `define SF_SD  `SLC_SD
+    `define SF_I   `SLC_I
 
     wire                slc_hit            = (tagArray[slc_set_addr] == slc_tag) & (slc_hit_state != `SLC_I);
 
@@ -67,14 +72,19 @@ module slc(
 
     // chi proto
     // slc miss and sf miss
+    wire [`CHI_SRCID_RANGE] ReturnNID     = rxreq_pocq_first_entry.SrcID;
+    wire [`CHI_TXNID_RANGE] ReturnTxnID   = rxreq_pocq_first_entry.TxnID;
+    wire [`CHI_SRCID_RANGE] SrcID         = rxreq_pocq_first_entry.TgtID;
+    wire [`CHI_TXNID_RANGE] TxnID         = {SrcID[`CHI_MAX_SRCID_RANGE], 
+                                             rxreq_pocq_first_entry.TxnID[`CHI_MAX_TXNID_RANGE]};
+
     reqflit_t read_no_snp = CreateReadNoSnpReqFlit(
         .Addr(rxreq_pocq_first_entry.Addr),
         .Size(rxreq_pocq_first_entry.Size),
-        .Opcode(rxreq_pocq_first_entry.Opcode),
-        .ReturnTxnID(rxreq_pocq_first_entry.ReturnTxnID),
-        .StashNID_ReturnNID(rxreq_pocq_first_entry.StashNID_ReturnNID),
-        .TxnID(rxreq_pocq_first_entry.TxnID),
-        .SrcID(rxreq_pocq_first_entry.SrcID),
-        .TgtID(rxreq_pocq_first_entry.TgtID),
+        .ReturnTxnID(ReturnTxnID),
+        .StashNID_ReturnNID(ReturnNID),
+        .TxnID(TxnID),
+        .SrcID(SrcID)
+        // .TgtID(rxreq_pocq_first_entry.TgtID),
     );
 endmodule
