@@ -13,8 +13,10 @@ struct Config {
     std::vector<uint32_t> numCreditsForSNReq = {4};
 
     std::vector<uint32_t> RNId = {0x0, 0x1, 0x2, 0x3};
-    std::vector<uint32_t> HNId = {0x28};
-    std::vector<uint32_t> SNId = {0x24};
+    std::vector<uint32_t> HNId = {0x4};
+    std::vector<uint32_t> SNId = {0x7};
+
+    std::vector<uint32_t> RNsOffset = {4};
 };
 
 extern Config config;

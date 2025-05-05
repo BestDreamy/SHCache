@@ -8,8 +8,9 @@ module hnf_rxreq(
     output logic     rxreqlcrdv,
 
     output reqflit_t rxreq_pocq_first_entry,
-    input  clock,
-    input  reset
+    output logic     rxreq_pocq_first_entry_v,
+    input            clock,
+    input            reset
 );
 
     reg rxreqflitv_q;
@@ -23,13 +24,12 @@ module hnf_rxreq(
             rxreqflitv_q <= 1'b0;
     end
 
+    wire rxreqflit_recv_en = rxreqflitv & rxreqflitv_q;
+
     parameter int rxreq_pocq_size = numCreditsForHNReq[0];
 
     wire rxreq_pocq_is_full;
     wire rxreq_pocq_is_empty;
-    // wire [$bits(reqFlit_t)-1:0] flat_wire;
-
-    // assign rxreq_pocq_first_entry = flat_wire;
     
     sfifo #(
         .WIDTH($bits(reqflit_t)),
@@ -37,7 +37,7 @@ module hnf_rxreq(
     ) rxreq_pocq (
         .clk(clock),
         .rst_n(~reset),
-        .winc(rxreqflitv & rxreqflitv_q),
+        .winc(rxreqflit_recv_en),
         .rinc(/* 读取使能信号 */),
         .wdata(rxreqflit),
         // output
@@ -45,6 +45,8 @@ module hnf_rxreq(
         .rempty(rxreq_pocq_is_empty),
         .rdata(rxreq_pocq_first_entry)
     );
+
+    assign rxreq_pocq_first_entry_v = rxreq_pocq_is_empty ? 1'b0 : 1'b1;
 
     assign rxreqlcrdv = rxreq_pocq_is_full ? 1'b0 : 1'b1;
 
@@ -74,5 +76,10 @@ module hnf_rxreq(
     wire [6:0]  SrcID              = rxreqflit.SrcID;
     wire [6:0]  TgtID              = rxreqflit.TgtID;
     wire [3:0]  QoS                = rxreqflit.QoS;
+
+    always_comb begin
+        assert(rxreqflit_recv_en & (TgtID == HNId[0][`CHI_TGT_RANGE])) else
+            $error("HNF RXREQ: Received a request with TgtID != HNF");
+    end
 
 endmodule

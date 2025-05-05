@@ -150,7 +150,7 @@ typedef struct packed {
     logic       [98  :51]           Addr;
     logic       [50  :48]           Size;
     logic       [47  :42]           Opcode;
-    logic       [41  :34]           StashLPID;
+    logic       [41  :34]           ReturnTxnID;
     logic       [33  :33]           StashNIDValid;
     logic       [32  :26]           StashNID_ReturnNID;
     logic       [25  :18]           TxnID;
@@ -213,5 +213,39 @@ typedef struct packed {
     logic       [10 :4]                  SrcID;
     logic       [3  :0]                  QoS;
 } snpflit_t;
+
+
+// CHI protocol just allow 1024 transactions in flight
+`define CHI_MAX_TXNID_W                  10   
+`define CHI_MAX_TXNID                    1 << `CHI_MAX_TXNID_W
+`define CHI_MAX_TXNID_RANGE              `CHI_MAX_TXNID_W-1 :0
+
+// Tgt fields in  reqflit_t
+`define CHI_TGT_W                        7
+`define CHI_TGT_RANGE                    `CHI_TGT_W-1 :0
+
+function reqflit_t CreateReadNoSnpReqFlit (
+    logic       [47:0]   Addr,
+    logic       [2:0]    Size,
+    logic       [7:0]    ReturnTxnID,
+    logic       [6:0]    StashNID_ReturnNID,
+    logic       [7:0]    TxnID,
+    logic       [6:0]    SrcID,
+    logic       [6:0]    TgtID
+);
+    reqflit_t reqFlit;
+
+    reqFlit.ExpCompAck         = 1'b0;
+    reqFlit.Addr               = Addr;
+    reqFlit.Size               = Size;
+    reqFlit.Opcode             = `OP_ReadNoSnp;
+    reqFlit.ReturnTxnID        = ReturnTxnID;
+    reqFlit.StashNID_ReturnNID = StashNID_ReturnNID;
+    reqFlit.TxnID              = TxnID;
+    reqFlit.SrcID              = SrcID;
+    reqFlit.TgtID              = TgtID;
+
+    return reqFlit;
+endfunction
 
 `endif

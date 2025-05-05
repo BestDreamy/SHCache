@@ -55,7 +55,7 @@ inline void bind_req_flit(Vmodule* dut, const reqFlit &req) {
     set_req_bits(0, 1);                     // StashNIDValid
     set_req_bits(0, 8);                     // StashLPID
     set_req_bits(req.Opcode, 6);            // Opcode
-    set_req_bits(req.Size, 3);              // Size
+    set_req_bits(req.Size, 3);              // Size (8 bytes)
     set_req_bits(req.Addr, 48);             // Addr
     set_req_bits(0, 1);                     // NS
     set_req_bits(0, 1);                     // LikelyShared

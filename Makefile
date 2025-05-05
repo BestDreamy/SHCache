@@ -3,7 +3,8 @@ TOP_NAME = shhl
 VERILATOR_INC_PATH  = $(addprefix -I, $(abspath ./vsrc/chi) \
 									  $(abspath ./vsrc/include) \
 									  $(abspath ./vsrc/flow) \
-									  $(abspath ./vsrc/cbb) )
+									  $(abspath ./vsrc/cbb) \
+									  $(abspath ./vsrc/hnf) )
 VERILATOR_FLAGS = -cc --exe --build --trace-fst --top-module $(TOP_NAME) $(VERILATOR_INC_PATH)
 
 CSRCS = $(shell find $(abspath .) -name "*.c" -or -name "*.cc" -or -name "*.cpp")
@@ -42,4 +43,7 @@ git:
 	git commit -m "$(commit)"
 	git push
 
-.PHONY: default all clean run
+config:
+	python config.py
+
+.PHONY: default all clean run config git
