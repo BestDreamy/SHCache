@@ -3,7 +3,10 @@ module sf(
     input logic                         rxreq_pocq_first_entry_v,
 
     output                              sf_hit,
-    output [`CHI_CACHE_STATE_RANGE]     sf_hit_state
+    output [`CHI_CACHE_STATE_RANGE]     sf_hit_state,
+
+    input                               clock,
+    input                               reset
 );
 
   //           |<------16 bytes---->| 

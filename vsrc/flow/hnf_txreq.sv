@@ -8,24 +8,24 @@ module hnf_txreq(
     output logic     txreqflitpend,
     input  logic     txreqlcrdv,
 
-    output reqflit_t rxreq_pocq_first_entry,
-    output logic     rxreq_pocq_first_entry_v,
+    input  reqflit_t rxreq_pocq_first_entry,
+    input  logic     rxreq_pocq_first_entry_v,
     input            clock,
     input            reset
 );
 
-    reg rxreqflitv_q;
+    reg txreqflitv_q;
     
-    always @(posedge clock) begin: rxreqflitv_ff
+    always @(posedge clock) begin: txreqflitv_ff
         if(reset == 1'b1)
-            rxreqflitv_q <= 1'b0;
-        else if (rxreqflitpend == 1'b1)
-            rxreqflitv_q <= 1'b1;
+            txreqflitv_q <= 1'b0;
+        else if (txreqflitpend == 1'b1)
+            txreqflitv_q <= 1'b1;
         else
-            rxreqflitv_q <= 1'b0;
+            txreqflitv_q <= 1'b0;
     end
 
-    wire rxreqflit_recv_en = rxreqflitv & rxreqflitv_q;
+    wire txreqflit_recv_en = txreqflitv & txreqflitv_q;
 
     parameter int rxreq_pocq_size = numCreditsForHNReq[0];
 
@@ -38,9 +38,9 @@ module hnf_txreq(
     ) rxreq_pocq (
         .clk(clock),
         .rst_n(~reset),
-        .winc(rxreqflit_recv_en),
+        .winc(txreqflit_recv_en),
         .rinc(/* 读取使能信号 */),
-        .wdata(rxreqflit),
+        .wdata(txreqflit),
         // output
         .wfull(rxreq_pocq_is_full),
         .rempty(rxreq_pocq_is_empty),
@@ -53,33 +53,33 @@ module hnf_txreq(
 
     /*************************************************************/
 
-    wire [5:0]  ldid               = rxreqflit.ldid;
-    wire [3:0]  SrcType            = rxreqflit.SrcType;
-    wire [3:0]  RSVDC              = rxreqflit.RSVDC;
-    wire        TraceTag           = rxreqflit.TraceTag;
-    wire        ExpCompAck         = rxreqflit.ExpCompAck;
-    wire        Excl               = rxreqflit.Excl;
-    wire [4:0]  LPID               = rxreqflit.LPID;
-    wire        SnpAttr            = rxreqflit.SnpAttr;
-    wire [3:0]  MemAttr            = rxreqflit.MemAttr;
-    wire [3:0]  PCrdType           = rxreqflit.PCrdType;
-    wire [1:0]  Order              = rxreqflit.Order;
-    wire        AllowRetry         = rxreqflit.AllowRetry;
-    wire        LikelyShared       = rxreqflit.LikelyShared;
-    wire        NS                 = rxreqflit.NS;
-    wire [47:0] Addr               = rxreqflit.Addr;
-    wire [2:0]  Size               = rxreqflit.Size;
-    wire [5:0]  Opcode             = rxreqflit.Opcode;
-    wire [7:0]  StashLPID          = rxreqflit.StashLPID;
-    wire        StashNIDValid      = rxreqflit.StashNIDValid;
-    wire [6:0]  StashNID_ReturnNID = rxreqflit.StashNID_ReturnNID;
-    wire [7:0]  TxnID              = rxreqflit.TxnID;
-    wire [6:0]  SrcID              = rxreqflit.SrcID;
-    wire [6:0]  TgtID              = rxreqflit.TgtID;
-    wire [3:0]  QoS                = rxreqflit.QoS;
+    wire [5:0]  ldid               = txreqflit.ldid;
+    wire [3:0]  SrcType            = txreqflit.SrcType;
+    wire [3:0]  RSVDC              = txreqflit.RSVDC;
+    wire        TraceTag           = txreqflit.TraceTag;
+    wire        ExpCompAck         = txreqflit.ExpCompAck;
+    wire        Excl               = txreqflit.Excl;
+    wire [4:0]  LPID               = txreqflit.LPID;
+    wire        SnpAttr            = txreqflit.SnpAttr;
+    wire [3:0]  MemAttr            = txreqflit.MemAttr;
+    wire [3:0]  PCrdType           = txreqflit.PCrdType;
+    wire [1:0]  Order              = txreqflit.Order;
+    wire        AllowRetry         = txreqflit.AllowRetry;
+    wire        LikelyShared       = txreqflit.LikelyShared;
+    wire        NS                 = txreqflit.NS;
+    wire [47:0] Addr               = txreqflit.Addr;
+    wire [2:0]  Size               = txreqflit.Size;
+    wire [5:0]  Opcode             = txreqflit.Opcode;
+    wire [7:0]  StashLPID          = txreqflit.StashLPID;
+    wire        StashNIDValid      = txreqflit.StashNIDValid;
+    wire [6:0]  StashNID_ReturnNID = txreqflit.StashNID_ReturnNID;
+    wire [7:0]  TxnID              = txreqflit.TxnID;
+    wire [6:0]  SrcID              = txreqflit.SrcID;
+    wire [6:0]  TgtID              = txreqflit.TgtID;
+    wire [3:0]  QoS                = txreqflit.QoS;
 
     always_comb begin
-        assert(rxreqflit_recv_en & (TgtID[CHI_MAX_SRCID_RANGE] == HNId[0][CHI_MAX_SRCID_RANGE])) else
+        assert(txreqflit_recv_en & (TgtID[CHI_MAX_SRCID_RANGE] == HNId[0][CHI_MAX_SRCID_RANGE])) else
             $error("HNF RXREQ: Received a request with TgtID != HNF");
     end
 

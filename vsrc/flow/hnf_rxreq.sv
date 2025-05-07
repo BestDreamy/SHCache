@@ -10,6 +10,7 @@ module hnf_rxreq(
 
     output reqflit_t rxreq_pocq_first_entry,
     output logic     rxreq_pocq_first_entry_v,
+    input  logic     rxreq_pocq_first_entry_dis,
     input            clock,
     input            reset
 );
@@ -39,7 +40,7 @@ module hnf_rxreq(
         .clk(clock),
         .rst_n(~reset),
         .winc(rxreqflit_recv_en),
-        .rinc(/* 读取使能信号 */),
+        .rinc(rxreq_pocq_first_entry_dis),
         .wdata(rxreqflit),
         // output
         .wfull(rxreq_pocq_is_full),

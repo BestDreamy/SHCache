@@ -1,9 +1,16 @@
 module slc(
     input reqflit_t                     rxreq_pocq_first_entry,
     input logic                         rxreq_pocq_first_entry_v,
+    output                              rxreq_pocq_first_entry_dis,
 
     input                               sf_hit,
-    output [`CHI_CACHE_STATE_RANGE]     sf_hit_state
+    output [`CHI_CACHE_STATE_RANGE]     sf_hit_state,
+
+    output reqflit_t                    read_no_snp,
+    output                              read_no_snp_v
+
+    input                               clock,
+    input                               reset
 );
 
   //           |<------16 bytes---->| 
@@ -87,4 +94,8 @@ module slc(
         .SrcID(SrcID)
         // .TgtID(rxreq_pocq_first_entry.TgtID),
     );
+
+    wire read_no_snp_v = slc_miss_sf_miss & rxreq_pocq_first_entry_v;
+
+    assign rxreq_pocq_first_entry_dis = read_no_snp_v;
 endmodule
