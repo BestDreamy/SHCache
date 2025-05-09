@@ -15,7 +15,7 @@ module hnf_rxreq(
     input            reset
 );
 
-    reg rxreqflitv_q;
+    reg rxreqflitv_q; // ensure L-credit for chi
     
     always @(posedge clock) begin: rxreqflitv_ff
         if(reset == 1'b1)

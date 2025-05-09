@@ -8,29 +8,31 @@ module hnf_txreq(
     output logic     txreqflitpend,
     input  logic     txreqlcrdv,
 
-    input  reqflit_t rxreq_pocq_first_entry,
-    input  logic     rxreq_pocq_first_entry_v,
+    input  reqflit_t read_no_snp,
+    input  logic     read_no_snp_v,
     input            clock,
     input            reset
 );
+    parameter int txreq_pocq_size = numCreditsForSNReq[0];
 
-    reg txreqflitv_q;
-    
+    wire txreq_pocq_is_full;
+    wire txreq_pocq_is_empty;
+
+    reg txreqflitv_q; // ensure L-credit for chi
+
+    assign txreqflitpend = 'b1;
+
     always @(posedge clock) begin: txreqflitv_ff
         if(reset == 1'b1)
             txreqflitv_q <= 1'b0;
-        else if (txreqflitpend == 1'b1)
+        else if (~txreq_pocq_is_empty & txreqflitpend)
             txreqflitv_q <= 1'b1;
         else
             txreqflitv_q <= 1'b0;
     end
 
-    wire txreqflit_recv_en = txreqflitv & txreqflitv_q;
+    assign txreqflitv = txreqflitv_q;
 
-    parameter int rxreq_pocq_size = numCreditsForHNReq[0];
-
-    wire rxreq_pocq_is_full;
-    wire rxreq_pocq_is_empty;
     
     sfifo #(
         .WIDTH($bits(reqflit_t)),
@@ -42,14 +44,10 @@ module hnf_txreq(
         .rinc(/* 读取使能信号 */),
         .wdata(txreqflit),
         // output
-        .wfull(rxreq_pocq_is_full),
-        .rempty(rxreq_pocq_is_empty),
+        .wfull(txreq_pocq_is_full),
+        .rempty(txreq_pocq_is_empty),
         .rdata(rxreq_pocq_first_entry)
     );
-
-    assign rxreq_pocq_first_entry_v = rxreq_pocq_is_empty ? 1'b0 : 1'b1;
-
-    assign rxreqlcrdv = rxreq_pocq_is_full ? 1'b0 : 1'b1;
 
     /*************************************************************/
 
@@ -78,9 +76,9 @@ module hnf_txreq(
     wire [6:0]  TgtID              = txreqflit.TgtID;
     wire [3:0]  QoS                = txreqflit.QoS;
 
-    always_comb begin
-        assert(txreqflit_recv_en & (TgtID[CHI_MAX_SRCID_RANGE] == HNId[0][CHI_MAX_SRCID_RANGE])) else
-            $error("HNF RXREQ: Received a request with TgtID != HNF");
-    end
+    // always_comb begin
+    //     assert(txreqflit_recv_en & (TgtID[CHI_MAX_SRCID_RANGE] == HNId[0][CHI_MAX_SRCID_RANGE])) else
+    //         $error("HNF RXREQ: Received a request with TgtID != HNF");
+    // end
 
 endmodule
