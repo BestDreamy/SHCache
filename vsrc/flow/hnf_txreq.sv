@@ -8,24 +8,16 @@ module hnf_txreq(
     output logic     txreqflitpend,
     input  logic     txreqlcrdv,
 
-    input  reqflit_t read_no_snp,
-    input  logic     read_no_snp_v,
     input            clock,
     input            reset
 );
-    parameter int txreq_pocq_size = numCreditsForSNReq[0];
-
-    wire txreq_pocq_is_full;
-    wire txreq_pocq_is_empty;
 
     reg txreqflitv_q; // ensure L-credit for chi
-
-    assign txreqflitpend = 'b1;
 
     always @(posedge clock) begin: txreqflitv_ff
         if(reset == 1'b1)
             txreqflitv_q <= 1'b0;
-        else if (~txreq_pocq_is_empty & txreqflitpend)
+        else if (txreqlcrdv & txreqflitpend)
             txreqflitv_q <= 1'b1;
         else
             txreqflitv_q <= 1'b0;
@@ -33,21 +25,7 @@ module hnf_txreq(
 
     assign txreqflitv = txreqflitv_q;
 
-    
-    sfifo #(
-        .WIDTH($bits(reqflit_t)),
-        .DEPTH(rxreq_pocq_size)
-    ) rxreq_pocq (
-        .clk(clock),
-        .rst_n(~reset),
-        .winc(txreqflit_recv_en),
-        .rinc(/* 读取使能信号 */),
-        .wdata(txreqflit),
-        // output
-        .wfull(txreq_pocq_is_full),
-        .rempty(txreq_pocq_is_empty),
-        .rdata(rxreq_pocq_first_entry)
-    );
+
 
     /*************************************************************/
 

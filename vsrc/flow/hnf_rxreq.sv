@@ -8,9 +8,9 @@ module hnf_rxreq(
     input  logic     rxreqflitpend,
     output logic     rxreqlcrdv,
 
-    output reqflit_t rxreq_pocq_first_entry,
-    output logic     rxreq_pocq_first_entry_v,
-    input  logic     rxreq_pocq_first_entry_dis,
+    output reqflit_t rxreq_posq_first_entry,
+    output logic     rxreq_posq_first_entry_v,
+    input  logic     rxreq_posq_first_entry_dis,
     input            clock,
     input            reset
 );
@@ -28,29 +28,29 @@ module hnf_rxreq(
 
     wire rxreqflit_recv_en = rxreqflitv & rxreqflitv_q;
 
-    parameter int rxreq_pocq_size = numCreditsForHNReq[0];
+    parameter int rxreq_posq_size = numCreditsForHNReq[0];
 
-    wire rxreq_pocq_is_full;
-    wire rxreq_pocq_is_empty;
+    wire rxreq_posq_is_full;
+    wire rxreq_posq_is_empty;
     
     sfifo #(
         .WIDTH($bits(reqflit_t)),
-        .DEPTH(rxreq_pocq_size)
-    ) rxreq_pocq (
+        .DEPTH(rxreq_posq_size)
+    ) rxreq_posq (
         .clk(clock),
         .rst_n(~reset),
         .winc(rxreqflit_recv_en),
-        .rinc(rxreq_pocq_first_entry_dis),
+        .rinc(rxreq_posq_first_entry_dis),
         .wdata(rxreqflit),
         // output
-        .wfull(rxreq_pocq_is_full),
-        .rempty(rxreq_pocq_is_empty),
-        .rdata(rxreq_pocq_first_entry)
+        .wfull(rxreq_posq_is_full),
+        .rempty(rxreq_posq_is_empty),
+        .rdata(rxreq_posq_first_entry)
     );
 
-    assign rxreq_pocq_first_entry_v = rxreq_pocq_is_empty ? 1'b0 : 1'b1;
+    assign rxreq_posq_first_entry_v = rxreq_posq_is_empty ? 1'b0 : 1'b1;
 
-    assign rxreqlcrdv = rxreq_pocq_is_full ? 1'b0 : 1'b1;
+    assign rxreqlcrdv = rxreq_posq_is_full ? 1'b0 : 1'b1;
 
     /*************************************************************/
 

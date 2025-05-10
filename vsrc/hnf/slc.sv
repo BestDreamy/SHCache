@@ -1,7 +1,6 @@
 module slc(
-    input reqflit_t                     rxreq_pocq_first_entry,
-    input logic                         rxreq_pocq_first_entry_v,
-    output                              rxreq_pocq_first_entry_dis,
+    input reqflit_t                     slc_sf_req,
+    input logic                         slc_sf_req_v,
 
     input                               sf_hit,
     output [`CHI_CACHE_STATE_RANGE]     sf_hit_state,
@@ -42,10 +41,10 @@ module slc(
 
     `define SLC_TAG_RANGE (ADDR_W-1) : (ADDR_W - TAG_W)
     `define SLC_SET_RANGE (ADDR_W - TAG_W - 1) : (ADDR_W - TAG_W - SET_W)
-    wire is_read_unique = (rxreq_pocq_first_entry.Opcode == `OP_ReadUnique);
+    wire is_read_unique = (slc_sf_req.Opcode == `OP_ReadUnique);
     // Get the tag and set address from the incoming reqflit
-    wire [SET_W-1:0]    slc_set_addr    = rxreq_pocq_first_entry.Addr[`SLC_SET_RANGE];
-    wire [TAG_W-1:0]    slc_tag         = rxreq_pocq_first_entry.Addr[`SLC_TAG_RANGE];
+    wire [SET_W-1:0]    slc_set_addr    = slc_sf_req.Addr[`SLC_SET_RANGE];
+    wire [TAG_W-1:0]    slc_tag         = slc_sf_req.Addr[`SLC_TAG_RANGE];
     wire [STATE_W-1:0]  slc_hit_state   = stateArray[slc_set_addr];
 
 
@@ -79,23 +78,22 @@ module slc(
 
     // chi proto
     // slc miss and sf miss
-    wire [`CHI_SRCID_RANGE] ReturnNID     = rxreq_pocq_first_entry.SrcID;
-    wire [`CHI_TXNID_RANGE] ReturnTxnID   = rxreq_pocq_first_entry.TxnID;
-    wire [`CHI_SRCID_RANGE] SrcID         = rxreq_pocq_first_entry.TgtID;
+    wire [`CHI_SRCID_RANGE] ReturnNID     = slc_sf_req.SrcID;
+    wire [`CHI_TXNID_RANGE] ReturnTxnID   = slc_sf_req.TxnID;
+    wire [`CHI_SRCID_RANGE] SrcID         = slc_sf_req.TgtID;
     wire [`CHI_TXNID_RANGE] TxnID         = {SrcID[`CHI_MAX_SRCID_RANGE], 
-                                             rxreq_pocq_first_entry.TxnID[`CHI_MAX_TXNID_RANGE]};
+                                             slc_sf_req.TxnID[`CHI_MAX_TXNID_RANGE]};
 
     reqflit_t read_no_snp = CreateReadNoSnpReqFlit(
-        .Addr(rxreq_pocq_first_entry.Addr),
-        .Size(rxreq_pocq_first_entry.Size),
+        .Addr(slc_sf_req.Addr),
+        .Size(slc_sf_req.Size),
         .ReturnTxnID(ReturnTxnID),
         .StashNID_ReturnNID(ReturnNID),
         .TxnID(TxnID),
         .SrcID(SrcID)
-        // .TgtID(rxreq_pocq_first_entry.TgtID),
+        // .TgtID(slc_sf_req.TgtID),
     );
 
-    wire read_no_snp_v = slc_miss_sf_miss & rxreq_pocq_first_entry_v;
+    wire read_no_snp_v = slc_miss_sf_miss & slc_sf_req_v;
 
-    assign rxreq_pocq_first_entry_dis = read_no_snp_v;
 endmodule

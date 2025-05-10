@@ -1,6 +1,6 @@
 module sf(
-    input reqflit_t                     rxreq_pocq_first_entry,
-    input logic                         rxreq_pocq_first_entry_v,
+    input reqflit_t                     slc_sf_req,
+    input logic                         slc_sf_req_v,
 
     output                              sf_hit,
     output [`CHI_CACHE_STATE_RANGE]     sf_hit_state,
@@ -32,13 +32,13 @@ module sf(
     reg [RNF_W-1: 0]                    rnfVec[SET_NUM][numRNs];
 
 
-    wire is_read_unique = (rxreq_pocq_first_entry.Opcode == `OP_ReadUnique);
+    wire is_read_unique = (slc_sf_req.Opcode == `OP_ReadUnique);
 
     `define SF_TAG_RANGE (ADDR_W-1) : (ADDR_W - TAG_W)
     `define SF_SET_RANGE (ADDR_W - TAG_W - 1) : (ADDR_W - TAG_W - SET_W)
     // Get the tag and set address from the incoming reqflit
-    wire [SET_W-1:0]      sf_set_addr    = rxreq_pocq_first_entry.Addr[`SF_SET_RANGE];
-    wire [TAG_W-1:0]      sf_tag         = rxreq_pocq_first_entry.Addr[`SF_TAG_RANGE];
+    wire [SET_W-1:0]      sf_set_addr    = slc_sf_req.Addr[`SF_SET_RANGE];
+    wire [TAG_W-1:0]      sf_tag         = slc_sf_req.Addr[`SF_TAG_RANGE];
     assign                sf_hit         = (tagArray[sf_set_addr] == sf_tag);
     assign                sf_hit_state   = stateArray[sf_set_addr];
 
