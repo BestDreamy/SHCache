@@ -45,6 +45,6 @@ git:
 	git push
 
 config:
-	python config.py
+	python config/psrc/config_sys.py
 
 .PHONY: default all clean run config git

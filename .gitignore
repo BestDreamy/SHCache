@@ -10,7 +10,5 @@
 !main.cc
 !benchmark/
 !benchmark/**
-!config.py
-!genFiles.py
-!spec/
-!spec/**
+!config/
+!config/**
