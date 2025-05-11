@@ -44,11 +44,13 @@ in_valid   valid_q   out_ready  |  out_valid(flush)  next_valid_q(flush)  in_rea
     end
 
     reg[WIDTH-1:0] data_q;
+    assign pout_data = data_q;
+    
     always @(posedge clock) begin
         if (reset)
-            pout_data <= 'b0;
+            data_q <= 'b0;
         else if (valid_en)
-            pout_data <= pin_data;
+            data_q <= pin_data;
     end
 
     assign pout_valid = valid_q & ~flush;

@@ -1,6 +1,6 @@
 module sf(
     input reqflit_t                     slc_sf_req,
-    input logic                         slc_sf_req_v,
+    input logic                         slc_sf_req_valid,
 
     output                              sf_hit,
     output [`CHI_CACHE_STATE_RANGE]     sf_hit_state,

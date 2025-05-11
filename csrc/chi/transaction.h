@@ -73,7 +73,7 @@ inline void bind_chi_req_flit(Vmodule* dut, const reqFlit &req) {
     set_req_bits(0, 6);                     // ldid
 
     for (int i = 0; i < 7; ++i) {
-        dut->rxreqflit[i] = bits[i];
+        dut->RXREQFLIT[i] = bits[i];
     }
 }
 
@@ -83,16 +83,16 @@ inline void chi_issue_ReadUnique_req(
 ) {
     reqFlit req = createReadUnique(srcID, Addr, Size);
     while (true) {
-        if (dut->rxreqlcrdv == 1) {
-            dut->rxreqflitpend = 1;
+        if (dut->RXREQLCRDV == 1) {
+            dut->RXREQFLITPEND = 1;
             sim_one_cycle(dut, tfp); // @posedge
 
-            dut->rxreqflitpend = 0;
-            dut->rxreqflitv = 1;
+            dut->RXREQFLITPEND = 0;
+            dut->RXREQFLITV = 1;
             bind_chi_req_flit(dut, req);
 
             sim_one_cycle(dut, tfp); // @posedge
-            dut->rxreqflitv = 0;
+            dut->RXREQFLITV = 0;
             break;
         } else {
             sim_one_cycle(dut, tfp); // @posedge
@@ -100,27 +100,50 @@ inline void chi_issue_ReadUnique_req(
     }
 }
 
-inline void chi_recv_ReadNoSnp_req(
-    Vmodule* dut, VerilatedFstC* tfp, 
-    const int &srcID, const uint32_t &Addr, const uint32_t &Size
-) {
-    reqFlit req = createReadNoSnp(srcID, Addr, Size);
-    while (true) {
-        if (dut->rxreqlcrdv == 1) {
-            dut->rxreqflitpend = 1;
-            sim_one_cycle(dut, tfp); // @posedge
+// inline void chi_recv_ReadNoSnp_req(
+//     Vmodule* dut, VerilatedFstC* tfp, 
+//     const int &srcID, const uint32_t &Addr, const uint32_t &Size
+// ) {
+//     reqFlit req = createReadNoSnp(srcID, Addr, Size);
+//     while (true) {
+//         if (dut->rxreqlcrdv == 1) {
+//             dut->rxreqflitpend = 1;
+//             sim_one_cycle(dut, tfp); // @posedge
 
-            dut->rxreqflitpend = 0;
-            dut->rxreqflitv = 1;
-            bind_chi_req_flit(dut, req);
+//             dut->rxreqflitpend = 0;
+//             dut->rxreqflitv = 1;
+//             bind_chi_req_flit(dut, req);
 
-            sim_one_cycle(dut, tfp); // @posedge
-            dut->rxreqflitv = 0;
-            break;
-        } else {
-            sim_one_cycle(dut, tfp); // @posedge
-        }
-    }
+//             sim_one_cycle(dut, tfp); // @posedge
+//             dut->rxreqflitv = 0;
+//             break;
+//         } else {
+//             sim_one_cycle(dut, tfp); // @posedge
+//         }
+//     }
+// }
+
+extern "C" dataflit_t_dpi chi_recv_ReadNoSnp_req(reqflit_t_dpi req) {
+    dataflit_t_dpi result = {0};
+
+    uint32_t mem_data = 0;
+    mem.read_memory(static_cast<uint32_t>(req.Addr & 0xffffffff), mem_data);
+
+    result.DevEvent          = 0; 
+    result.TraceTag          = req.TraceTag;
+    result.PCrdType          = req.PCrdType;
+    result.DBID              = static_cast<uint8_t>(mem_data & 0xff);
+    result.FwdState_DataPull = 0;
+    result.Resp              = 0; 
+    result.RespErr           = 0;
+    result.Opcode            = 4;
+    result.HomeNID           = 0;
+    result.TxnID             = req.TxnID;
+    result.SrcID             = req.SrcID;
+    result.TgtID             = req.TgtID;
+    result.QoS               = req.QoS;
+
+    return result;
 }
 
 #endif // TRANSACTION_H

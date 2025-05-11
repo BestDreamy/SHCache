@@ -1,12 +1,12 @@
 module slc(
     input reqflit_t                     slc_sf_req,
-    input logic                         slc_sf_req_v,
+    input logic                         slc_sf_req_valid,
 
     input                               sf_hit,
     output [`CHI_CACHE_STATE_RANGE]     sf_hit_state,
 
     output reqflit_t                    read_no_snp,
-    output                              read_no_snp_v
+    output                              read_no_snp_v,
 
     input                               clock,
     input                               reset
@@ -84,7 +84,7 @@ module slc(
     wire [`CHI_TXNID_RANGE] TxnID         = {SrcID[`CHI_MAX_SRCID_RANGE], 
                                              slc_sf_req.TxnID[`CHI_MAX_TXNID_RANGE]};
 
-    reqflit_t read_no_snp = CreateReadNoSnpReqFlit(
+    assign read_no_snp = CreateReadNoSnpReqFlit(
         .Addr(slc_sf_req.Addr),
         .Size(slc_sf_req.Size),
         .ReturnTxnID(ReturnTxnID),
@@ -94,6 +94,6 @@ module slc(
         // .TgtID(slc_sf_req.TgtID),
     );
 
-    wire read_no_snp_v = slc_miss_sf_miss & slc_sf_req_v;
+    assign read_no_snp_v = slc_miss_sf_miss & slc_sf_req_valid;
 
 endmodule

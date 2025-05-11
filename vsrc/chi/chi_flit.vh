@@ -133,8 +133,6 @@
 
 
 typedef struct packed {
-    logic [5:0] ldid;
-    logic [3:0] SrcType;
     logic [3:0] RSVDC;
     logic TraceTag;
     logic ExpCompAck;
@@ -160,7 +158,6 @@ typedef struct packed {
 } reqflit_t;
 
 typedef struct packed {
-    logic [1:0] DevEvent;
     logic TraceTag;
     logic [3:0] PCrdType;
     logic [7:0] DBID;
@@ -175,9 +172,6 @@ typedef struct packed {
 } rspflit_t;
 
 typedef struct packed {
-    logic [1:0] DevEvent;
-    logic [1:0] ChunkV;
-    logic [3:0] Poison;
     logic [255:0] Data;
     logic [31:0] BE;
     logic [3:0] RSVDC;
@@ -197,12 +191,11 @@ typedef struct packed {
 } datflit_t;
 
 typedef struct packed {
-    logic [5:0] LDID;
     logic TraceTag;
     logic RetToSrc;
     logic DoNotDataPull;
     logic NS;
-    logic [44:0] Addr;
+    logic [47:0] Addr;
     logic [4:0] Opcode;
     logic [7:0] FwdTxnID;
     logic [6:0] FwdNID;

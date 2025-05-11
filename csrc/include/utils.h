@@ -10,10 +10,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
-#include "Vshhl.h"
+#include "VSHCache.h"
 #include "verilated_fst_c.h"
 
-typedef Vshhl Vmodule;
+typedef VSHCache Vmodule;
 
 extern int32_t time_counter;
 

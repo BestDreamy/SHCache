@@ -8,9 +8,9 @@ module slc_txreq (
     output                                  pout_valid,
     input                                   pout_ready,
 
-    input reqflit_t                         rxreq_posq_first_entry_i,
+    input reqflit_t                         txreq_in,
 
-    output reqflit_t                        rxreq_posq_first_entry_o,
+    output reqflit_t                        txreq_out,
 
     input                                   clock,
     input                                   reset
@@ -24,8 +24,8 @@ module slc_txreq (
         .pin_ready(pin_ready),
         .pout_valid(pout_valid),
         .pout_ready(pout_ready),
-        .pin_data(rxreq_posq_first_entry_i),
-        .pout_data(rxreq_posq_first_entry_o),
+        .pin_data(txreq_in),
+        .pout_data(txreq_out),
         .clock(clock),
         .reset(reset)
     );
