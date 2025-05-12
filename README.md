@@ -14,7 +14,9 @@ pyjson
 # Run
 ```
 # To generate csrc/include/autoconfig.h and vsrc/include/autoconfig.v
-python config.py
+make config
 
 make
+
+gtkwave wave.fst
 ```

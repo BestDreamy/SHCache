@@ -1,11 +1,11 @@
 module pocq #(
     parameter DEPTH = 16
 )(
-    input                   rxreq_pocq_first_entry_dis,
-    input reqflit_t         rxreq_pocq_first_entry,
+    input                   req_entry_en,
+    input reqflit_t         req_entry,
 
-    input                   clk,
-    input                   rst
+    input                   clock,
+    input                   reset
 );
     reg [$bits(reqflit_t)-1:0]          buffer [DEPTH-1:0];
     reg                                 valid  [DEPTH-1:0];
@@ -14,23 +14,23 @@ module pocq #(
     reg [$clog2(DEPTH)-1:0] pocq_first_valid_entry;
 
     always @(*) begin : find_pocq_first_valid_entry
+        pocq_first_valid_entry = '0;
         for (int i = 0; i < DEPTH; i = i + 1) begin
-            if (~valid[i]) begin
+            if (~valid[i] && pocq_first_valid_entry == '0) begin
                 pocq_first_valid_entry = i[$clog2(DEPTH)-1:0];
-                disable find_pocq_first_valid_entry;
             end
         end
     end
 
-    always @(posedge clk) begin: rxreq_pocq_first_entry_fill_buffer
-        if (rst) begin
+    always @(posedge clock) begin: req_entry_into_buffer
+        if (reset) begin
             for (int i = 0; i < DEPTH; i = i + 1) begin
                 buffer[i] <= 'b0;
                 valid[i]  <= 'b0;
                 sleep[i]  <= 'b0;
             end
-        end else if (rxreq_pocq_first_entry_dis) begin
-            buffer[pocq_first_valid_entry] <= rxreq_pocq_first_entry;
+        end else if (req_entry_en) begin
+            buffer[pocq_first_valid_entry] <= req_entry;
             valid[pocq_first_valid_entry] <= 1'b1;
             sleep[pocq_first_valid_entry] <= 1'b1; // fill buffer && sleep
         end

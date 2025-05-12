@@ -98,14 +98,14 @@ module SHCache(
         .reset(reset)
     );
 
-    // pocq #(
-    //     .DEPTH(16)
-    // ) u_pocq_inst (
-    //     .rxreq_pocq_first_entry_dis(rxreq_pocq_first_entry_dis),
-    //     .rxreq_pocq_first_entry(rxreq_pocq_first_entry),
-    //     .clk(clock),
-    //     .rst(reset),
-    // );
+    pocq #(
+        .DEPTH(16)
+    ) u_pocq_inst (
+        .req_entry_en(rxreq_posq_first_entry_ready),
+        .req_entry(rxreq_posq_first_entry),
+        .clock(clock),
+        .reset(reset)
+    );
     
 
 endmodule
