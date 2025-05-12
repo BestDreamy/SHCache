@@ -52,8 +52,6 @@ module hnf_rxreq(
 
     /*************************************************************/
 
-    wire [5:0]  ldid               = RXREQFLIT.ldid;
-    wire [3:0]  SrcType            = RXREQFLIT.SrcType;
     wire [3:0]  RSVDC              = RXREQFLIT.RSVDC;
     wire        TraceTag           = RXREQFLIT.TraceTag;
     wire        ExpCompAck         = RXREQFLIT.ExpCompAck;

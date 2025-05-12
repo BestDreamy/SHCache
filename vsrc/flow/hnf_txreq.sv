@@ -1,4 +1,7 @@
-import "DPI-C" function dataflit_t chi_recv_ReadNoSnp_req(input reqflit_t req);
+import "DPI-C" function void chi_recv_ReadNoSnp_req(
+    input reqflit_t req,
+    output datflit_t data
+    );
 
 // Transmit request flit to the SNF
 module hnf_txreq(
@@ -24,19 +27,25 @@ module hnf_txreq(
 
     assign TXREQFLITV = txreqflitv_q;
 
-    dataflit_t CompData;
+    datflit_t CompData_q, CompData_d;
     always@(posedge clock) begin: CompData_ff
         if (reset) begin
-            CompData <= '0;
+            CompData_q <= '0;
         end else if (TXREQFLITV) begin
-            CompData <= chi_recv_ReadNoSnp_req(TXREQFLIT);
+            CompData_q <= CompData_d;
+        end
+    end
+
+    always_comb begin: CompData_comb
+        if (TXREQFLITV) begin
+            chi_recv_ReadNoSnp_req(TXREQFLIT, CompData_d);
+        end else begin
+            CompData_d = '0;
         end
     end
 
     /*************************************************************/
 
-    wire [5:0]  ldid               = TXREQFLIT.ldid;
-    wire [3:0]  SrcType            = TXREQFLIT.SrcType;
     wire [3:0]  RSVDC              = TXREQFLIT.RSVDC;
     wire        TraceTag           = TXREQFLIT.TraceTag;
     wire        ExpCompAck         = TXREQFLIT.ExpCompAck;

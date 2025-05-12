@@ -123,27 +123,6 @@ inline void chi_issue_ReadUnique_req(
 //     }
 // }
 
-extern "C" dataflit_t_dpi chi_recv_ReadNoSnp_req(reqflit_t_dpi req) {
-    dataflit_t_dpi result = {0};
-
-    uint32_t mem_data = 0;
-    mem.read_memory(static_cast<uint32_t>(req.Addr & 0xffffffff), mem_data);
-
-    result.DevEvent          = 0; 
-    result.TraceTag          = req.TraceTag;
-    result.PCrdType          = req.PCrdType;
-    result.DBID              = static_cast<uint8_t>(mem_data & 0xff);
-    result.FwdState_DataPull = 0;
-    result.Resp              = 0; 
-    result.RespErr           = 0;
-    result.Opcode            = 4;
-    result.HomeNID           = 0;
-    result.TxnID             = req.TxnID;
-    result.SrcID             = req.SrcID;
-    result.TgtID             = req.TgtID;
-    result.QoS               = req.QoS;
-
-    return result;
-}
+extern "C" void chi_recv_ReadNoSnp_req(reqflit_t req, datflit_t *data);
 
 #endif // TRANSACTION_H
