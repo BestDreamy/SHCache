@@ -1,6 +1,3 @@
-`include "autoconfig.v"
-`include "chi_flit.vh"
-
 import "DPI-C" function dataflit_t chi_recv_ReadNoSnp_req(input reqflit_t req);
 
 // Transmit request flit to the SNF
@@ -31,7 +28,7 @@ module hnf_txreq(
     always@(posedge clock) begin: CompData_ff
         if (reset) begin
             CompData <= '0;
-        end else if (TXREQLCRDV) begin
+        end else if (TXREQFLITV) begin
             CompData <= chi_recv_ReadNoSnp_req(TXREQFLIT);
         end
     end

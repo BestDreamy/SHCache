@@ -6,7 +6,7 @@
 struct Req {
     uint32_t reqflitpend;
     uint32_t reqflitv;
-    reqFlit reqflit;
+    reqflit_t reqflit;
     uint32_t reqlcrdv;
 };
 

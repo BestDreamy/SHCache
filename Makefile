@@ -46,5 +46,6 @@ git:
 
 config:
 	python config/psrc/config_sys.py
+	python config/psrc/gen_flit.py
 
 .PHONY: default all clean run config git

@@ -1,5 +1,3 @@
-`include "autoconfig.v"
-`include "chi_flit.vh"
 
 // Receive request flit from the RNF
 module hnf_rxreq(

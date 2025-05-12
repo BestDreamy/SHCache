@@ -8,6 +8,7 @@ make
 python 3.12
 c++
 gtkwave
+pyjson
 ```
 
 # Run

@@ -38,7 +38,7 @@ inline void set_bits(uint64_t value, int width, uint64_t &bit_offset, uint32_t *
     bit_offset += width;
 }
 
-inline void bind_chi_req_flit(Vmodule* dut, const reqFlit &req) {
+inline void bind_chi_req_flit(Vmodule* dut, const reqflit_t &req) {
     uint32_t bits[7] = {0};
 
     uint64_t bit_offset = 0;
@@ -81,7 +81,7 @@ inline void chi_issue_ReadUnique_req(
     Vmodule* dut, VerilatedFstC* tfp, 
     const int &srcID, const uint32_t &Addr, const uint32_t &Size
 ) {
-    reqFlit req = createReadUnique(srcID, Addr, Size);
+    reqflit_t req = createReadUnique(srcID, Addr, Size);
     while (true) {
         if (dut->RXREQLCRDV == 1) {
             dut->RXREQFLITPEND = 1;
@@ -104,7 +104,7 @@ inline void chi_issue_ReadUnique_req(
 //     Vmodule* dut, VerilatedFstC* tfp, 
 //     const int &srcID, const uint32_t &Addr, const uint32_t &Size
 // ) {
-//     reqFlit req = createReadNoSnp(srcID, Addr, Size);
+//     reqflit_t req = createReadNoSnp(srcID, Addr, Size);
 //     while (true) {
 //         if (dut->rxreqlcrdv == 1) {
 //             dut->rxreqflitpend = 1;

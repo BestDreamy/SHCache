@@ -1,11 +1,11 @@
 from pathlib import Path
 
-# 读取 YAML 内容
-import yaml
-with open("spec/flit_structs.yaml", "r") as f:
-    structs = yaml.safe_load(f)
+import json
 
-# 生成 SystemVerilog 和 C++ 的定义
+def load_json(file_path):
+    with open(file_path, "r") as f:
+        return json.load(f)
+
 def sv_width_decl(width):
     return f"[{width - 1}:0] " if width > 1 else ""
 
@@ -20,30 +20,32 @@ def cpp_type(width):
         return "uint64_t"
     else:
         return f"std::bitset<{width}>"
+    
+if __name__ == "__main__":
+    config = load_json(Path("config/spec/flit.json"))
 
-sv_lines = []
-cpp_lines = ['#pragma once\n#include <cstdint>\n#include <bitset>\n\n']
+    sv_lines = []
+    cpp_lines = ['#pragma once\n#include <cstdint>\n#include <bitset>\n\n']
 
-for struct_name, fields in structs.items():
-    # SystemVerilog struct
-    sv_lines.append(f"typedef struct packed {{")
-    for field in fields:
-        name = field["name"]
-        width = field["width"]
-        sv_lines.append(f"    logic {sv_width_decl(width)}{name};")
-    sv_lines.append(f"}} {struct_name};\n")
+    for struct_name, fields in config.items():
+        # sv struct
+        sv_lines.append(f"typedef struct packed {{")
+        for field in fields:
+            name = field["name"]
+            width = field["width"]
+            sv_lines.append(f"    logic {sv_width_decl(width)}{name};")
+        sv_lines.append(f"}} {struct_name};\n")
 
-    # C++ struct
-    cpp_lines.append(f"struct {struct_name} {{")
-    for field in fields:
-        name = field["name"]
-        width = field["width"]
-        cpp_lines.append(f"    {cpp_type(width)} {name};")
-    cpp_lines.append("};\n")
+        # C++ struct
+        cpp_lines.append(f"struct {struct_name} {{")
+        for field in fields:
+            name = field["name"]
+            width = field["width"]
+            cpp_lines.append(f"    {cpp_type(width)} {name};")
+        cpp_lines.append("};\n")
 
-# 写入文件
-sv_path = Path("spec/generated_flit_structs.sv")
-cpp_path = Path("spec/generated_flit_structs.hpp")
+    sv_path = Path("vsrc/chi/auto_chi_flit.vh")
+    cpp_path = Path("csrc/chi/auto_flit.h")
 
-sv_path.write_text("\n".join(sv_lines))
-cpp_path.write_text("\n".join(cpp_lines))
+    sv_path.write_text("\n".join(sv_lines))
+    cpp_path.write_text("\n".join(cpp_lines))

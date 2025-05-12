@@ -2,6 +2,7 @@
 #define FLIT_H
 #include <cstdint>
 #include "../include/autoconfig.h"
+#include "auto_flit.h"
 
 #define OP_ReadNoSnp               0x4
 #define OP_ReadUnique              0x7
@@ -11,45 +12,45 @@
 #define OP_WriteNoSnpFull          0x1D
 #define OP_ReadNotSharedDirty      0x26
 
-struct reqFlit {
-    uint32_t TgtID;
-    uint32_t SrcID;
-    uint32_t TxnID;
-    uint32_t Opcode;
-    uint32_t Addr;
-    uint32_t Size;
-    uint32_t ExpCompAck;
-};
+// struct reqFlit {
+//     uint32_t TgtID;
+//     uint32_t SrcID;
+//     uint32_t TxnID;
+//     uint32_t Opcode;
+//     uint32_t Addr;
+//     uint32_t Size;
+//     uint32_t ExpCompAck;
+// };
 
-struct dataFlit {
-    uint32_t TgtID;
-    uint32_t SrcID;
-    uint32_t TxnID;
-    uint32_t HomeID;
-    uint32_t Opcode;
-    uint32_t Resp;
-    uint32_t DBID;
-    uint32_t CCID;
-    uint32_t DataID;
-    uint32_t Data[8];
-    uint32_t BE[8];
-};
+// struct dataFlit {
+//     uint32_t TgtID;
+//     uint32_t SrcID;
+//     uint32_t TxnID;
+//     uint32_t HomeID;
+//     uint32_t Opcode;
+//     uint32_t Resp;
+//     uint32_t DBID;
+//     uint32_t CCID;
+//     uint32_t DataID;
+//     uint32_t Data[8];
+//     uint32_t BE[8];
+// };
 
-struct snpFlit {
-    uint32_t SrcID;
-    uint32_t TxnID;
-    uint32_t Opcode;
-    uint32_t Addr;
-};
+// struct snpFlit {
+//     uint32_t SrcID;
+//     uint32_t TxnID;
+//     uint32_t Opcode;
+//     uint32_t Addr;
+// };
 
-struct rspFlit {
-    uint32_t TgtID;
-    uint32_t SrcID;
-    uint32_t TxnID;
-    uint32_t Opcode;
-    uint32_t Resp;
-    uint32_t DBID;
-};
+// struct rspFlit {
+//     uint32_t TgtID;
+//     uint32_t SrcID;
+//     uint32_t TxnID;
+//     uint32_t Opcode;
+//     uint32_t Resp;
+//     uint32_t DBID;
+// };
 
 enum chiCompX {
     Comp_I = 0,
@@ -67,10 +68,10 @@ enum chiCompDataX {
     CompData_SD_PD = 7,
 };
 
-inline reqFlit createReadUnique(
+inline reqflit_t createReadUnique(
     const int &SrcID, const uint32_t &Addr, const uint32_t &Size
 ) {
-    reqFlit flit;
+    reqflit_t flit;
     flit.TgtID = config.HNId[0];
     flit.SrcID = SrcID;
     flit.TxnID = 0;
@@ -82,10 +83,10 @@ inline reqFlit createReadUnique(
     return flit;
 }
 
-inline reqFlit createReadNoSnp(
+inline reqflit_t createReadNoSnp(
     const int &SrcID, const uint32_t &Addr, const uint32_t &Size
 ) {
-    reqFlit flit;
+    reqflit_t flit;
     flit.TgtID = config.HNId[0];
     flit.SrcID = SrcID;
     flit.TxnID = 0;
