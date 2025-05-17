@@ -3,8 +3,8 @@
 #include "../include/utils.h"
 #include "verilated_fst_c.h"
 #include "cache.h"
-#include <cassert>
 #include <memory>
+#include "../include/dbg.h"
 
 template <size_t NumRegisters = 32, size_t NumCacheSets = 128, size_t CacheBlockSize = 4>
 struct CPU {
@@ -16,7 +16,10 @@ struct CPU {
 
     CPU() {
         reg.clear();
+        op_finished = true;
     }
+
+    bool op_finished;
 
     // Read from memory (via cache)
     bool read_memory(const uint32_t &address, uint32_t& data) {
@@ -31,12 +34,17 @@ struct CPU {
         cache.update(dut, tfp, coreId, address, data);
     }
 
+    void update_cache(const datflit_t &data) {
+        cache.update(data);
+        op_finished = true;
+    }
+
     bool exec_once(
         Vmodule* dut, VerilatedFstC* tfp, 
         const Operation &op
     ) {
         OperationType opType = op.operation;
-        bool op_finished = false;
+        Assert(this->op_finished == true, "Last operation must be finished");
 
         dbg_operation(op);
         switch (opType) {
@@ -45,7 +53,7 @@ struct CPU {
                 uint32_t data = 0;
                 // Load operation
                 this->read_memory(address, data);
-                assert(op.rs.size() == 1);
+                Assert(op.rs.size() == 1, "Load operation should have only one rs");
                 std::string rs = op.rs[0];
                 reg[rs] = data;
                 break;
@@ -56,9 +64,9 @@ struct CPU {
                 if (op.result.has_value()) {
                     data = std::stoi(op.result.value(), nullptr, 16);
                 } else {
-                    assert(op.rs.size() == 1);
+                    Assert(op.rs.size() == 1, "Store operation should have only one rs");
                     std::string rs = op.rs[0];
-                    assert(reg.find(rs) != reg.end());
+                    Assert(reg.find(rs) != reg.end(), "Reg not found");
                     data = reg[rs];
                 }
                 // Store operation
@@ -66,15 +74,15 @@ struct CPU {
                 break;
             }
             case OperationType::COMPUTE: {
-                op_finished = true;
+                this->op_finished = true;
 
                 std::string rs1 = op.rs[0];
                 std::string rs2 = op.rs[1];
-                assert(reg.find(rs1) != reg.end());
-                assert(reg.find(rs2) != reg.end());
+                Assert(reg.find(rs1) != reg.end(), "Reg1 not found");
+                Assert(reg.find(rs2) != reg.end(), "Reg2 not found");
                 uint32_t data1 = reg[rs1];
                 uint32_t data2 = reg[rs2];
-                assert(op.compute_type.has_value());
+                Assert(op.compute_type.has_value(), "Compute type is not set");
                 // -- Get data and check data.
                 switch (op.compute_type.value()) {
                     case ComputeType::ADD:
@@ -106,13 +114,13 @@ struct CPU {
                         break;
                     case ComputeType::SLTU:
                         reg[op.result.value()] = data1 < data2 ? 1 : 0;
-                    default: assert(0);
+                    default: Assert(0, "Unknown compute type");
                 }
             }
             default: break;
         }
 
-        return op_finished;
+        return this->op_finished;
     }
 };
 

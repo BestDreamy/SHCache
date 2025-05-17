@@ -29,10 +29,18 @@ inline bool sys_exec_once(Vmodule* dut, VerilatedFstC* tfp, const Operation& op)
     return op_finished;
 }
 
-inline bool wait_exec_finished(VerilatedFstC* tfp, const Operation &lastop, uint32_t &lastop_exec_times) {
+inline bool wait_exec_finished(Vmodule* dut, VerilatedFstC* tfp, const Operation &lastop, uint32_t &lastop_exec_times) {
+    dut->clock = 1 - dut->clock; // clock = 0
+    dut->eval();
+    DUMP_TIME(time_counter);
+
     lastop_exec_times ++;
-    Exit(lastop_exec_times < 20, "Execution time exceeded limit");
-    return true;
+    Exit(lastop_exec_times < 10, "Execution time exceeded limit");
+
+    dut->clock = 1 - dut->clock; // clock = 1
+    dut->eval();
+    DUMP_TIME(time_counter);
+    return false;
 }
 
 inline void sys_exec(Vmodule* dut, VerilatedFstC* tfp, std::ifstream& file) {
@@ -43,7 +51,7 @@ inline void sys_exec(Vmodule* dut, VerilatedFstC* tfp, std::ifstream& file) {
     std::string line;
     while (true) {
         if (lastop_finished == false) {
-            lastop_finished = wait_exec_finished(tfp, lastop, lastop_exec_times);
+            lastop_finished = wait_exec_finished(dut, tfp, lastop, lastop_exec_times);
             continue;
         } else {
             std::getline(file, line);
@@ -52,6 +60,8 @@ inline void sys_exec(Vmodule* dut, VerilatedFstC* tfp, std::ifstream& file) {
             Operation op = read_trace_one_line(line);
     
             lastop_finished = sys_exec_once(dut, tfp, op);
+
+            if (!lastop_finished) lastop_exec_times = 0;
 
             lastop = op;
         }

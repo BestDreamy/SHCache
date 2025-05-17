@@ -3,6 +3,7 @@
 #include "../include/utils.h"
 #include "../mem.h"
 #include "../chi/transaction.h"
+#include "../include/autoconfig.h"
 
 enum cpuCacheState {
     I = 0,
@@ -21,6 +22,9 @@ struct Cache {
     cpuCacheState val_array[NumSets];
     bool access_finished;
 
+    reqflit_t RN_Tracker[config.numCreditsForHNReq[0]];
+    bool RN_Tracker_valid[config.numCreditsForHNReq[0]];
+
     Cache() {
         access_finished = false;
         
@@ -31,6 +35,27 @@ struct Cache {
                 data_array[i][j] = 0;
             }
         }
+
+        for (int i = 0; i < config.numCreditsForHNReq[0]; i ++) 
+            RN_Tracker_valid[i] = false;
+    }
+
+    int find_first_RN_Tracker() {
+        for (int i = 0; i < config.numCreditsForHNReq[0]; i ++) {
+            if (RN_Tracker_valid[i] == false) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    int find_RN_Tracker_from_CompData(const datflit_t &data) {
+        for (int i = 0; i < config.numCreditsForHNReq[0]; i ++) {
+            if (RN_Tracker[i].TxnID == data.TxnID) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     /*
@@ -79,7 +104,13 @@ struct Cache {
         uint32_t tag = address / (NumSets * numBlock); // Extract tag from address
 
         if (!is_unique(address)) {
-            chi_issue_ReadUnique_req(dut, tfp, coreId, address, BlockSize);
+            reqflit_t req = chi_issue_ReadUnique_req(dut, tfp, coreId, address, BlockSize);
+
+            int id = find_first_RN_Tracker();
+            Assert(id != -1, "No available RN_Tracker");
+
+            RN_Tracker[id] = req;
+            RN_Tracker_valid[id] = true;
         }
         
         // // Update the cache line
@@ -90,6 +121,16 @@ struct Cache {
         /*
         mem.write_memory(address, new_data);
         */
+    }
+
+    void update(const datflit_t &data) {
+        int id = find_RN_Tracker_from_CompData(data);
+        size_t index = (data.Addr / numBlock) % NumSets; // Extract index from address
+        uint32_t tag = data.Addr / (NumSets * numBlock); // Extract tag from address
+
+        tag_array[index] = tag;
+        val_array[index] = static_cast<cpuCacheState>(data.Resp);
+        memcpy(data_array[index], data.Data, numBlock * sizeof(uint32_t));
     }
 };
 

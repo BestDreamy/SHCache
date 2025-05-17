@@ -3,6 +3,10 @@ import "DPI-C" function void chi_recv_ReadNoSnp_req(
     output datflit_t data
     );
 
+import "DPI-C" function void chi_DMT_ReadNoSnp_req(
+    input reqflit_t req
+    );
+
 // Transmit request flit to the SNF
 module hnf_txreq(
     output reqflit_t TXREQFLIT, // txreq channel
@@ -37,10 +41,10 @@ module hnf_txreq(
     end
 
     always_comb begin: CompData_comb
+        CompData_d = '0;
         if (TXREQFLITV) begin
-            chi_recv_ReadNoSnp_req(TXREQFLIT, CompData_d);
-        end else begin
-            CompData_d = '0;
+            // chi_recv_ReadNoSnp_req(TXREQFLIT, CompData_d);
+            chi_DMT_ReadNoSnp_req(TXREQFLIT);
         end
     end
 

@@ -3,7 +3,7 @@ module sfifo#(
     parameter   DEPTH = 16
 )(
     input                   clk     ,
-    input                   rst_n   ,
+    input                   rst     ,
     input                   winc    , // write increment
     input                   rinc    , // read increment
     input       [WIDTH-1:0] wdata   ,
@@ -19,16 +19,16 @@ module sfifo#(
     assign next_wp = wp + 1;
     assign next_rp = rp + 1;
  
-    always @(posedge clk, negedge rst_n) begin
-        if (~rst_n) begin
+    always @(posedge clk) begin
+        if (rst) begin
             wp <= 0;
         end else if (w_en) begin
             wp <= next_wp;
         end
     end
  
-    always @(posedge clk, negedge rst_n) begin
-        if (~rst_n) begin
+    always @(posedge clk) begin
+        if (rst) begin
             rp <= 0;
         end else if (r_en) begin
             rp <= next_rp;
@@ -42,25 +42,32 @@ module sfifo#(
     assign is_same_addr = (wp[$clog2(DEPTH)-1: 0] == rp[$clog2(DEPTH)-1: 0]);
     assign is_same_msb  = (wp[$clog2(DEPTH)] == rp[$clog2(DEPTH)]);
  
-    always @(posedge clk, negedge rst_n) begin
-        if (~rst_n) begin
-            wfull <= 0;
-        end else if (is_same_addr & ~is_same_msb) begin
-            wfull <= 1;
-        end else begin
-            wfull <= 0;
-        end
-    end
+    // always @(posedge clk) begin
+    //     if (rst) begin
+    //         wfull <= 0;
+    //     end else if (is_same_addr & ~is_same_msb) begin
+    //         wfull <= 1;
+    //     end else begin
+    //         wfull <= 0;
+    //     end
+    // end
  
-    always @(posedge clk, negedge rst_n) begin
-        if (~rst_n) begin
-            rempty <= 0;
-        end else if (is_same_addr & is_same_msb) begin
-            rempty <= 1;
-        end else begin
-            rempty <= 0;
-        end
-    end
+    // always @(posedge clk) begin
+    //     if (rst) begin
+    //         rempty <= 1;
+    //     end else if (is_same_addr & is_same_msb) begin
+    //         rempty <= 1;
+    //     end else begin
+    //         rempty <= 0;
+    //     end
+    // end
+
+    assign wfull  = (wp[$clog2(DEPTH)-1:0] == rp[$clog2(DEPTH)-1:0]) &&
+                    (wp[$clog2(DEPTH)] != rp[$clog2(DEPTH)]);
+
+    assign rempty = (wp[$clog2(DEPTH)-1:0] == rp[$clog2(DEPTH)-1:0]) &&
+                    (wp[$clog2(DEPTH)] == rp[$clog2(DEPTH)]);
+
 
     dual_port_RAM #(
         .DEPTH(DEPTH),

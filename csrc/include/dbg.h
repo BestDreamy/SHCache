@@ -41,8 +41,8 @@ inline void assert_fail_msg(const char* msg) {
     do { \
         if (!(cond)) { \
             assert_fail_msg(msg); \
+            tfp -> close(); \
         } \
-        tfp -> close(); \
         if (!(cond)) exit(0); \
     } while(0)
 #endif

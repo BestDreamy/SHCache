@@ -7,6 +7,7 @@ VERILATOR_INC_PATH  = $(addprefix -I, $(abspath ./vsrc/chi) \
 									  $(abspath ./vsrc/hnf) \
 									  $(abspath ./vsrc/pipe) )
 VERILATOR_FLAGS = -cc --exe --build --trace-fst --top-module $(TOP_NAME) $(VERILATOR_INC_PATH)
+VERILATOR_FLAGS += -Wno-WIDTHEXPAND -Wno-WIDTHTRUNC # TODO
 
 CSRCS = $(shell find $(abspath .) -name "*.c" -or -name "*.cc" -or -name "*.cpp")
 VSRCS = $(shell find $(abspath ./vsrc) -name "$(TOP_NAME).*v")
@@ -31,6 +32,9 @@ $(BIN): $(CSRCS) $(VSRCS) | $(OBJ_DIR)
 
 run: $(BIN) $(TEST-SRC)
 	@$(BIN) $(TEST-SRC)
+
+gtk: run
+	gtkwave wave.fst &
 
 $(OBJ_DIR):
 	mkdir -p $(OBJ_DIR)

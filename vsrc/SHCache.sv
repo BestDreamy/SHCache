@@ -38,7 +38,8 @@ module SHCache(
     wire                slc_sf_req_valid;
     reqflit_t           slc_sf_req;
     wire                slc_sf_req_ready;
-    rxreq_slc u_rxreq_slc (
+    wire                slc_sf_req_lhs_hs;
+    rxreq_slc pipe_rxreq_slc (
         .flush(default_pipe_flush),
         .pin_valid(rxreq_posq_first_entry_valid),
         .pin_ready(rxreq_posq_first_entry_ready),
@@ -77,7 +78,7 @@ module SHCache(
     wire                    txreq_valid;
     reqflit_t               txreqflit;
     wire                    txreq_ready;
-    slc_txreq u_slc_txreq (
+    slc_txreq pipe_slc_txreq (
         .flush(default_pipe_flush),
         .pin_valid(read_no_snp_v),
         .pin_ready(slc_sf_req_ready),
@@ -101,7 +102,7 @@ module SHCache(
     pocq #(
         .DEPTH(16)
     ) u_pocq_inst (
-        .req_entry_en(rxreq_posq_first_entry_ready),
+        .req_entry_en(slc_sf_req_lhs_hs),
         .req_entry(rxreq_posq_first_entry),
         .clock(clock),
         .reset(reset)

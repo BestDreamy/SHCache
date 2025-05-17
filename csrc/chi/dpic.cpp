@@ -1,23 +1,25 @@
+#include "auto_flit.h"
 #include "transaction.h"
-#include "../mem.h"
+#include <cassert>
+#include "../cpu/cpu.h"
 
 extern "C" void chi_recv_ReadNoSnp_req(reqflit_t req, datflit_t *data) {
     data = new datflit_t;
-
-    uint32_t mem_data = 0;
-    mem.read_memory(static_cast<uint32_t>(req.Addr & 0xffffffff), mem_data);
-
-    data->TraceTag          = req.TraceTag;
-    data->DBID              = static_cast<uint8_t>(mem_data & 0xff);
-    data->FwdState_DataPull = 0;
-    data->Resp              = 0; 
-    data->RespErr           = 0;
-    data->Opcode            = 4;
-    data->HomeNID           = 0;
-    data->TxnID             = req.TxnID;
-    data->SrcID             = req.SrcID;
-    data->TgtID             = req.TgtID;
-    data->QoS               = req.QoS;
-
+    *data = createCompData_UC(req);
     return ;
+}
+
+extern "C" void chi_DMT_ReadNoSnp_req(reqflit_t req) {
+    datflit_t data = createCompData_UC(req);
+    
+    bool validTgtID = false;
+    for (int i = 0; i < config.numRNs; i++) {
+        if (req.TgtID == config.RNId[i]) {
+            validTgtID = true;
+            break;
+        }
+    }
+    Assert(validTgtID, "Invalid TgtID");
+
+    cpu[req.TgtID].update_cache(data);
 }

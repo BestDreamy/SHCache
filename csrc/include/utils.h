@@ -1,5 +1,5 @@
-#ifndef UTIL_H
-#define UTIL_H
+#pragma once
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -17,4 +17,5 @@ typedef VSHCache Vmodule;
 
 extern int32_t time_counter;
 
-#endif
+extern VerilatedFstC* tfp;
+extern Vmodule* dut;

@@ -77,14 +77,14 @@ if __name__ == "__main__":
     credits_hn = [4]
     credits_sn = [4]
 
-    # rnid must encode from 0x0
-    node_rn = [0x0, 0x1, 0x2, 0x3]
+    # rnid must encode from 0x1
+    node_rn = [0x1, 0x2, 0x3, 0x4]
     rns_offset = [4] # each cache line has 16 bytes
     for id, it in enumerate(node_rn):
         assert(id == it)
     # node_rn = [0x0C, 0x2C, 0x3C, 0x4C]
-    node_hn = [0x4]              
-    node_sn = [0x7]                    
+    node_hn = [0x5]              
+    node_sn = [0x6]                    
 
     cpp_config = generate_cpp_config(num_rns, num_hns, num_sns, 
                                      credits_hn, credits_sn, 

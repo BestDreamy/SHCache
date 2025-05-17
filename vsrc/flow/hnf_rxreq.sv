@@ -36,7 +36,7 @@ module hnf_rxreq(
         .DEPTH(rxreq_posq_size)
     ) rxreq_posq (
         .clk(clock),
-        .rst_n(~reset),
+        .rst(reset),
         .winc(rxreqflit_recv_en),
         .rinc(rxreq_posq_first_entry_ready),
         .wdata(RXREQFLIT),
@@ -46,7 +46,7 @@ module hnf_rxreq(
         .rdata(rxreq_posq_first_entry)
     );
 
-    assign rxreq_posq_first_entry_valid = rxreq_posq_is_empty ? 1'b0 : 1'b1;
+    assign rxreq_posq_first_entry_valid = ~rxreq_posq_is_empty;
 
     assign RXREQLCRDV = rxreq_posq_is_full ? 1'b0 : 1'b1;
 
