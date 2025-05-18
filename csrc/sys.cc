@@ -11,6 +11,7 @@ void sys_init(Vmodule* dut, VerilatedFstC* tfp) {
 
     // posedge clock && reset
     dut->clock = 1; dut->reset = 1; dut->eval();
+    dut->TXREQLCRDV = 1;
     DUMP_TIME(time_counter);
 
     dut->reset = 0;

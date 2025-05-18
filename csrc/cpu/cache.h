@@ -4,6 +4,7 @@
 #include "../mem.h"
 #include "../chi/transaction.h"
 #include "../include/autoconfig.h"
+#include <cstddef>
 
 enum cpuCacheState {
     I = 0,
@@ -16,17 +17,15 @@ enum cpuCacheState {
 // Direct-Map Local Cache
 template <size_t NumSets = 128, size_t BlockSize = 4>
 struct Cache {
-    #define numBlock  1 << BlockSize
+    static constexpr size_t numBlock = 1 << BlockSize;
     uint32_t tag_array[NumSets];
     uint8_t data_array[NumSets][numBlock]; // 4 int per set
     cpuCacheState val_array[NumSets];
-    bool access_finished;
 
     reqflit_t RN_Tracker[config.numCreditsForHNReq[0]];
     bool RN_Tracker_valid[config.numCreditsForHNReq[0]];
 
     Cache() {
-        access_finished = false;
         
         for (size_t i = 0; i < NumSets; ++i) {
             tag_array[i] = 0;
@@ -51,7 +50,7 @@ struct Cache {
 
     int find_RN_Tracker_from_CompData(const datflit_t &data) {
         for (int i = 0; i < config.numCreditsForHNReq[0]; i ++) {
-            if (RN_Tracker[i].TxnID == data.TxnID) {
+            if (RN_Tracker[i].TxnID == data.TxnID && RN_Tracker[i].SrcID == data.TgtID) {
                 return i;
             }
         }
@@ -125,12 +124,53 @@ struct Cache {
 
     void update(const datflit_t &data) {
         int id = find_RN_Tracker_from_CompData(data);
-        size_t index = (data.Addr / numBlock) % NumSets; // Extract index from address
-        uint32_t tag = data.Addr / (NumSets * numBlock); // Extract tag from address
+        Assert(id != -1, "No available RN_Tracker");
+        reqflit_t req = RN_Tracker[id];
+
+        uint32_t addr = (req.Addr).to_ulong();
+        size_t index = (addr / numBlock) % NumSets; // Extract index from address
+        uint32_t tag = addr / (NumSets * numBlock); // Extract tag from address
 
         tag_array[index] = tag;
-        val_array[index] = static_cast<cpuCacheState>(data.Resp);
-        memcpy(data_array[index], data.Data, numBlock * sizeof(uint32_t));
+        val_array[index] = static_cast<cpuCacheState>((data.Resp).to_ulong());
+
+        for (int word = 0; word < data.Data.size() / 32; word ++) {
+            uint32_t BE = (data.BE).to_ulong();
+            uint8_t be_nibble = (BE >> (4 * word)) & 0xF;
+
+            for (int byte_in_word = 0; byte_in_word < 4; byte_in_word ++) {
+                uint8_t src_byte = 0;
+                for (int bit = 0; bit < 8; bit++) {
+                    int bit_index = word * 32 + byte_in_word * 8 + bit;
+                    if (data.Data.test(bit_index))
+                        src_byte |= (1 << bit);
+                }
+
+                if (be_nibble & (1 << byte_in_word))
+                    data_array[index][word * 4 + byte_in_word] = src_byte;
+                else
+                    data_array[index][word * 4 + byte_in_word] = 0;
+            }
+        }
+
+        show_cache();
+    }
+
+    void show_cache() const {
+        std::cout << "Cache Information:" << std::endl;
+        std::cout << "Number of Sets: " << NumSets << std::endl;
+        std::cout << "Block Size (numBlock): " << numBlock << " entries per set." << std::endl;
+        for (size_t set = 0; set < NumSets; set++) {
+            std::cout << "Set " << std::setw(3) << set << ": ";
+            std::cout << "Tag = 0x" << std::hex << tag_array[set] << std::dec << ", ";
+            std::cout << "State = " << val_array[set] << ", Data = [";
+            for (size_t blk = 0; blk < numBlock; blk++) {
+                std::cout << static_cast<int>(data_array[set][blk]);
+                if (blk != numBlock - 1)
+                    std::cout << ", ";
+            }
+            std::cout << "]" << std::endl;
+        }
     }
 };
 

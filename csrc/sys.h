@@ -58,6 +58,7 @@ inline void sys_exec(Vmodule* dut, VerilatedFstC* tfp, std::ifstream& file) {
             if (line.empty()) continue;
 
             Operation op = read_trace_one_line(line);
+            if (op.operation == OperationType::OTHER) break;
     
             lastop_finished = sys_exec_once(dut, tfp, op);
 

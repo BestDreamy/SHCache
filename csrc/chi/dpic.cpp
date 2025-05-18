@@ -1,7 +1,9 @@
 #include "auto_flit.h"
+#include "flit.h"
 #include "transaction.h"
 #include <cassert>
 #include "../cpu/cpu.h"
+#include "../include/utils.h"
 
 extern "C" void chi_recv_ReadNoSnp_req(reqflit_t req, datflit_t *data) {
     data = new datflit_t;
@@ -19,7 +21,11 @@ extern "C" void chi_DMT_ReadNoSnp_req(reqflit_t req) {
             break;
         }
     }
-    Assert(validTgtID, "Invalid TgtID");
+    dbg(req.TgtID);
+    printReqFlit(req);
+    printDataFlit(data);
+    Exit(validTgtID, "Invalid TgtID");
+    puts("DMT");
 
-    cpu[req.TgtID].update_cache(data);
+    cpu[(req.TgtID).to_ulong()].update_cache(data);
 }

@@ -7,13 +7,14 @@
 #include <sstream>
 
 enum OperationType {
+    OTHER,
     STORE,
     LOAD,
-    COMPUTE,
-    OTHER
+    COMPUTE
 };
 
 enum ComputeType {
+    INVALID,
     ADD,
     SUB,
     AND,
@@ -23,8 +24,7 @@ enum ComputeType {
     SRL,
     SRA,
     SLT,
-    SLTU,
-    INVALID
+    SLTU
 };
 
 inline ComputeType stocompute_type(const std::string& str) {
@@ -78,7 +78,8 @@ inline Operation read_trace_one_line(std::string &line) {
     std::stringstream linestream(line);
     std::string token;
 
-    Operation op;
+    Operation op = {OTHER};
+
     while (std::getline(linestream, token, ',')) {
         std::stringstream field(token);
         std::string key, value;

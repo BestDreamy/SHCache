@@ -1,9 +1,10 @@
 #include "csrc/sys.h"
 
-int main(int argc, char** argv) {
-    Vmodule* dut = new Vmodule;
+Vmodule* dut = new Vmodule;
 
-    VerilatedFstC* tfp = new VerilatedFstC;
+VerilatedFstC* tfp = new VerilatedFstC;
+
+int main(int argc, char** argv) {
     Verilated::traceEverOn(true);
     dut->trace(tfp, 0);
     tfp->open("wave.fst");

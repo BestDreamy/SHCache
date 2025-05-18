@@ -247,7 +247,7 @@ function reqflit_t CreateReadNoSnpReqFlit (
     reqFlit.StashNID_ReturnNID = StashNID_ReturnNID;
     reqFlit.TxnID              = TxnID;
     reqFlit.SrcID              = SrcID;
-    // reqFlit.TgtID              = TgtID;
+    reqFlit.TgtID              = SNId[0];
 
     return reqFlit;
 endfunction

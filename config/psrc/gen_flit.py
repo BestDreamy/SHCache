@@ -10,15 +10,15 @@ def sv_width_decl(width):
     return f"[{width - 1}:0] " if width > 1 else ""
 
 def cpp_type(width):
-    if width <= 8:
-        return "uint8_t"
-    elif width <= 16:
-        return "uint16_t"
-    elif width <= 32:
-        return "uint32_t"
-    elif width <= 64:
-        return "uint64_t"
-    else:
+    # if width <= 8:
+    #     return "uint8_t"
+    # elif width <= 16:
+    #     return "uint16_t"
+    # elif width <= 32:
+    #     return "uint32_t"
+    # elif width <= 64:
+    #     return "uint64_t"
+    # else:
         return f"std::bitset<{width}>"
     
 if __name__ == "__main__":

@@ -34,9 +34,10 @@ struct CPU {
         cache.update(dut, tfp, coreId, address, data);
     }
 
-    void update_cache(const datflit_t &data) {
+    bool update_cache(const datflit_t &data) {
         cache.update(data);
-        op_finished = true;
+        this->op_finished = true;
+        return this->op_finished;
     }
 
     bool exec_once(
@@ -49,6 +50,8 @@ struct CPU {
         dbg_operation(op);
         switch (opType) {
             case OperationType::LOAD: {
+                this->op_finished = false;
+
                 uint32_t address = op.address.value();
                 uint32_t data = 0;
                 // Load operation
@@ -59,6 +62,8 @@ struct CPU {
                 break;
             }
             case OperationType::STORE: {
+                this->op_finished = false;
+
                 uint32_t address = op.address.value();
                 uint32_t data = 0;
                 if (op.result.has_value()) {
@@ -74,8 +79,6 @@ struct CPU {
                 break;
             }
             case OperationType::COMPUTE: {
-                this->op_finished = true;
-
                 std::string rs1 = op.rs[0];
                 std::string rs2 = op.rs[1];
                 Assert(reg.find(rs1) != reg.end(), "Reg1 not found");

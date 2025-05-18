@@ -5,17 +5,41 @@
 #include "auto_flit.h"
 #include "../mem.h"
 #include "../include/dbg.h"
+#include <iostream>
+
+inline void printReqFlit(const reqflit_t &flit) {
+    std::cout << "reqFlit:" << std::endl;
+    std::cout << "  TgtID      : " << flit.TgtID << std::endl;
+    std::cout << "  SrcID      : " << flit.SrcID << std::endl;
+    std::cout << "  TxnID      : " << flit.TxnID << std::endl;
+    std::cout << "  Opcode     : " << flit.Opcode << std::endl;
+    std::cout << "  Addr       : " << flit.Addr << std::endl;
+    std::cout << "  Size       : " << static_cast<uint32_t>(flit.Size) << std::endl;
+    std::cout << "  ExpCompAck : " << static_cast<uint32_t>(flit.ExpCompAck) << std::endl;
+}
 
 // struct reqFlit {
-//     uint32_t TgtID;
-//     uint32_t SrcID;
-//     uint32_t TxnID;
-//     uint32_t Opcode;
-//     uint32_t Addr;
-//     uint32_t Size;
-//     uint32_t ExpCompAck;
-// };
-
+    //     uint32_t TgtID;
+    //     uint32_t SrcID;
+    //     uint32_t TxnID;
+    //     uint32_t Opcode;
+    //     uint32_t Addr;
+    //     uint32_t Size;
+    //     uint32_t ExpCompAck;
+    // };
+    
+inline void printDataFlit(const datflit_t &flit) {
+    std::cout << "dataFlit:" << std::endl;
+    std::cout << "  TgtID  : " << flit.TgtID << std::endl;
+    std::cout << "  SrcID  : " << flit.SrcID << std::endl;
+    std::cout << "  TxnID  : " << flit.TxnID << std::endl;
+    std::cout << "  HomeID : " << flit.HomeNID << std::endl;
+    std::cout << "  Opcode : " << flit.Opcode << std::endl;
+    std::cout << "  Resp   : " << flit.Resp << std::endl;
+    std::cout << "  DBID   : " << flit.DBID << std::endl;
+    std::cout << "  CCID   : " << flit.CCID << std::endl;
+    std::cout << "  DataID : " << flit.DataID << std::endl;
+}
 // struct dataFlit {
 //     uint32_t TgtID;
 //     uint32_t SrcID;
@@ -78,13 +102,13 @@ enum CHI_DataFlit_Opcode {
     WriterDataCancel     = 0x7
 };
 
-enum chiCompX {
-    Comp_I = 0,
-    Comp_SC = 1,
-    Comp_UC = 2,
-    Comp_UD_PD = 6,
-    Comp_SD_PD = 7,
-};
+// enum chiCompX {
+//     Comp_I = 0,
+//     Comp_SC = 1,
+//     Comp_UC = 2,
+//     Comp_UD_PD = 6,
+//     Comp_SD_PD = 7,
+// };
 
 enum CHI_DataFlit_Resp {
     CompData_I = 0,

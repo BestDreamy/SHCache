@@ -12,18 +12,18 @@ def generate_cpp_config(num_rns, num_hns, num_sns,
 #include <cstdint>
 
 struct Config {{
-    uint32_t numRNs = {num_rns};
-    uint32_t numHNs = {num_hns};
-    uint32_t numSNs = {num_sns};
+    static constexpr uint32_t numRNs = 4;
+    static constexpr uint32_t numHNs = 1;
+    static constexpr uint32_t numSNs = 1;
 
-    std::vector<uint32_t> numCreditsForHNReq = {{{', '.join(map(str, credits_hn))}}};
-    std::vector<uint32_t> numCreditsForSNReq = {{{', '.join(map(str, credits_sn))}}};
+    static constexpr uint32_t numCreditsForHNReq[1] = {{4}};
+    static constexpr uint32_t numCreditsForSNReq[1] = {{4}};
 
-    std::vector<uint32_t> RNId = {{{', '.join(hex(x) for x in node_rn)}}};
-    std::vector<uint32_t> HNId = {{{', '.join(hex(x) for x in node_hn)}}};
-    std::vector<uint32_t> SNId = {{{', '.join(hex(x) for x in node_sn)}}};
+    static constexpr uint32_t RNId[4] = {{0x1, 0x2, 0x3, 0x4}};
+    static constexpr uint32_t HNId[1] = {{0x5}};
+    static constexpr uint32_t SNId[1] = {{0x6}};
 
-    std::vector<uint32_t> RNsOffset = {{{', '.join(map(str, rns_offset))}}};
+    static constexpr uint32_t RNsOffset[1] = {{4}};
 }};
 
 extern Config config;
@@ -81,7 +81,7 @@ if __name__ == "__main__":
     node_rn = [0x1, 0x2, 0x3, 0x4]
     rns_offset = [4] # each cache line has 16 bytes
     for id, it in enumerate(node_rn):
-        assert(id == it)
+        assert(id + 1== it)
     # node_rn = [0x0C, 0x2C, 0x3C, 0x4C]
     node_hn = [0x5]              
     node_sn = [0x6]                    

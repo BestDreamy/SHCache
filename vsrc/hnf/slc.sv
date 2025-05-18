@@ -32,12 +32,12 @@ module slc(
     reg [BYTE_W-1: 0]                   dataArray[SET_NUM][OFFSET_NUM];
     reg [STATE_W-1: 0]                  stateArray[SET_NUM] ; // (U|S), (D|C), I
 
-    // wire [47:0] Addr               = rxreqflit.Addr;
-    // wire [2:0]  Size               = rxreqflit.Size;
-    // wire [5:0]  Opcode             = rxreqflit.Opcode;
-    // wire [7:0]  TxnID              = rxreqflit.TxnID;
-    // wire [6:0]  SrcID              = rxreqflit.SrcID;
-    // wire [6:0]  TgtID              = rxreqflit.TgtID;
+    // wire [47:0] Addr               = read_no_snp.Addr;
+    // wire [2:0]  Size               = read_no_snp.Size;
+    // wire [5:0]  Opcode             = read_no_snp.Opcode;
+    // wire [7:0]  TxnID              = read_no_snp.TxnID;
+    // wire [6:0]  SrcID              = read_no_snp.SrcID;
+    // wire [6:0]  TgtID              = read_no_snp.TgtID;
 
     `define SLC_TAG_RANGE (ADDR_W-1) : (ADDR_W - TAG_W)
     `define SLC_SET_RANGE (ADDR_W - TAG_W - 1) : (ADDR_W - TAG_W - SET_W)
@@ -95,5 +95,32 @@ module slc(
     );
 
     assign read_no_snp_v = slc_miss_sf_miss & slc_sf_req_valid;
+
+    /*************************************************************/
+
+    /*
+    wire [3:0]  RSVDC              = read_no_snp.RSVDC;
+    wire        TraceTag           = read_no_snp.TraceTag;
+    wire        ExpCompAck         = read_no_snp.ExpCompAck;
+    wire        Excl               = read_no_snp.Excl;
+    wire [4:0]  LPID               = read_no_snp.LPID;
+    wire        SnpAttr            = read_no_snp.SnpAttr;
+    wire [3:0]  MemAttr            = read_no_snp.MemAttr;
+    wire [3:0]  PCrdType           = read_no_snp.PCrdType;
+    wire [1:0]  Order              = read_no_snp.Order;
+    wire        AllowRetry         = read_no_snp.AllowRetry;
+    wire        LikelyShared       = read_no_snp.LikelyShared;
+    wire        NS                 = read_no_snp.NS;
+    wire [47:0] Addr               = read_no_snp.Addr;
+    wire [2:0]  Size               = read_no_snp.Size;
+    wire [5:0]  Opcode             = read_no_snp.Opcode;
+    // wire [7:0]  StashLPID          = read_no_snp.StashLPID;
+    // wire        StashNIDValid      = read_no_snp.StashNIDValid;
+    wire [6:0]  StashNID_ReturnNID = read_no_snp.StashNID_ReturnNID;
+    wire [7:0]  TxnID              = read_no_snp.TxnID;
+    wire [6:0]  SrcID              = read_no_snp.SrcID;
+    wire [6:0]  TgtID              = read_no_snp.TgtID;
+    wire [3:0]  QoS                = read_no_snp.QoS;
+    */
 
 endmodule
