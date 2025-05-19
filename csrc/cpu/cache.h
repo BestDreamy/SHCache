@@ -127,15 +127,15 @@ struct Cache {
         Assert(id != -1, "No available RN_Tracker");
         reqflit_t req = RN_Tracker[id];
 
-        uint32_t addr = (req.Addr).to_ulong();
+        uint32_t addr = req.Addr;
         size_t index = (addr / numBlock) % NumSets; // Extract index from address
         uint32_t tag = addr / (NumSets * numBlock); // Extract tag from address
 
         tag_array[index] = tag;
-        val_array[index] = static_cast<cpuCacheState>((data.Resp).to_ulong());
+        val_array[index] = static_cast<cpuCacheState>(data.Resp);
 
         for (int word = 0; word < data.Data.size() / 32; word ++) {
-            uint32_t BE = (data.BE).to_ulong();
+            uint32_t BE = data.BE;
             uint8_t be_nibble = (BE >> (4 * word)) & 0xF;
 
             for (int byte_in_word = 0; byte_in_word < 4; byte_in_word ++) {

@@ -7,16 +7,31 @@
 #include "../include/dbg.h"
 #include <iostream>
 
-inline void printReqFlit(const reqflit_t &flit) {
+inline void printReqFlit(const reqflit_t &req) {
     puts("*******************cpp*******************");
-    std::cout << "reqFlit:" << std::endl;
-    std::cout << "  TgtID      : " << flit.TgtID.to_ulong() << std::endl;
-    std::cout << "  SrcID      : " << flit.SrcID.to_ulong() << std::endl;
-    std::cout << "  TxnID      : " << flit.TxnID.to_ulong() << std::endl;
-    std::cout << "  Opcode     : " << flit.Opcode.to_ulong() << std::endl;
-    std::cout << "  Addr       : " << flit.Addr.to_ullong() << std::endl;
-    std::cout << "  Size       : " << static_cast<uint32_t>(flit.Size.to_ulong()) << std::endl;
-    std::cout << "  ExpCompAck : " << static_cast<uint32_t>(flit.ExpCompAck.to_ulong()) << std::endl;
+    std::cout << "reqflit_t:" << std::endl;
+    std::cout << "  RSVDC              : " << static_cast<unsigned>(req.RSVDC) << std::endl;
+    std::cout << "  TraceTag           : " << static_cast<unsigned>(req.TraceTag) << std::endl;
+    std::cout << "  ExpCompAck         : " << static_cast<unsigned>(req.ExpCompAck) << std::endl;
+    std::cout << "  Excl               : " << static_cast<unsigned>(req.Excl) << std::endl;
+    std::cout << "  LPID               : " << static_cast<unsigned>(req.LPID) << std::endl;
+    std::cout << "  SnpAttr            : " << static_cast<unsigned>(req.SnpAttr) << std::endl;
+    std::cout << "  MemAttr            : " << static_cast<unsigned>(req.MemAttr) << std::endl;
+    std::cout << "  PCrdType           : " << static_cast<unsigned>(req.PCrdType) << std::endl;
+    std::cout << "  Order              : " << static_cast<unsigned>(req.Order) << std::endl;
+    std::cout << "  AllowRetry         : " << static_cast<unsigned>(req.AllowRetry) << std::endl;
+    std::cout << "  LikelyShared       : " << static_cast<unsigned>(req.LikelyShared) << std::endl;
+    std::cout << "  NS                 : " << static_cast<unsigned>(req.NS) << std::endl;
+    std::cout << "  Addr               : " << static_cast<uint64_t>(req.Addr) << std::endl;
+    std::cout << "  Size               : " << static_cast<unsigned>(req.Size) << std::endl;
+    std::cout << "  Opcode             : " << static_cast<unsigned>(req.Opcode) << std::endl;
+    std::cout << "  ReturnTxnID        : " << static_cast<unsigned>(req.ReturnTxnID) << std::endl;
+    std::cout << "  StashNIDValid      : " << static_cast<unsigned>(req.StashNIDValid) << std::endl;
+    std::cout << "  StashNID_ReturnNID : " << static_cast<unsigned>(req.StashNID_ReturnNID) << std::endl;
+    std::cout << "  TxnID              : " << static_cast<unsigned>(req.TxnID) << std::endl;
+    std::cout << "  SrcID              : " << static_cast<unsigned>(req.SrcID) << std::endl;
+    std::cout << "  TgtID              : " << static_cast<unsigned>(req.TgtID) << std::endl;
+    std::cout << "  QoS                : " << static_cast<unsigned>(req.QoS) << std::endl;
 }
 
 // struct reqFlit {
@@ -32,15 +47,15 @@ inline void printReqFlit(const reqflit_t &flit) {
 inline void printDataFlit(const datflit_t &flit) {
     puts("*******************cpp*******************");
     std::cout << "dataFlit:" << std::endl;
-    std::cout << "  TgtID  : " << flit.TgtID.to_ulong() << std::endl;
-    std::cout << "  SrcID  : " << flit.SrcID.to_ulong() << std::endl;
-    std::cout << "  TxnID  : " << flit.TxnID.to_ulong() << std::endl;
-    std::cout << "  HomeID : " << flit.HomeNID.to_ulong() << std::endl;
-    std::cout << "  Opcode : " << flit.Opcode.to_ulong() << std::endl;
-    std::cout << "  Resp   : " << flit.Resp.to_ulong() << std::endl;
-    std::cout << "  DBID   : " << flit.DBID.to_ulong() << std::endl;
-    std::cout << "  CCID   : " << flit.CCID.to_ulong() << std::endl;
-    std::cout << "  DataID : " << flit.DataID.to_ulong() << std::endl;
+    std::cout << "  TgtID  : " << flit.TgtID << std::endl;
+    std::cout << "  SrcID  : " << flit.SrcID << std::endl;
+    std::cout << "  TxnID  : " << flit.TxnID << std::endl;
+    std::cout << "  HomeID : " << flit.HomeNID << std::endl;
+    std::cout << "  Opcode : " << flit.Opcode << std::endl;
+    std::cout << "  Resp   : " << flit.Resp << std::endl;
+    std::cout << "  DBID   : " << flit.DBID << std::endl;
+    std::cout << "  CCID   : " << flit.CCID << std::endl;
+    std::cout << "  DataID : " << flit.DataID << std::endl;
 }
 // struct dataFlit {
 //     uint32_t TgtID;
@@ -153,17 +168,16 @@ inline reqflit_t createReadNoSnp(
 inline datflit_t createCompData_UC(const reqflit_t &req) {
     datflit_t flit;
 
-    uint64_t addr = req.Addr.to_ullong();
-    uint8_t size = req.Size.to_ulong(); // Suppose Size=4
+    uint8_t size = req.Size; // Suppose Size=4
     printReqFlit(req);
-    Assert(addr % 4 == 0, "Address must be aligned to 4 bytes");
+    Assert(req.Addr % 4 == 0, "Address must be aligned to 4 bytes");
     Exit(size < 6, "Size must be less than 6");
     
     int num_bytes = 1 << size; // 16 bytes
     int num_words = num_bytes / 4;
     uint32_t word_data = 0;
     for (int i = 0; i < num_words; i++) {
-        uint64_t word_addr = static_cast<uint64_t>((req.Addr.to_ullong() & ~0x3UL) + i * 4);
+        uint64_t word_addr = static_cast<uint64_t>((req.Addr & ~0x3UL) + i * 4);
         mem.read_memory(word_addr, word_data);
         
         // DataFlit include 256 bits (32 bytes)
