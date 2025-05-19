@@ -36,8 +36,8 @@ extern "C" void chi_DMT_ReadNoSnp_req(const svBitVecVal* req_bits) {
         }
     }
     // dbg(req.TgtID);
-    printReqFlit(req);
-    printDataFlit(data);
+    // printReqFlit(req);
+    // printDataFlit(data);
     Exit(validTgtID, "Invalid TgtID");
     puts("DMT");
 

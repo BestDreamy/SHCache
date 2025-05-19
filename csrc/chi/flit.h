@@ -46,16 +46,17 @@ inline void printReqFlit(const reqflit_t &req) {
     
 inline void printDataFlit(const datflit_t &flit) {
     puts("*******************cpp*******************");
+    puts("*******************cpp*******************");
     std::cout << "dataFlit:" << std::endl;
-    std::cout << "  TgtID  : " << flit.TgtID << std::endl;
-    std::cout << "  SrcID  : " << flit.SrcID << std::endl;
-    std::cout << "  TxnID  : " << flit.TxnID << std::endl;
-    std::cout << "  HomeID : " << flit.HomeNID << std::endl;
-    std::cout << "  Opcode : " << flit.Opcode << std::endl;
-    std::cout << "  Resp   : " << flit.Resp << std::endl;
-    std::cout << "  DBID   : " << flit.DBID << std::endl;
-    std::cout << "  CCID   : " << flit.CCID << std::endl;
-    std::cout << "  DataID : " << flit.DataID << std::endl;
+    std::cout << "  TgtID  : " << flit.TgtID.to_ulong() << std::endl;
+    std::cout << "  SrcID  : " << flit.SrcID.to_ulong() << std::endl;
+    std::cout << "  TxnID  : " << flit.TxnID.to_ulong() << std::endl;
+    std::cout << "  HomeID : " << flit.HomeNID.to_ulong() << std::endl;
+    std::cout << "  Opcode : " << flit.Opcode.to_ulong() << std::endl;
+    std::cout << "  Resp   : " << flit.Resp.to_ulong() << std::endl;
+    std::cout << "  DBID   : " << flit.DBID.to_ulong() << std::endl;
+    std::cout << "  CCID   : " << flit.CCID.to_ulong() << std::endl;
+    std::cout << "  DataID : " << flit.DataID.to_ulong() << std::endl;
 }
 // struct dataFlit {
 //     uint32_t TgtID;
