@@ -4,14 +4,14 @@
 #include <map>
 
 struct Memory {
-    std::map<uint32_t, uint32_t> mem;
+    std::map<uint64_t, uint32_t> mem;
 
     Memory() {
         mem.clear();
     }
 
     // Read from memory
-    bool read_memory(const uint32_t &address, uint32_t& data) {
+    bool read_memory(const uint64_t &address, uint32_t& data) {
         auto it = mem.find(address);
         if (it == mem.end()) {
             mem[address] = 0;

@@ -40,6 +40,7 @@ inline void set_bits(uint64_t value, int width, uint64_t &bit_offset, uint32_t *
 }
 
 inline void bind_chi_req_flit(Vmodule* dut, const reqflit_t &req) {
+    // Total 125 bits
     uint32_t bits[7] = {0};
 
     uint64_t bit_offset = 0;
@@ -49,15 +50,15 @@ inline void bind_chi_req_flit(Vmodule* dut, const reqflit_t &req) {
     };
 
     set_req_bits(0, 4);                     // QoS
-    set_req_bits(req.TgtID, 7);             // TgtID
-    set_req_bits(req.SrcID, 7);             // SrcID
-    set_req_bits(req.TxnID, 8);             // TxnID
+    set_req_bits(req.TgtID.to_ulong(), 7);             // TgtID
+    set_req_bits(req.SrcID.to_ulong(), 7);             // SrcID
+    set_req_bits(req.TxnID.to_ulong(), 8);             // TxnID
     set_req_bits(0, 7);                     // StashNID_ReturnNID
     set_req_bits(0, 1);                     // StashNIDValid
     set_req_bits(0, 8);                     // StashLPID
-    set_req_bits(req.Opcode, 6);            // Opcode
-    set_req_bits(req.Size, 3);              // Size (8 bytes)
-    set_req_bits(req.Addr, 48);             // Addr
+    set_req_bits(req.Opcode.to_ulong(), 6);            // Opcode
+    set_req_bits(req.Size.to_ulong(), 3);              // Size (8 bytes)
+    set_req_bits(req.Addr.to_ullong(), 48);             // Addr
     set_req_bits(0, 1);                     // NS
     set_req_bits(0, 1);                     // LikelyShared
     set_req_bits(0, 1);                     // AllowRetry
@@ -67,7 +68,7 @@ inline void bind_chi_req_flit(Vmodule* dut, const reqflit_t &req) {
     set_req_bits(0, 1);                     // SnpAttr
     set_req_bits(0, 5);                     // LPID
     set_req_bits(0, 1);                     // Excl
-    set_req_bits(req.ExpCompAck, 1);        // ExpCompAck
+    set_req_bits(req.ExpCompAck.to_ulong(), 1);        // ExpCompAck
     set_req_bits(0, 1);                     // TraceTag
     set_req_bits(0, 4);                     // RSVDC
     set_req_bits(0, 4);                     // SrcType
