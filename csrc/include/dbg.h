@@ -1,6 +1,7 @@
 #ifndef DBG_H
 #define DBG_H
 #include <stdio.h>
+#include <assert.h>
 
 #define RESET_TXT "\033[0m"
 #define RED_TXT "\033[1;31m"

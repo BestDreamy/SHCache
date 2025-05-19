@@ -8,14 +8,15 @@
 #include <iostream>
 
 inline void printReqFlit(const reqflit_t &flit) {
+    puts("*******************cpp*******************");
     std::cout << "reqFlit:" << std::endl;
-    std::cout << "  TgtID      : " << flit.TgtID << std::endl;
-    std::cout << "  SrcID      : " << flit.SrcID << std::endl;
-    std::cout << "  TxnID      : " << flit.TxnID << std::endl;
-    std::cout << "  Opcode     : " << flit.Opcode << std::endl;
-    std::cout << "  Addr       : " << flit.Addr << std::endl;
-    std::cout << "  Size       : " << static_cast<uint32_t>(flit.Size) << std::endl;
-    std::cout << "  ExpCompAck : " << static_cast<uint32_t>(flit.ExpCompAck) << std::endl;
+    std::cout << "  TgtID      : " << flit.TgtID.to_ulong() << std::endl;
+    std::cout << "  SrcID      : " << flit.SrcID.to_ulong() << std::endl;
+    std::cout << "  TxnID      : " << flit.TxnID.to_ulong() << std::endl;
+    std::cout << "  Opcode     : " << flit.Opcode.to_ulong() << std::endl;
+    std::cout << "  Addr       : " << flit.Addr.to_ullong() << std::endl;
+    std::cout << "  Size       : " << static_cast<uint32_t>(flit.Size.to_ulong()) << std::endl;
+    std::cout << "  ExpCompAck : " << static_cast<uint32_t>(flit.ExpCompAck.to_ulong()) << std::endl;
 }
 
 // struct reqFlit {
@@ -29,16 +30,17 @@ inline void printReqFlit(const reqflit_t &flit) {
     // };
     
 inline void printDataFlit(const datflit_t &flit) {
+    puts("*******************cpp*******************");
     std::cout << "dataFlit:" << std::endl;
-    std::cout << "  TgtID  : " << flit.TgtID << std::endl;
-    std::cout << "  SrcID  : " << flit.SrcID << std::endl;
-    std::cout << "  TxnID  : " << flit.TxnID << std::endl;
-    std::cout << "  HomeID : " << flit.HomeNID << std::endl;
-    std::cout << "  Opcode : " << flit.Opcode << std::endl;
-    std::cout << "  Resp   : " << flit.Resp << std::endl;
-    std::cout << "  DBID   : " << flit.DBID << std::endl;
-    std::cout << "  CCID   : " << flit.CCID << std::endl;
-    std::cout << "  DataID : " << flit.DataID << std::endl;
+    std::cout << "  TgtID  : " << flit.TgtID.to_ulong() << std::endl;
+    std::cout << "  SrcID  : " << flit.SrcID.to_ulong() << std::endl;
+    std::cout << "  TxnID  : " << flit.TxnID.to_ulong() << std::endl;
+    std::cout << "  HomeID : " << flit.HomeNID.to_ulong() << std::endl;
+    std::cout << "  Opcode : " << flit.Opcode.to_ulong() << std::endl;
+    std::cout << "  Resp   : " << flit.Resp.to_ulong() << std::endl;
+    std::cout << "  DBID   : " << flit.DBID.to_ulong() << std::endl;
+    std::cout << "  CCID   : " << flit.CCID.to_ulong() << std::endl;
+    std::cout << "  DataID : " << flit.DataID.to_ulong() << std::endl;
 }
 // struct dataFlit {
 //     uint32_t TgtID;
@@ -151,16 +153,17 @@ inline reqflit_t createReadNoSnp(
 inline datflit_t createCompData_UC(const reqflit_t &req) {
     datflit_t flit;
 
-    uint64_t addr = req.Addr;
+    uint64_t addr = req.Addr.to_ullong();
+    uint8_t size = req.Size.to_ulong(); // Suppose Size=4
+    printReqFlit(req);
     Assert(addr % 4 == 0, "Address must be aligned to 4 bytes");
-    Assert(req.Size < 6, "Size must be less than 6");
-    uint8_t size = req.Size; // Suppose Size=4
+    Assert(size < 6, "Size must be less than 6");
     
     int num_bytes = 1 << size; // 16 bytes
     int num_words = num_bytes / 4;
     uint32_t word_data = 0;
     for (int i = 0; i < num_words; i++) {
-        uint32_t word_addr = static_cast<uint32_t>((req.Addr & ~0x3UL) + i * 4);
+        uint64_t word_addr = static_cast<uint64_t>((req.Addr.to_ullong() & ~0x3UL) + i * 4);
         mem.read_memory(word_addr, word_data);
         
         // DataFlit include 256 bits (32 bytes)

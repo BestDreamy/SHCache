@@ -21,9 +21,9 @@ extern "C" void chi_DMT_ReadNoSnp_req(reqflit_t req) {
             break;
         }
     }
-    dbg(req.TgtID);
-    printReqFlit(req);
-    printDataFlit(data);
+    // dbg(req.TgtID);
+    // printReqFlit(req);
+    // printDataFlit(data);
     Exit(validTgtID, "Invalid TgtID");
     puts("DMT");
 
