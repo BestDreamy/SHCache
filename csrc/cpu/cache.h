@@ -39,7 +39,7 @@ struct Cache {
             RN_Tracker_valid[i] = false;
     }
 
-    int find_first_RN_Tracker() {
+    int find_first_empty_RN_Tracker() {
         for (int i = 0; i < config.numCreditsForHNReq[0]; i ++) {
             if (RN_Tracker_valid[i] == false) {
                 return i;
@@ -105,7 +105,7 @@ struct Cache {
         if (!is_unique(address)) {
             reqflit_t req = chi_issue_ReadUnique_req(dut, tfp, coreId, address, BlockSize);
 
-            int id = find_first_RN_Tracker();
+            int id = find_first_empty_RN_Tracker();
             Assert(id != -1, "No available RN_Tracker");
 
             RN_Tracker[id] = req;

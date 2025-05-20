@@ -1,0 +1,13 @@
+{
+    "numRNs": 4,
+    "numHNs": 1,
+    "numSNs": 1,
+    "numCreditsForHNReq": [4],
+    "numCreditsForSNReq": [4],
+    "_comment": "rnid must encode from 0x0, because cpu[0] is the first cpu ",
+    "RNId": [0, 1, 2, 3],
+    "HNId": [5],
+    "SNId": [6],
+    "RNsOffset": [4]
+  }
+  

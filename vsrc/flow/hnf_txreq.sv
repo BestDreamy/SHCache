@@ -71,18 +71,18 @@ module hnf_txreq(
     //         $error("HNF RXREQ: Received a request with TgtID != HNF");
     // end
 
-always_comb begin
-    if (TXREQFLITV) begin 
-        $display("******************verilog debug******************");
-        $display("reqFlit:");
-        $display("  TgtID      : %h", TXREQFLIT.TgtID);
-        $display("  SrcID      : %h", TXREQFLIT.SrcID);
-        $display("  TxnID      : %h", TXREQFLIT.TxnID);
-        $display("  Opcode     : %h", TXREQFLIT.Opcode);
-        $display("  Addr       : %h", TXREQFLIT.Addr);
-        $display("  Size       : %h", TXREQFLIT.Size);
-        $display("  ExpCompAck : %b", TXREQFLIT.ExpCompAck);
-    end
-end
+// always_comb begin
+//     if (TXREQFLITV) begin 
+//         $display("******************verilog debug******************");
+//         $display("reqFlit:");
+//         $display("  TgtID      : %h", TXREQFLIT.TgtID);
+//         $display("  SrcID      : %h", TXREQFLIT.SrcID);
+//         $display("  TxnID      : %h", TXREQFLIT.TxnID);
+//         $display("  Opcode     : %h", TXREQFLIT.Opcode);
+//         $display("  Addr       : %h", TXREQFLIT.Addr);
+//         $display("  Size       : %h", TXREQFLIT.Size);
+//         $display("  ExpCompAck : %b", TXREQFLIT.ExpCompAck);
+//     end
+// end
 
 endmodule

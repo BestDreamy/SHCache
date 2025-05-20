@@ -28,13 +28,22 @@ if __name__ == "__main__":
     cpp_lines = ['#pragma once\n#include <cstdint>\n#include <bitset>\n\n']
 
     for struct_name, fields in config.items():
+        flit_width = 0
+
         # sv struct
         sv_lines.append(f"typedef struct packed {{")
         for field in fields:
             name = field["name"]
             width = field["width"]
             sv_lines.append(f"    logic {sv_width_decl(width)}{name};")
+            flit_width += width
         sv_lines.append(f"}} {struct_name};\n")
+        sv_lines.append(f"parameter int {struct_name[:-2]}_width = {flit_width};\n")
+        for field in fields:
+            name = field["name"]
+            width = field["width"]
+            sv_lines.append(f"parameter int {struct_name[:-2]}_{name}_width = {width};")
+        sv_lines.append("\n")
 
         # C++ struct
         cpp_lines.append(f"struct {struct_name} {{")
@@ -42,7 +51,17 @@ if __name__ == "__main__":
             name = field["name"]
             width = field["width"]
             cpp_lines.append(f"    {cpp_type(width)} {name};")
+        cpp_lines.append(f"    {struct_name}() :")
+        cpp_lines.append("        " + ",\n        ".join([f"{field['name']}(0)" for field in fields]) + " {}")
         cpp_lines.append("};\n")
+        # C++ struct total width
+        cpp_lines.append(f"constexpr size_t {struct_name[:-2]}_width = {flit_width};\n")
+        # C++ field width
+        for field in fields:
+            name = field["name"]
+            width = field["width"]
+            cpp_lines.append(f"constexpr size_t {struct_name[:-2]}_{name}_width = {width};")
+        cpp_lines.append("\n")
 
     sv_path = Path("vsrc/chi/auto_chi_flit.vh")
     cpp_path = Path("csrc/chi/auto_flit.h")

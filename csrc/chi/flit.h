@@ -8,7 +8,7 @@
 #include <iostream>
 
 inline void printReqFlit(const reqflit_t &req) {
-    puts("*******************cpp*******************");
+    std::cout << "================ Req Flit ================" << std::endl;
     std::cout << "reqflit_t:" << std::endl;
     std::cout << "  RSVDC              : " << static_cast<unsigned>(req.RSVDC) << std::endl;
     std::cout << "  TraceTag           : " << static_cast<unsigned>(req.TraceTag) << std::endl;
@@ -32,6 +32,7 @@ inline void printReqFlit(const reqflit_t &req) {
     std::cout << "  SrcID              : " << static_cast<unsigned>(req.SrcID) << std::endl;
     std::cout << "  TgtID              : " << static_cast<unsigned>(req.TgtID) << std::endl;
     std::cout << "  QoS                : " << static_cast<unsigned>(req.QoS) << std::endl;
+    std::cout << "============================================" << std::endl;
 }
 
 // struct reqFlit {
@@ -45,18 +46,32 @@ inline void printReqFlit(const reqflit_t &req) {
     // };
     
 inline void printDataFlit(const datflit_t &flit) {
-    puts("*******************cpp*******************");
-    puts("*******************cpp*******************");
-    std::cout << "dataFlit:" << std::endl;
-    std::cout << "  TgtID  : " << flit.TgtID << std::endl;
-    std::cout << "  SrcID  : " << flit.SrcID << std::endl;
-    std::cout << "  TxnID  : " << flit.TxnID << std::endl;
-    std::cout << "  HomeID : " << flit.HomeNID << std::endl;
-    std::cout << "  Opcode : " << flit.Opcode << std::endl;
-    std::cout << "  Resp   : " << flit.Resp << std::endl;
-    std::cout << "  DBID   : " << flit.DBID << std::endl;
-    std::cout << "  CCID   : " << flit.CCID << std::endl;
-    std::cout << "  DataID : " << flit.DataID << std::endl;
+    std::cout << "================ DataFlit ================" << std::endl;
+    std::cout << "Data:" << std::endl;
+    for (int i = 0; i < 8; ++i) { // 256 bits / 32 = 8
+        uint32_t val = 0;
+        for (int b = 0; b < 32; ++b) {
+            val |= (flit.Data[i * 32 + b] << b);
+        }
+        std::cout << "Word[" << i << "] = 0x" << std::hex << val << std::dec << std::endl;
+    }
+    std::cout << "BE       : 0x" << std::setw(8) << std::setfill('0') 
+                << std::hex << flit.BE << std::dec << std::setfill(' ') << std::endl;
+    std::cout << "RSVDC    : " << static_cast<unsigned>(flit.RSVDC) << std::endl;
+    std::cout << "TraceTag : " << static_cast<unsigned>(flit.TraceTag) << std::endl;
+    std::cout << "DataID   : " << static_cast<unsigned>(flit.DataID) << std::endl;
+    std::cout << "CCID     : " << static_cast<unsigned>(flit.CCID) << std::endl;
+    std::cout << "DBID     : " << static_cast<unsigned>(flit.DBID) << std::endl;
+    std::cout << "FwdState_DataPull : " << static_cast<unsigned>(flit.FwdState_DataPull) << std::endl;
+    std::cout << "Resp     : " << static_cast<unsigned>(flit.Resp) << std::endl;
+    std::cout << "RespErr  : " << static_cast<unsigned>(flit.RespErr) << std::endl;
+    std::cout << "Opcode   : " << static_cast<unsigned>(flit.Opcode) << std::endl;
+    std::cout << "HomeNID  : " << static_cast<unsigned>(flit.HomeNID) << std::endl;
+    std::cout << "TxnID    : " << static_cast<unsigned>(flit.TxnID) << std::endl;
+    std::cout << "SrcID    : " << static_cast<unsigned>(flit.SrcID) << std::endl;
+    std::cout << "TgtID    : " << static_cast<unsigned>(flit.TgtID) << std::endl;
+    std::cout << "QoS      : " << static_cast<unsigned>(flit.QoS) << std::endl;
+    std::cout << "============================================" << std::endl;
 }
 // struct dataFlit {
 //     uint32_t TgtID;
@@ -170,7 +185,6 @@ inline datflit_t createCompData_UC(const reqflit_t &req) {
     datflit_t flit;
 
     uint8_t size = req.Size; // Suppose Size=4
-    printReqFlit(req);
     Assert(req.Addr % 4 == 0, "Address must be aligned to 4 bytes");
     Exit(size < 6, "Size must be less than 6");
     

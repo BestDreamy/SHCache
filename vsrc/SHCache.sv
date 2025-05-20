@@ -1,5 +1,5 @@
-`include "chi_intf.vh"
-`include "autoconfig.v"
+`include "chi_flit.vh"
+`include "autoconfig.vh"
 `include "chi_cache.vh"
 
 module SHCache(

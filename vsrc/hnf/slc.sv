@@ -76,7 +76,7 @@ module slc(
     wire                slc_miss_sf_SC     = (~slc_hit) & (sf_hit & (sf_hit_state == `SF_SC));
     wire                slc_miss_sf_SD     = (~slc_hit) & (sf_hit & (sf_hit_state == `SF_SD));
 
-    // chi proto
+    // chi protocal
     // slc miss and sf miss
     wire [`CHI_SRCID_RANGE] ReturnNID     = slc_sf_req.SrcID;
     wire [`CHI_TXNID_RANGE] ReturnTxnID   = slc_sf_req.TxnID;
@@ -91,7 +91,6 @@ module slc(
         .StashNID_ReturnNID(ReturnNID),
         .TxnID(TxnID),
         .SrcID(SrcID)
-        // .TgtID(slc_sf_req.TgtID),
     );
 
     assign read_no_snp_v = slc_miss_sf_miss & slc_sf_req_valid;

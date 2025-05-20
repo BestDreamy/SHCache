@@ -208,6 +208,7 @@
 
 // CHI protocol just allow 1024 transactions in flight when txnid is 10 bits
 // In order to ensure the transaction ID is unique, {SrcID[3: 0], TxnID[3 :0]} is the real transaction ID
+// In other words, the max value SrcID and TxnID cannot exceed 15
 `define CHI_MAX_TXNID_W                  4   
 `define CHI_MAX_TXNID                    1 << `CHI_MAX_TXNID_W
 `define CHI_MAX_TXNID_RANGE              `CHI_MAX_TXNID_W-1 :0

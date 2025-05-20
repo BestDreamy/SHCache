@@ -2,6 +2,7 @@
 #include "flit.h"
 #include "transaction.h"
 #include <cassert>
+#include <cstddef>
 #include "../cpu/cpu.h"
 #include "../include/utils.h"
 
@@ -12,15 +13,15 @@ extern "C" void chi_recv_ReadNoSnp_req(reqflit_t req, datflit_t *data) {
 }
 
 extern "C" void chi_DMT_ReadNoSnp_req(const svBitVecVal* req_bits) {
-    std::bitset<125> bits;
-    for (int i = 0; i < 8; ++i) { // 4 words * 32 = 128 bits
+    std::bitset<reqflit_width> bits;
+    Assert(sizeof(size_t) == 8, "ABI must be 64 bits");
+    for (int i = 0; i < ceil_div(reqflit_width, 32) * 2; ++i) { // 4 words * 32 = 128 bits
         uint32_t word = req_bits[i];
-        printf("%08x\n", word);
         if (i & 1) {
             Assert(word == 0, "Padding word should be 0");
             continue;
         }
-        for (int j = 0; j < 32 && (i * 16 + j) < 125; ++j) {
+        for (int j = 0; j < 32 && (i * 16 + j) < reqflit_width; ++j) {
             bits[i * 16 + j] = (word >> j) & 1;
         }
     }
@@ -30,16 +31,15 @@ extern "C" void chi_DMT_ReadNoSnp_req(const svBitVecVal* req_bits) {
     
     bool validTgtID = false;
     for (int i = 0; i < config.numRNs; i++) {
-        if (req.TgtID == config.RNId[i]) {
+        if (data.TgtID == config.RNId[i]) {
             validTgtID = true;
             break;
         }
     }
-    // dbg(req.TgtID);
-    // printReqFlit(req);
-    // printDataFlit(data);
+
+    printReqFlit(req);
+    printDataFlit(data);
     Exit(validTgtID, "Invalid TgtID");
-    puts("DMT");
 
     cpu[req.TgtID].update_cache(data);
 }
