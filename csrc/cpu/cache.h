@@ -50,6 +50,7 @@ struct Cache {
 
     int find_RN_Tracker_from_CompData(const datflit_t &data) {
         for (int i = 0; i < config.numCreditsForHNReq[0]; i ++) {
+            if (RN_Tracker_valid[i] == false) continue;
             if (RN_Tracker[i].TxnID == data.TxnID && RN_Tracker[i].SrcID == data.TgtID) {
                 return i;
             }
@@ -106,6 +107,7 @@ struct Cache {
             reqflit_t req = chi_issue_ReadUnique_req(dut, tfp, coreId, address, BlockSize);
 
             int id = find_first_empty_RN_Tracker();
+            show_RN_Tracker();
             Assert(id != -1, "No available RN_Tracker");
 
             RN_Tracker[id] = req;
@@ -171,6 +173,17 @@ struct Cache {
             }
             std::cout << "]" << std::endl;
         }
+    }
+
+    void show_RN_Tracker() const {
+        std::cout << "RN_Tracker Information:" << std::endl;
+        for (int i = 0; i < config.numCreditsForHNReq[0]; i ++) {
+            if (RN_Tracker_valid[i]) {
+                std::cout << "ID: " << i << ", TxnID: " << RN_Tracker[i].TxnID
+                          << ", SrcID: " << RN_Tracker[i].SrcID << std::endl;
+            }
+        }
+        std::cout << "----------------------------------------" << std::endl;
     }
 };
 

@@ -78,6 +78,9 @@ module hnf_rxreq(
     always_comb begin
         assert(rxreqflit_recv_en & (TgtID[`CHI_MAX_SRCID_RANGE] == HNId[0][`CHI_MAX_SRCID_RANGE])) else
             $error("HNF RXREQ: Received a request with TgtID != HNF");
+
+        assert(rxreqflit_recv_en & (TxnID[`CHI_TXNID_RANGE] < rxreq_posq_size)) else
+            $error("Each RNF can only send %0d requests to HNF at a time", rxreq_posq_size);
     end
 
 endmodule

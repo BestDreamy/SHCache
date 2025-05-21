@@ -95,6 +95,35 @@ module slc(
 
     assign read_no_snp_v = slc_miss_sf_miss & slc_sf_req_valid;
 
+
+    parameter int rxreq_posq_size = numCreditsForHNReq[0];
+    reg HN_Tracker [`CHI_SRCID_RANGE][rxreq_posq_size];
+
+    always @(posedge clock) begin: HN_Tracker_ff
+        if (reset) begin
+            for (int i = 0; i < `CHI_SRCID_W; i++) begin
+                for (int j = 0; j < rxreq_posq_size; j++) begin
+                    HN_Tracker[i][j] <= '0;
+                end
+            end
+        end else begin
+            if (read_no_snp_v) begin
+                int free_txnid = -1;
+                for (int i = 0; i < rxreq_posq_size; i++) begin
+                    if (HN_Tracker[i][slc_sf_req.SrcID] == '0 && free_txnid == -1) begin
+                        free_txnid = i;
+                    end
+                end
+
+                if (free_txnid != -1) begin
+                    HN_Tracker[free_txnid][slc_sf_req.SrcID] <= slc_sf_req;
+                end else begin
+                    $error("No free HN Tracker entry available for SrcID %0d", SrcID);
+                end
+            end
+        end
+    end
+
     /*************************************************************/
 
     /*
