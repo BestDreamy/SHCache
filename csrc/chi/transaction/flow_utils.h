@@ -1,9 +1,7 @@
-#ifndef TRANSACTION_H
-#define TRANSACTION_H
 #include <cstdint>
-#include "../include/utils.h"
-#include "auto_flit.h"
-#include "flit.h"
+#include "../../include/utils.h"
+#include "../auto_flit.h"
+#include "../flit.h"
 
 inline void sim_one_cycle(
     Vmodule* dut, VerilatedFstC* tfp
@@ -79,37 +77,6 @@ inline void encode_chi_req_flit(Vmodule* dut, const reqflit_t &req) {
     }
 }
 
-inline reqflit_t chi_issue_ReadUnique_req(
-    Vmodule* dut, VerilatedFstC* tfp, 
-    const int &srcID, const uint32_t &Addr, const uint32_t &Size
-) {
-    reqflit_t req = createReadUnique(srcID, Addr, Size);
-    while (true) {
-        if (dut->RXREQLCRDV == 1) {
-            sim_half_cycle(dut, tfp); // @posedge
-            dut->RXREQFLITPEND = 1;
-            dut->eval();
-            sim_half_cycle(dut, tfp);
-
-            sim_half_cycle(dut, tfp); // @posedge
-            dut->RXREQFLITPEND = 0; // Special for verilator (Real should be 0)
-            dut->RXREQFLITV = 1;
-            encode_chi_req_flit(dut, req);
-            dut->eval();
-            sim_half_cycle(dut, tfp);
-
-            sim_half_cycle(dut, tfp); // @posedge
-            dut->RXREQFLITV = 0;
-            dut->eval();
-            sim_half_cycle(dut, tfp);
-            break;
-        } else {
-            sim_one_cycle(dut, tfp); // @posedge
-        }
-    }
-    return req;
-}
-
 // input: svBitVecVal*
 // output: reqflit_t
 inline reqflit_t decode_req_from_bitset(const std::bitset<reqflit_width>& bits) {
@@ -149,32 +116,3 @@ inline reqflit_t decode_req_from_bitset(const std::bitset<reqflit_width>& bits) 
     req.RSVDC              = static_cast<uint8_t>(get_req_bits(offset, reqflit_RSVDC_width));              offset += reqflit_RSVDC_width;
     return req;
 }
-
-// inline void chi_recv_ReadNoSnp_req(
-//     Vmodule* dut, VerilatedFstC* tfp, 
-//     const int &srcID, const uint32_t &Addr, const uint32_t &Size
-// ) {
-//     reqflit_t req = createReadNoSnp(srcID, Addr, Size);
-//     while (true) {
-//         if (dut->rxreqlcrdv == 1) {
-//             dut->rxreqflitpend = 1;
-//             sim_one_cycle(dut, tfp); // @posedge
-
-//             dut->rxreqflitpend = 0;
-//             dut->rxreqflitv = 1;
-//             bind_chi_req_flit(dut, req);
-
-//             sim_one_cycle(dut, tfp); // @posedge
-//             dut->rxreqflitv = 0;
-//             break;
-//         } else {
-//             sim_one_cycle(dut, tfp); // @posedge
-//         }
-//     }
-// }
-
-extern "C" void chi_recv_ReadNoSnp_req(reqflit_t req, datflit_t *data);
-
-extern "C" void chi_DMT_ReadNoSnp_req(const svBitVecVal* req);
-
-#endif // TRANSACTION_H

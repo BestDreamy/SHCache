@@ -2,7 +2,7 @@
 #define CACHE_H
 #include "../include/utils.h"
 #include "../mem.h"
-#include "../chi/transaction.h"
+#include "../chi/transaction/flow.h"
 #include "../include/autoconfig.h"
 #include <cstddef>
 

@@ -1,6 +1,6 @@
 #include "auto_flit.h"
 #include "flit.h"
-#include "transaction.h"
+#include "transaction/flow.h"
 #include <cassert>
 #include <cstddef>
 #include "../cpu/cpu.h"

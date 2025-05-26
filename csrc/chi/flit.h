@@ -48,7 +48,7 @@ inline void printReqFlit(const reqflit_t &req) {
 inline void printDataFlit(const datflit_t &flit) {
     std::cout << "================ DataFlit ================" << std::endl;
     std::cout << "Data:" << std::endl;
-    for (int i = 0; i < 8; ++i) { // 256 bits / 32 = 8
+    for (int i = 7; i >= 0; i --) { // 256 bits / 32 = 8
         uint32_t val = 0;
         for (int b = 0; b < 32; ++b) {
             val |= (flit.Data[i * 32 + b] << b);
