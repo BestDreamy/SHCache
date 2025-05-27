@@ -1,7 +1,7 @@
 #include <cstdint>
 #include "../../include/utils.h"
-#include "../auto_flit.h"
-#include "../flit.h"
+#include "../flit/auto_flit.h"
+#include "../flit/flit.h"
 
 inline void sim_one_cycle(
     Vmodule* dut, VerilatedFstC* tfp

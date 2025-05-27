@@ -4,7 +4,6 @@
 #include "../mem.h"
 #include "../chi/transaction/flow.h"
 #include "../include/autoconfig.h"
-#include <cstddef>
 
 enum cpuCacheState {
     I = 0,
@@ -39,7 +38,7 @@ struct Cache {
             RN_Tracker_valid[i] = false;
     }
 
-    int find_first_empty_RN_Tracker() {
+    int find_first_empty_RN_Tracker() const {
         for (int i = 0; i < config.numCreditsForHNReq[0]; i ++) {
             if (RN_Tracker_valid[i] == false) {
                 return i;
@@ -48,14 +47,33 @@ struct Cache {
         return -1;
     }
 
-    int find_RN_Tracker_from_CompData(const datflit_t &data) {
+    int find_RN_Tracker_from_CompData(const datflit_t &data) const {
         for (int i = 0; i < config.numCreditsForHNReq[0]; i ++) {
             if (RN_Tracker_valid[i] == false) continue;
-            if (RN_Tracker[i].TxnID == data.TxnID && RN_Tracker[i].SrcID == data.TgtID) {
+            if (RN_Tracker[i].TxnID == data.TxnID && RN_Tracker[i].TgtID == data.HomeNID) {
                 return i;
             }
         }
         return -1;
+    }
+
+    int RN_Tracker_pop(const datflit_t &data) {
+        dbgLog("RN Tracker pop");
+        int id = find_RN_Tracker_from_CompData(data);
+        Assert(id != -1, "No available RN_Tracker");
+        
+        RN_Tracker_valid[id] = false;
+        return id;
+    }
+
+    int RN_Tracker_push(const reqflit_t &req) {
+        dbgLog("RN Tracker push");
+        int id = find_first_empty_RN_Tracker();
+        Assert(id != -1, "No available RN_Tracker");
+        
+        RN_Tracker[id] = req;
+        RN_Tracker_valid[id] = true;
+        return id;
     }
 
     /*
@@ -64,14 +82,14 @@ struct Cache {
     ------------------------------------------------------------------
     */
 
-    bool is_hit(const uint32_t &address) {
+    bool is_hit(const uint32_t &address) const {
         size_t index = (address / numBlock) % NumSets; // Extract index from address
         uint32_t tag = address / (NumSets * numBlock); // Extract tag from address
         
         return (val_array[index] and tag_array[index] == tag);
     }
 
-    bool is_unique(const uint32_t &address) {
+    bool is_unique(const uint32_t &address) const {
         size_t index = (address / numBlock) % NumSets; // Extract index from address
         uint32_t tag = address / (NumSets * numBlock); // Extract tag from address
         
@@ -96,6 +114,8 @@ struct Cache {
         */
     }
 
+    // If the cache line is not valid
+    // issue a ReadUnique request
     void update(
         Vmodule* dut, VerilatedFstC* tfp,
         const int &coreId, const uint32_t &address, const uint32_t& new_data
@@ -105,13 +125,8 @@ struct Cache {
 
         if (!is_unique(address)) {
             reqflit_t req = chi_issue_ReadUnique_req(dut, tfp, coreId, address, BlockSize);
-
-            int id = find_first_empty_RN_Tracker();
-            show_RN_Tracker();
-            Assert(id != -1, "No available RN_Tracker");
-
-            RN_Tracker[id] = req;
-            RN_Tracker_valid[id] = true;
+            
+            RN_Tracker_push(req);
         }
         
         // // Update the cache line
@@ -125,8 +140,15 @@ struct Cache {
     }
 
     void update(const datflit_t &data) {
-        int id = find_RN_Tracker_from_CompData(data);
-        Assert(id != -1, "No available RN_Tracker");
+        Log("show RN Tracker");
+        show_RN_Tracker();
+        Log("show reqflit_t");
+    printReqFlit(RN_Tracker[0]);
+    Log("show datflit_t");
+    printDataFlit(data);
+        int id = RN_Tracker_pop(data);
+        Log("show id");
+        dbg(id);
         reqflit_t req = RN_Tracker[id];
 
         uint32_t addr = req.Addr;
@@ -155,6 +177,7 @@ struct Cache {
             }
         }
 
+        Log("show cache");
         show_cache();
     }
 
@@ -179,8 +202,8 @@ struct Cache {
         std::cout << "RN_Tracker Information:" << std::endl;
         for (int i = 0; i < config.numCreditsForHNReq[0]; i ++) {
             if (RN_Tracker_valid[i]) {
-                std::cout << "ID: " << i << ", TxnID: " << RN_Tracker[i].TxnID
-                          << ", SrcID: " << RN_Tracker[i].SrcID << std::endl;
+                std::cout << "ID: " << i << ", TxnID: " << static_cast<unsigned>(RN_Tracker[i].TxnID)
+                          << ", SrcID: " << static_cast<unsigned>(RN_Tracker[i].SrcID) << std::endl;
             }
         }
         std::cout << "----------------------------------------" << std::endl;

@@ -1,15 +1,16 @@
 #ifndef DBG_H
 #define DBG_H
 #include <stdio.h>
-#include "../include/utils.h"
+#include "utils.h"
 
+#define ANSI_FMT(str, color) color str RESET_TXT
 #define RESET_TXT "\033[0m"
 #define RED_TXT "\033[1;31m"
 #define GREEN_TXT "\033[1;32m"
 #define BLUE_TXT "\033[1;34m"
 #define YELLOW_TXT "\033[1;33m"
 
-#define dbg(a) std::cout << #a << " : " << (a) << std::endl
+#define dbg(a) std::cout << __FILE__ << __LINE__ << " " << #a << " : " << static_cast<unsigned>(a) << std::endl
 
 #define PRINT_RESULT(condition) \
     do { \
@@ -25,6 +26,16 @@
         printf(ANSI_FMT("[%s:%d %s] " format, BLUE_TXT) "\n", \
         __FILE__, __LINE__, __func__, ## __VA_ARGS__); \
     } while(0)
+
+#ifdef DEBUG
+    #define dbgLog(format, ...) ((void)0)
+#else
+    #define dbgLog(format, ...) \
+        do { \
+            printf(ANSI_FMT("[%s:%d %s] " format, YELLOW_TXT) "\n", \
+            __FILE__, __LINE__, __func__, ## __VA_ARGS__); \
+        } while(0)
+#endif
 
 inline void assert_fail_msg(const char* msg) {
     printf(RED_TXT "%s\n" RESET_TXT, msg);

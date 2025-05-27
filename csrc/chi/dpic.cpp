@@ -1,5 +1,4 @@
-#include "auto_flit.h"
-#include "flit.h"
+#include "flit/flit.h"
 #include "transaction/flow.h"
 #include <cassert>
 #include <cstddef>
@@ -37,9 +36,9 @@ extern "C" void chi_DMT_ReadNoSnp_req(const svBitVecVal* req_bits) {
         }
     }
 
-    printReqFlit(req);
+    dbgLog("CompData received");
     printDataFlit(data);
     Exit(validTgtID, "Invalid TgtID");
 
-    cpu[req.TgtID].update_cache(data);
+    cpu[data.TgtID].update_cache(data);
 }

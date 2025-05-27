@@ -16,7 +16,7 @@ struct Memory {
         if (it == mem.end()) {
             mem[address] = 0;
         }
-        data = it->second;
+        data = mem[address];
         return true;
     }
 

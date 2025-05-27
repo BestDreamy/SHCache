@@ -16,7 +16,8 @@ BUILD_DIR = ./build
 OBJ_DIR = $(BUILD_DIR)/obj_dir
 BIN = $(BUILD_DIR)/$(TOP_NAME)
 
-CXXFLAGS = -MMD -MP
+DEBUG ?= Y
+CXXFLAGS = -MMD -MP -D${DEBUG}
 
 # Just for testing
 TEST_DIR = $(abspath ./benchmark)

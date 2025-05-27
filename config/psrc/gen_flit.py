@@ -1,5 +1,4 @@
 from pathlib import Path
-
 import json
 
 def load_json(file_path):
@@ -20,7 +19,13 @@ def cpp_type(width):
         return "uint64_t"
     else:
         return f"std::bitset<{width}>"
-    
+
+def cpp_init_expr(width):
+    if width > 64:
+        return f"std::bitset<{width}>()"
+    else:
+        return f"{cpp_type(width)}()"
+
 if __name__ == "__main__":
     config = load_json(Path("config/spec/flit.json"))
 
@@ -51,8 +56,33 @@ if __name__ == "__main__":
             name = field["name"]
             width = field["width"]
             cpp_lines.append(f"    {cpp_type(width)} {name};")
-        cpp_lines.append(f"    {struct_name}() :")
-        cpp_lines.append("        " + ",\n        ".join([f"{field['name']}(0)" for field in fields]) + " {}")
+
+        # default constructor
+        if fields:
+            cpp_lines.append(f"    {struct_name}() noexcept")
+            cpp_lines.append("        : " + ",\n          ".join(
+                [f"{field['name']}({cpp_init_expr(field['width'])})" for field in fields]
+            ) + " {}")
+        else:
+            cpp_lines.append(f"    {struct_name}() {{}}")
+
+        # copy constructor
+        cpp_lines.append(f"    {struct_name}(const {struct_name}& other) noexcept {{")
+        for field in fields:
+            name = field["name"]
+            cpp_lines.append(f"        {name} = other.{name};")
+        cpp_lines.append("    }")
+
+        # copy assignment operator
+        cpp_lines.append(f"    {struct_name}& operator=(const {struct_name}& other) noexcept {{")
+        cpp_lines.append("        if (this != &other) {")
+        for field in fields:
+            name = field["name"]
+            cpp_lines.append(f"            {name} = other.{name};")
+        cpp_lines.append("        }")
+        cpp_lines.append("        return *this;")
+        cpp_lines.append("    }")
+
         cpp_lines.append("};\n")
         # C++ struct total width
         cpp_lines.append(f"constexpr size_t {struct_name[:-2]}_width = {flit_width};\n")
@@ -64,7 +94,7 @@ if __name__ == "__main__":
         cpp_lines.append("\n")
 
     sv_path = Path("vsrc/chi/auto_chi_flit.vh")
-    cpp_path = Path("csrc/chi/auto_flit.h")
+    cpp_path = Path("csrc/chi/flit/auto_flit.h")
 
     sv_path.write_text("\n".join(sv_lines))
     cpp_path.write_text("\n".join(cpp_lines))
