@@ -60,7 +60,7 @@ struct Cache {
     int RN_Tracker_pop(const datflit_t &data) {
         dbgLog("RN Tracker pop");
         int id = find_RN_Tracker_from_CompData(data);
-        Assert(id != -1, "No available RN_Tracker");
+        Exit(id != -1, "No available RN_Tracker");
         
         RN_Tracker_valid[id] = false;
         return id;
@@ -69,7 +69,7 @@ struct Cache {
     int RN_Tracker_push(const reqflit_t &req) {
         dbgLog("RN Tracker push");
         int id = find_first_empty_RN_Tracker();
-        Assert(id != -1, "No available RN_Tracker");
+        Exit(id != -1, "No available RN_Tracker");
         
         RN_Tracker[id] = req;
         RN_Tracker_valid[id] = true;
@@ -140,15 +140,7 @@ struct Cache {
     }
 
     void update(const datflit_t &data) {
-        Log("show RN Tracker");
-        show_RN_Tracker();
-        Log("show reqflit_t");
-    printReqFlit(RN_Tracker[0]);
-    Log("show datflit_t");
-    printDataFlit(data);
         int id = RN_Tracker_pop(data);
-        Log("show id");
-        dbg(id);
         reqflit_t req = RN_Tracker[id];
 
         uint32_t addr = req.Addr;
@@ -177,8 +169,6 @@ struct Cache {
             }
         }
 
-        Log("show cache");
-        show_cache();
     }
 
     void show_cache() const {

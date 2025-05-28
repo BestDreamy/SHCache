@@ -36,8 +36,6 @@ extern "C" void chi_DMT_ReadNoSnp_req(const svBitVecVal* req_bits) {
         }
     }
 
-    dbgLog("CompData received");
-    printDataFlit(data);
     Exit(validTgtID, "Invalid TgtID");
 
     cpu[data.TgtID].update_cache(data);

@@ -14,29 +14,25 @@ module hnf_txreq(
     output logic     TXREQFLITPEND,
     input  logic     TXREQLCRDV,
 
+    input  reqflit_t txreqflit,
+    input  logic     txreq_valid,
+    output logic     txreq_ready,
+
     input            clock,
     input            reset
 );
+    assign TXREQFLITPEND = TXREQLCRDV;
+    assign TXREQFLIT = txreqflit;
+    assign TXREQFLITV = txreq_valid;
 
-    reg txreqflitv_q; // ensure L-credit for chi
-
-    always @(posedge clock) begin: TXREQFLITV_ff
-        if(reset == 1'b1)
-            txreqflitv_q <= 1'b0;
-        else if (TXREQLCRDV & TXREQFLITPEND)
-            txreqflitv_q <= 1'b1;
-        else
-            txreqflitv_q <= 1'b0;
-    end
-
-    assign TXREQFLITV = txreqflitv_q;
+    assign txreq_ready = TXREQLCRDV;
 
     datflit_t CompData_q, CompData_d;
     always@(posedge clock) begin: CompData_ff
         if (reset) begin
             CompData_q <= '0;
         end else if (TXREQFLITV) begin
-            CompData_q <= CompData_d;
+            CompData_q <= 'b1;
             chi_DMT_ReadNoSnp_req(TXREQFLIT);
         end
     end

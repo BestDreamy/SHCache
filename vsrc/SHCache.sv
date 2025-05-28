@@ -38,7 +38,9 @@ module SHCache(
     wire                slc_sf_req_valid;
     reqflit_t           slc_sf_req;
     wire                slc_sf_req_ready;
-    wire                slc_sf_req_lhs_hs;
+    wire                slc_sf_req_lhs_hs = rxreq_posq_first_entry_valid & 
+                                            rxreq_posq_first_entry_ready;
+    wire                pocq_push_rxreq_en = slc_sf_req_lhs_hs & slc_sf_req.ExpCompAck;
     rxreq_slc pipe_rxreq_slc (
         .flush(default_pipe_flush),
         .pin_valid(rxreq_posq_first_entry_valid),
@@ -78,6 +80,7 @@ module SHCache(
     wire                    txreq_valid;
     reqflit_t               txreqflit;
     wire                    txreq_ready;
+    wire                    txreq_rhs_hs = txreq_valid & txreq_ready;
     slc_txreq pipe_slc_txreq (
         .flush(default_pipe_flush),
         .pin_valid(read_no_snp_v),
@@ -91,10 +94,13 @@ module SHCache(
     );
 
     hnf_txreq u_hnf_txreq (
-        .TXREQFLIT(txreqflit),
-        .TXREQFLITV(txreq_ready),
-        .TXREQFLITPEND(txreq_valid),
+        .TXREQFLIT(TXREQFLIT),
+        .TXREQFLITV(TXREQFLITV),
+        .TXREQFLITPEND(TXREQFLITPEND),
         .TXREQLCRDV(TXREQLCRDV),
+        .txreqflit(txreqflit),
+        .txreq_valid(txreq_rhs_hs),
+        .txreq_ready(txreq_ready),
         .clock(clock),
         .reset(reset)
     );
@@ -102,7 +108,7 @@ module SHCache(
     pocq #(
         .DEPTH(16)
     ) u_pocq_inst (
-        .req_entry_en(slc_sf_req_lhs_hs),
+        .req_entry_en(pocq_push_rxreq_en),
         .req_entry(rxreq_posq_first_entry),
         .clock(clock),
         .reset(reset)

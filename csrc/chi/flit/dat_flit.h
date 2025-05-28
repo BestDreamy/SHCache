@@ -13,7 +13,9 @@ enum CHI_DataFlit_Opcode {
     CompData             = 0x4,
     SnpRespDataPtl       = 0x5,
     SnpRespDataFwded     = 0x6,
-    WriterDataCancel     = 0x7
+    WriterDataCancel     = 0x7,
+    DataSepResp          = 0xb,
+    NCBWrDataCompAck     = 0xc
 };
 
 enum CHI_DataFlit_Resp {
