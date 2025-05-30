@@ -5,6 +5,7 @@
 #include "cache.h"
 #include <memory>
 #include "../include/dbg.h"
+#include <queue>
 
 template <size_t NumRegisters = 32, size_t NumCacheSets = 128, size_t CacheBlockSize = 4>
 struct CPU {
@@ -131,5 +132,10 @@ struct CPU {
 
 #define NUMCORES 2
 extern CPU<> cpu[NUMCORES];
+
+extern reqflit_t RN_req_channel[NUMCORES];
+extern datflit_t RN_dat_channel[NUMCORES];
+extern rspflit_t RN_rsp_channel[NUMCORES];
+extern snpflit_t RN_snp_channel[NUMCORES];
 
 #endif

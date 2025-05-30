@@ -83,21 +83,21 @@ struct Cache {
     ------------------------------------------------------------------
     */
 
-    bool is_hit(const uint32_t &addr) const {
+    bool is_hit(const uint64_t &addr) const {
         size_t index = (addr / numBlock) % numSet; // Extract index from address
         uint32_t tag = addr / (numSet * numBlock); // Extract tag from address
         
         return (val_array[index] and tag_array[index] == tag);
     }
 
-    bool is_unique(const uint32_t &addr) const {
+    bool is_unique(const uint64_t &addr) const {
         size_t index = (addr / numBlock) % numSet; // Extract index from address
         uint32_t tag = addr / (numSet * numBlock); // Extract tag from address
         
         return ((val_array[index] == UC or val_array[index] == UD) and tag_array[index] == tag);
     }
     
-    bool access(const uint32_t &addr, uint32_t& data) const {
+    bool access(const uint64_t &addr, uint32_t& data) const {
         uint32_t aligned_addr = addr & ~(numBlock - 1);
 
         size_t index = (aligned_addr / numBlock) % numSet; // Extract index from address
@@ -134,7 +134,7 @@ struct Cache {
     // issue a ReadUnique request
     void update(
         Vmodule* dut, VerilatedFstC* tfp,
-        const int &coreId, const uint32_t &addr, const uint32_t& new_data
+        const int &coreId, const uint64_t &addr, const uint32_t& new_data
     ) {
         uint32_t aligned_addr = addr & ~(numBlock - 1);
         if (!is_unique(aligned_addr)) {

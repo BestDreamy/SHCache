@@ -3,6 +3,10 @@
 
 Config config;
 CPU<> cpu[NUMCORES];
+reqflit_t RN_req_channel[NUMCORES];
+datflit_t RN_dat_channel[NUMCORES];
+rspflit_t RN_rsp_channel[NUMCORES];
+snpflit_t RN_snp_channel[NUMCORES];
 Memory mem;
 
 void sys_init(Vmodule* dut, VerilatedFstC* tfp) {

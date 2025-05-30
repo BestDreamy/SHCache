@@ -32,6 +32,8 @@ inline reqflit_t chi_issue_ReadUnique_req(
     return req;
 }
 
-extern "C" void chi_recv_ReadNoSnp_req(reqflit_t req, datflit_t *data);
+extern "C" {
+    void chi_recv_ReadNoSnp_req(reqflit_t req, datflit_t *data);
 
-extern "C" void chi_DMT_ReadNoSnp_req(const svBitVecVal* req);
+    void chi_DMT_ReadNoSnp_req(const svBitVecVal* req);
+}
