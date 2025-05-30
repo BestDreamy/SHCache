@@ -4,8 +4,9 @@
 #include "../mem.h"
 #include "../chi/transaction/flow.h"
 #include "../include/autoconfig.h"
+#include <cstddef>
 
-enum cpuCacheState {
+enum CPU_Cache_State {
     I = 0,
     SC = 1,
     UC = 2,
@@ -14,19 +15,19 @@ enum cpuCacheState {
 };
 
 // Direct-Map Local Cache
-template <size_t NumSets = 128, size_t BlockSize = 4>
+template <size_t numSet = 128, size_t BlockSize = 4>
 struct Cache {
     static constexpr size_t numBlock = 1 << BlockSize;
-    uint32_t tag_array[NumSets];
-    uint8_t data_array[NumSets][numBlock]; // 4 int per set
-    cpuCacheState val_array[NumSets];
+    uint32_t tag_array[numSet];
+    uint8_t data_array[numSet][numBlock]; // 4 int per set
+    CPU_Cache_State val_array[numSet];
 
     reqflit_t RN_Tracker[config.numCreditsForHNReq[0]];
     bool RN_Tracker_valid[config.numCreditsForHNReq[0]];
 
     Cache() {
         
-        for (size_t i = 0; i < NumSets; ++i) {
+        for (size_t i = 0; i < numSet; ++i) {
             tag_array[i] = 0;
             val_array[i] = I;
             for (size_t j = 0; j < numBlock; ++j) {
@@ -58,7 +59,7 @@ struct Cache {
     }
 
     int RN_Tracker_pop(const datflit_t &data) {
-        dbgLog("RN Tracker pop");
+        devLog("RN Tracker pop");
         int id = find_RN_Tracker_from_CompData(data);
         Exit(id != -1, "No available RN_Tracker");
         
@@ -67,7 +68,7 @@ struct Cache {
     }
 
     int RN_Tracker_push(const reqflit_t &req) {
-        dbgLog("RN Tracker push");
+        devLog("RN Tracker push");
         int id = find_first_empty_RN_Tracker();
         Exit(id != -1, "No available RN_Tracker");
         
@@ -82,27 +83,28 @@ struct Cache {
     ------------------------------------------------------------------
     */
 
-    bool is_hit(const uint32_t &address) const {
-        size_t index = (address / numBlock) % NumSets; // Extract index from address
-        uint32_t tag = address / (NumSets * numBlock); // Extract tag from address
+    bool is_hit(const uint32_t &addr) const {
+        size_t index = (addr / numBlock) % numSet; // Extract index from address
+        uint32_t tag = addr / (numSet * numBlock); // Extract tag from address
         
         return (val_array[index] and tag_array[index] == tag);
     }
 
-    bool is_unique(const uint32_t &address) const {
-        size_t index = (address / numBlock) % NumSets; // Extract index from address
-        uint32_t tag = address / (NumSets * numBlock); // Extract tag from address
+    bool is_unique(const uint32_t &addr) const {
+        size_t index = (addr / numBlock) % numSet; // Extract index from address
+        uint32_t tag = addr / (numSet * numBlock); // Extract tag from address
         
         return ((val_array[index] == UC or val_array[index] == UD) and tag_array[index] == tag);
     }
     
-    bool access(const uint32_t &address, uint32_t& data) {
-        size_t index = (address / numBlock) % NumSets; // Extract index from address
-        uint32_t tag = address / (NumSets * numBlock); // Extract tag from address
-        
-        if (is_hit(address)) {
-            size_t block_offset = address % numBlock;
-            memcpy(&data, &data_array[index][block_offset], sizeof(uint32_t));
+    bool access(const uint32_t &addr, uint32_t& data) const {
+        uint32_t aligned_addr = addr & ~(numBlock - 1);
+
+        size_t index = (aligned_addr / numBlock) % numSet; // Extract index from address
+        uint32_t tag = aligned_addr / (numSet * numBlock); // Extract tag from address
+
+        if (is_hit(aligned_addr)) {
+            memcpy(&data, data_array[index], sizeof(uint32_t));
             return true;
         }
         
@@ -114,45 +116,44 @@ struct Cache {
         */
     }
 
+    void update_cacheline(const uint64_t &addr, const uint8_t& data, const CPU_Cache_State &state) {
+        size_t offset = addr % numBlock; // Extract offset from address
+        size_t index = (addr / numBlock) % numSet; // Extract index from address
+        uint32_t tag = addr / (numSet * numBlock); // Extract tag from address
+        
+        // Update the cache line
+        tag_array[index] = tag;
+        val_array[index] = state; // Assume we update to Unique Cache state
+        memcpy(&data_array[index][offset], &data, sizeof(uint32_t));
+
+        // devLog("Set %3d: Tag = 0x%x, State = %d, Data = 0x%02x",
+        //         index, tag_array[index], val_array[index], data);
+    }
+
     // If the cache line is not valid
     // issue a ReadUnique request
     void update(
         Vmodule* dut, VerilatedFstC* tfp,
-        const int &coreId, const uint32_t &address, const uint32_t& new_data
+        const int &coreId, const uint32_t &addr, const uint32_t& new_data
     ) {
-        size_t index = (address / numBlock) % NumSets; // Extract index from address
-        uint32_t tag = address / (NumSets * numBlock); // Extract tag from address
-
-        if (!is_unique(address)) {
-            reqflit_t req = chi_issue_ReadUnique_req(dut, tfp, coreId, address, BlockSize);
+        uint32_t aligned_addr = addr & ~(numBlock - 1);
+        if (!is_unique(aligned_addr)) {
+            reqflit_t req = chi_issue_ReadUnique_req(dut, tfp, coreId, aligned_addr, BlockSize);
             
             RN_Tracker_push(req);
         }
-        
-        // // Update the cache line
-        // tag_array[index] = tag;
-        // val_array[index] = true;
-        // memcpy(data_array[index], new_data, numBlock * sizeof(uint32_t));
-        
-        /*
-        mem.write_memory(address, new_data);
-        */
     }
 
     void update(const datflit_t &data) {
         int id = RN_Tracker_pop(data);
         reqflit_t req = RN_Tracker[id];
 
-        uint32_t addr = req.Addr;
-        size_t index = (addr / numBlock) % NumSets; // Extract index from address
-        uint32_t tag = addr / (NumSets * numBlock); // Extract tag from address
-
-        tag_array[index] = tag;
-        val_array[index] = static_cast<cpuCacheState>(data.Resp);
+        uint64_t addr = req.Addr;
 
         for (int word = 0; word < data.Data.size() / 32; word ++) {
             uint32_t BE = data.BE;
             uint8_t be_nibble = (BE >> (4 * word)) & 0xF;
+            if (be_nibble == 0) continue; // No byte enabled for this word
 
             for (int byte_in_word = 0; byte_in_word < 4; byte_in_word ++) {
                 uint8_t src_byte = 0;
@@ -162,25 +163,27 @@ struct Cache {
                         src_byte |= (1 << bit);
                 }
 
-                if (be_nibble & (1 << byte_in_word))
-                    data_array[index][word * 4 + byte_in_word] = src_byte;
-                else
-                    data_array[index][word * 4 + byte_in_word] = 0;
+                update_cacheline(
+                    addr + word * 4 + byte_in_word, src_byte, 
+                    (data.Resp == CompData_UC) ? UC : UD
+                );
             }
         }
 
+        // chi_issue_CompAck_req(dut, tfp, const uint32_t &srcID, const uint32_t &Addr, const uint32_t &Size)
     }
 
     void show_cache() const {
         std::cout << "Cache Information:" << std::endl;
-        std::cout << "Number of Sets: " << NumSets << std::endl;
+        std::cout << "Number of Sets: " << numSet << std::endl;
         std::cout << "Block Size (numBlock): " << numBlock << " entries per set." << std::endl;
-        for (size_t set = 0; set < NumSets; set++) {
+        for (size_t set = 0; set < numSet; set++) {
+            if (val_array[set] == I) continue; // Skip invalid sets
             std::cout << "Set " << std::setw(3) << set << ": ";
             std::cout << "Tag = 0x" << std::hex << tag_array[set] << std::dec << ", ";
             std::cout << "State = " << val_array[set] << ", Data = [";
             for (size_t blk = 0; blk < numBlock; blk++) {
-                std::cout << static_cast<int>(data_array[set][blk]);
+                printf("0x%02x", data_array[set][blk]);
                 if (blk != numBlock - 1)
                     std::cout << ", ";
             }

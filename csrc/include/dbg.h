@@ -28,9 +28,9 @@
     } while(0)
 
 #ifdef DEBUG
-    #define dbgLog(format, ...) ((void)0)
+    #define devLog(format, ...) ((void)0)
 #else
-    #define dbgLog(format, ...) \
+    #define devLog(format, ...) \
         do { \
             printf(ANSI_FMT("[%s:%d %s] " format, YELLOW_TXT) "\n", \
             __FILE__, __LINE__, __func__, ## __VA_ARGS__); \

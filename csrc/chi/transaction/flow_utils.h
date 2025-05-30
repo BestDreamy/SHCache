@@ -1,3 +1,4 @@
+#pragma once
 #include <cstdint>
 #include "../../include/utils.h"
 #include "../flit/auto_flit.h"

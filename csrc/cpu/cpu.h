@@ -34,6 +34,8 @@ struct CPU {
         cache.update(dut, tfp, coreId, address, data);
     }
 
+    // Append data to cache
+    // This function is called when a data flit is received
     bool update_cache(const datflit_t &data) {
         cache.update(data);
         this->op_finished = true;

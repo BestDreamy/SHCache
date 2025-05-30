@@ -11,18 +11,18 @@ struct Memory {
     }
 
     // Read from memory
-    bool read_memory(const uint64_t &address, uint32_t& data) {
-        auto it = mem.find(address);
+    bool read_memory(const uint64_t &addr, uint32_t& data) {
+        auto it = mem.find(addr);
         if (it == mem.end()) {
-            mem[address] = 0;
+            mem[addr] = 0x44332211;
         }
-        data = mem[address];
+        data = mem[addr];
         return true;
     }
 
     // Write to memory
-    void write_memory(const uint32_t &address, const uint32_t &data) {
-        mem[address] = data;
+    void write_memory(const uint32_t &addr, const uint32_t &data) {
+        mem[addr] = data;
     }
 };
 

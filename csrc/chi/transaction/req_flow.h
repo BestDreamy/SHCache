@@ -3,7 +3,7 @@
 
 inline reqflit_t chi_issue_ReadUnique_req(
     Vmodule* dut, VerilatedFstC* tfp, 
-    const int &srcID, const uint32_t &Addr, const uint32_t &Size
+    const uint32_t &srcID, const uint32_t &Addr, const uint32_t &Size
 ) {
     reqflit_t req = createReadUnique(srcID, Addr, Size);
     while (true) {

@@ -20,8 +20,8 @@ enum CHI_DataFlit_Opcode {
 
 enum CHI_DataFlit_Resp {
     CompData_I = 0,
-    CompData_SC = 1,
-    CompData_UC = 2,
+    CompData_UC = 1,
+    CompData_SC = 2,
     CompData_UD_PD = 6,
     CompData_SD_PD = 7,
 };

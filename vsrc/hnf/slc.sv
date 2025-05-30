@@ -25,6 +25,7 @@ module slc(
   //   |     | |                    | |
   //   ⌊_____⌋ ⌊____________________⌋ --
 
+    // Same as RN
     localparam int ADDR_W = 48, BYTE_W = 8, STATE_W = `CHI_CACHE_STATE_W, SET_W = 7, OFFSET_W = 4;
     localparam int OFFSET_NUM = 1 << OFFSET_W, SET_NUM = 1 << SET_W;
     localparam int TAG_W = ADDR_W - $clog2(OFFSET_NUM) - $clog2(SET_NUM);

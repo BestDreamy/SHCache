@@ -1,4 +1,4 @@
-enum CHI_SnpFlit_Opcode {
+enum CHI_RspFlit_Opcode {
     RespLCrdReturn = 0x0,
     SnpResp = 0x1,
     CompAck = 0x2,
@@ -14,4 +14,13 @@ enum CHI_SnpFlit_Opcode {
     Persist = 0xC,
     CompPersist = 0xD,
     DBIDRespOrd = 0xE
+};
+
+// Just used for RspFlit Opcode is CompAck
+enum CHI_RspFlit_Resp {
+    CompAck_I = 0,
+    CompAck_UC = 1,
+    CompAck_SC = 2,
+    CompAck_UD_PD = 6,
+    CompAck_SD_PD = 7,
 };
