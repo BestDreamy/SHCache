@@ -1,7 +1,7 @@
-import "DPI-C" function void chi_recv_ReadNoSnp_req(
-    input reqflit_t req,
-    output datflit_t data
-    );
+// import "DPI-C" function void chi_recv_ReadNoSnp_req(
+//     input reqflit_t req,
+//     output datflit_t data
+//     );
 
 import "DPI-C" function void chi_DMT_ReadNoSnp_req(
     input reqflit_t req

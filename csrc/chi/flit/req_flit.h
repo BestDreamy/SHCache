@@ -1,7 +1,6 @@
 #pragma once
 #include "auto_flit.h"
 #include <iostream>
-#include "../../include/autoconfig.h"
 
 enum CHI_ReqFlit_Opcode {
     ReadNoSnp          = 0x4,
@@ -25,28 +24,17 @@ enum CHI_ReqFlit_Size {
 };
 
 inline reqflit_t createReadUnique(
-    const int &SrcID, const uint32_t &Addr, const uint32_t &Size=4
+    const int &TgtID,
+    const int &SrcID,
+    const int &TxnID,
+    const uint64_t &Addr, 
+    const uint32_t &Size=4
 ) {
     reqflit_t flit;
-    flit.TgtID = config.HNId[0];
+    flit.TgtID = TgtID;
     flit.SrcID = SrcID;
-    flit.TxnID = 0;
+    flit.TxnID = TxnID;
     flit.Opcode = ReadUnique;
-    flit.Addr = Addr;
-    flit.Size = Size;
-    flit.ExpCompAck = 1;
-
-    return flit;
-}
-
-inline reqflit_t createReadNoSnp(
-    const int &SrcID, const uint32_t &Addr, const uint32_t &Size=4
-) {
-    reqflit_t flit;
-    flit.TgtID = config.HNId[0];
-    flit.SrcID = SrcID;
-    flit.TxnID = 0;
-    flit.Opcode = ReadNoSnp;
     flit.Addr = Addr;
     flit.Size = Size;
     flit.ExpCompAck = 1;

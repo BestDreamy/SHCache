@@ -26,6 +26,31 @@ enum CHI_DataFlit_Resp {
     CompData_SD_PD = 7,
 };
 
+// inline datflit_t createCompData(
+//     const int &TgtID,
+//     const int &SrcID,
+//     const int &TxnID,
+//     const int &HomeNID,
+//     const int &Resp,
+//     const int &DBID,
+//     const int &CCID,
+//     const int &DataID,
+//     const int &Data[8],
+//     const int &BE[8]
+// ) {
+//     datflit_t flit;
+//     flit.TgtID = TgtID;
+//     flit.SrcID = SrcID;
+//     flit.TxnID = TxnID;
+//     flit.Addr = Addr;
+//     flit.Size = Size;
+//     flit.Opcode = CompData;
+//     flit.Resp = CompData_UC; // Default response
+//     flit.BE = 0; // Byte Enable, can be set later
+
+//     return flit;
+// }
+
 inline datflit_t createCompData_UC(const reqflit_t &req) {
     datflit_t flit;
 

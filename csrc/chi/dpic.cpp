@@ -5,13 +5,15 @@
 #include "../cpu/cpu.h"
 #include "../include/utils.h"
 
-extern "C" void chi_recv_ReadNoSnp_req(reqflit_t req, datflit_t *data) {
-    data = new datflit_t;
-    *data = createCompData_UC(req);
-    return ;
-}
+// Simulate SN
+// extern "C" void chi_recv_ReadNoSnp_req(reqflit_t req, datflit_t *data) {
+//     data = new datflit_t;
+//     *data = createCompData_UC(req);
+//     return ;
+// }
 
 extern "C" void chi_DMT_ReadNoSnp_req(const svBitVecVal* req_bits) {
+    // 1. SN receive ReadNoSnp request and decode it
     std::bitset<reqflit_width> bits;
     Assert(sizeof(size_t) == 8, "ABI must be 64 bits");
     for (int i = 0; i < ceil_div(reqflit_width, 32) * 2; ++i) { // 4 words * 32 = 128 bits
@@ -26,6 +28,7 @@ extern "C" void chi_DMT_ReadNoSnp_req(const svBitVecVal* req_bits) {
     }
 
     reqflit_t req = decode_req_from_bitset(bits);
+    // 2. SN build a DataFlit according to the request
     datflit_t data = createCompData_UC(req);
     
     bool validTgtID = false;
@@ -37,6 +40,6 @@ extern "C" void chi_DMT_ReadNoSnp_req(const svBitVecVal* req_bits) {
     }
 
     Exit(validTgtID, "Invalid TgtID");
-
+    // 3. RN receive the DataFlit and update its cache
     cpu[data.TgtID].update_cache(data);
 }

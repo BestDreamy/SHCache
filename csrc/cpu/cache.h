@@ -6,6 +6,9 @@
 #include "../include/autoconfig.h"
 #include <cstddef>
 
+extern VerilatedFstC* tfp;
+extern Vmodule* dut;
+
 enum CPU_Cache_State {
     I = 0,
     SC = 1,
@@ -170,7 +173,7 @@ struct Cache {
             }
         }
 
-        // chi_issue_CompAck_req(dut, tfp, const uint32_t &srcID, const uint32_t &Addr, const uint32_t &Size)
+        chi_issue_CompAck_rsp(dut, tfp, const uint32_t &srcID, const uint32_t &Addr, const uint32_t &Size)
     }
 
     void show_cache() const {

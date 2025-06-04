@@ -1,11 +1,12 @@
 #pragma once
 #include "flow_utils.h"
+#include "../../include/autoconfig.h"
 
 inline reqflit_t chi_issue_ReadUnique_req(
     Vmodule* dut, VerilatedFstC* tfp, 
     const uint32_t &srcID, const uint32_t &Addr, const uint32_t &Size
 ) {
-    reqflit_t req = createReadUnique(srcID, Addr, Size);
+    reqflit_t req = createReadUnique(config.HNId[0], srcID, 0, Addr, Size);
     while (true) {
         if (dut->RXREQLCRDV == 1) {
             sim_half_cycle(dut, tfp); // @posedge
@@ -33,7 +34,7 @@ inline reqflit_t chi_issue_ReadUnique_req(
 }
 
 extern "C" {
-    void chi_recv_ReadNoSnp_req(reqflit_t req, datflit_t *data);
+    // void chi_recv_ReadNoSnp_req(reqflit_t req, datflit_t *data);
 
     void chi_DMT_ReadNoSnp_req(const svBitVecVal* req);
 }

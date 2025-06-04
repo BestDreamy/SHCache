@@ -1,3 +1,6 @@
+#pragma once
+#include "auto_flit.h"
+
 enum CHI_RspFlit_Opcode {
     RespLCrdReturn = 0x0,
     SnpResp = 0x1,
@@ -24,3 +27,31 @@ enum CHI_RspFlit_Resp {
     CompAck_UD_PD = 6,
     CompAck_SD_PD = 7,
 };
+
+inline rspflit_t createCompAck(
+    const int &TgtID,
+    const int &SrcID,
+    const int &TxnID,
+    const int &Resp,
+    const int &DBID
+) {
+    rspflit_t flit;
+    flit.TgtID = TgtID;
+    flit.SrcID = SrcID;
+    flit.TxnID = TxnID;
+    flit.Opcode = CompAck;
+    flit.Resp = Resp; // Use the provided response
+    flit.DBID = DBID; // Use the provided DBID
+    return flit;
+}
+
+inline rspflit_t createCompAck(
+    const datflit_t &data
+) {
+    int TgtID = data.HomeNID;
+    int SrcID = data.TgtID;
+    int TxnID = data.DBID;
+    int Resp = data.Resp; // Use the response from the data flit
+    int DBID = 0; // Arbitrary value, can be set as needed
+    return createCompAck(TgtID, SrcID, TxnID, Resp, DBID);
+}

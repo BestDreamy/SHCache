@@ -13,6 +13,11 @@ module SHCache(
     output logic     TXREQFLITPEND,
     input  logic     TXREQLCRDV,
 
+    input  rspflit_t RXRSPFLIT, // rxrsp channel
+    input  logic     RXRSPFLITV,
+    input  logic     RXRSPFLITPEND,
+    output logic     RXRSPLCRDV,
+
     input  clock,
     input  reset
 );
@@ -23,6 +28,7 @@ module SHCache(
     logic     rxreq_posq_first_entry_valid;
     logic     rxreq_posq_first_entry_ready;
 
+    // 1.1 RXREQ Channel: Receive Request Flit
     hnf_rxreq u_hnf_rxreq (
         .RXREQFLIT(RXREQFLIT),
         .RXREQFLITV(RXREQFLITV),
@@ -53,6 +59,44 @@ module SHCache(
         .reset(reset)
     );
 
+
+    reqflit_t rxrsp_posq_first_entry;
+    logic     rxrsp_posq_first_entry_valid;
+    logic     rxrsp_posq_first_entry_ready;
+
+    // 1.2 RXRSP Channel: Receive Response Flit
+    hnf_rxrsp u_hnf_rxrsp (
+        .RXRSPFLIT(RXRSPFLIT),
+        .RXRSPFLITV(RXRSPFLITV),
+        .RXRSPFLITPEND(RXRSPFLITPEND),
+        .RXRSPLCRDV(RXRSPLCRDV),
+        .rxrsp_posq_first_entry(rxrsp_posq_first_entry),
+        .rxrsp_posq_first_entry_valid(rxrsp_posq_first_entry_valid),
+        .rxrsp_posq_first_entry_ready(rxrsp_posq_first_entry_ready),
+        .clock(clock),
+        .reset(reset)
+    );
+
+    wire                slc_sf_rsp_valid;
+    reqflit_t           slc_sf_rsp;
+    wire                slc_sf_rsp_ready;
+    wire                slc_sf_rsp_lhs_hs = rxrsp_posq_first_entry_valid & 
+                                            rxrsp_posq_first_entry_ready;
+    wire                pocq_push_rxrsp_en = slc_sf_rsp_lhs_hs & slc_sf_rsp.ExpCompAck;
+    rxrsp_slc pipe_rxrsp_slc (
+        .flush(default_pipe_flush),
+        .pin_valid(rxrsp_posq_first_entry_valid),
+        .pin_ready(rxrsp_posq_first_entry_ready),
+        .pout_valid(slc_sf_rsp_valid),
+        .pout_ready(slc_sf_rsp_ready), // to be determined
+        .rxrsp_posq_first_entry_i(rxrsp_posq_first_entry),
+        .rxrsp_posq_first_entry_o(slc_sf_rsp),
+        .clock(clock),
+        .reset(reset)
+    );
+
+
+    // 2. SLC SF: Main Snoop Filter Logic
     wire                            sf_hit;
     wire [`CHI_CACHE_STATE_RANGE]   sf_hit_state;
     reqflit_t                       read_no_snp;
@@ -77,6 +121,15 @@ module SHCache(
         .reset(reset)
     );
 
+    pocq #(
+        .DEPTH(16)
+    ) u_pocq_inst (
+        .req_entry_en(pocq_push_rxreq_en),
+        .req_entry(rxreq_posq_first_entry),
+        .clock(clock),
+        .reset(reset)
+    );
+
     wire                    txreq_valid;
     reqflit_t               txreqflit;
     wire                    txreq_ready;
@@ -93,6 +146,7 @@ module SHCache(
         .reset(reset)
     );
 
+    // 3. TXREQ Channel: Transmit Request Flit
     hnf_txreq u_hnf_txreq (
         .TXREQFLIT(TXREQFLIT),
         .TXREQFLITV(TXREQFLITV),
@@ -101,15 +155,6 @@ module SHCache(
         .txreqflit(txreqflit),
         .txreq_valid(txreq_rhs_hs),
         .txreq_ready(txreq_ready),
-        .clock(clock),
-        .reset(reset)
-    );
-
-    pocq #(
-        .DEPTH(16)
-    ) u_pocq_inst (
-        .req_entry_en(pocq_push_rxreq_en),
-        .req_entry(rxreq_posq_first_entry),
         .clock(clock),
         .reset(reset)
     );

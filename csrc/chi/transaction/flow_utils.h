@@ -43,6 +43,7 @@ inline void set_bits(uint64_t value, int width, uint64_t &bit_offset, uint32_t *
 inline void encode_chi_req_flit(Vmodule* dut, const reqflit_t &req) {
     // Total 125 bits
     uint32_t bits[4] = {0};
+    Assert(4 * 32 >= reqflit_width, "reqflit_width must be less than or equal to 128 bits");
 
     uint64_t bit_offset = 0;
 
@@ -50,27 +51,27 @@ inline void encode_chi_req_flit(Vmodule* dut, const reqflit_t &req) {
         set_bits(value, width, bit_offset, bits);
     };
 
-    set_req_bits(0, reqflit_QoS_width);                     // QoS
+    set_req_bits(0, reqflit_QoS_width);                       // QoS
     set_req_bits(req.TgtID, reqflit_TgtID_width);             // TgtID
     set_req_bits(req.SrcID, reqflit_SrcID_width);             // SrcID
     set_req_bits(req.TxnID, reqflit_TxnID_width);             // TxnID
-    set_req_bits(0, reqflit_StashNID_ReturnNID_width);                     // StashNID_ReturnNID
-    set_req_bits(0, reqflit_StashNIDValid_width);                     // StashNIDValid
-    set_req_bits(0, reqflit_ReturnTxnID_width);                     // StashLPID
-    set_req_bits(req.Opcode, reqflit_Opcode_width);            // Opcode
-    set_req_bits(req.Size, reqflit_Size_width);              // Size (8 bytes)
-    set_req_bits(req.Addr, reqflit_Addr_width);             // Addr
-    set_req_bits(0, reqflit_NS_width);                     // NS
-    set_req_bits(0, reqflit_LikelyShared_width);                     // LikelyShared
-    set_req_bits(0, reqflit_AllowRetry_width);                     // AllowRetry
+    set_req_bits(0, reqflit_StashNID_ReturnNID_width);        // StashNID_ReturnNID
+    set_req_bits(0, reqflit_StashNIDValid_width);             // StashNIDValid
+    set_req_bits(0, reqflit_ReturnTxnID_width);               // StashLPID
+    set_req_bits(req.Opcode, reqflit_Opcode_width);           // Opcode
+    set_req_bits(req.Size, reqflit_Size_width);               // Size (8 bytes)
+    set_req_bits(req.Addr, reqflit_Addr_width);               // Addr
+    set_req_bits(0, reqflit_NS_width);                        // NS
+    set_req_bits(0, reqflit_LikelyShared_width);              // LikelyShared
+    set_req_bits(0, reqflit_AllowRetry_width);                // AllowRetry
     set_req_bits(0, reqflit_Order_width);                     // Order
-    set_req_bits(0, reqflit_PCrdType_width);                     // PCrdType
-    set_req_bits(0, reqflit_MemAttr_width);                     // MemAttr
-    set_req_bits(0, reqflit_SnpAttr_width);                     // SnpAttr
-    set_req_bits(0, reqflit_LPID_width);                     // LPID
-    set_req_bits(0, reqflit_Excl_width);                     // Excl
-    set_req_bits(req.ExpCompAck, reqflit_ExpCompAck_width);        // ExpCompAck
-    set_req_bits(0, reqflit_TraceTag_width);                     // TraceTag
+    set_req_bits(0, reqflit_PCrdType_width);                  // PCrdType
+    set_req_bits(0, reqflit_MemAttr_width);                   // MemAttr
+    set_req_bits(0, reqflit_SnpAttr_width);                   // SnpAttr
+    set_req_bits(0, reqflit_LPID_width);                      // LPID
+    set_req_bits(0, reqflit_Excl_width);                      // Excl
+    set_req_bits(req.ExpCompAck, reqflit_ExpCompAck_width);   // ExpCompAck
+    set_req_bits(0, reqflit_TraceTag_width);                  // TraceTag
     set_req_bits(0, reqflit_RSVDC_width);                     // RSVDC
 
     for (int i = 0; i < 4; ++i) {
@@ -116,4 +117,34 @@ inline reqflit_t decode_req_from_bitset(const std::bitset<reqflit_width>& bits) 
     req.TraceTag           = static_cast<uint8_t>(get_req_bits(offset, reqflit_TraceTag_width));           offset += reqflit_TraceTag_width;
     req.RSVDC              = static_cast<uint8_t>(get_req_bits(offset, reqflit_RSVDC_width));              offset += reqflit_RSVDC_width;
     return req;
+}
+
+// input: rspflit_t
+// output: svBitVecVal*
+inline void encode_chi_rsp_flit(Vmodule* dut, const rspflit_t &rsp) {
+    // Total 51 bits
+    uint32_t bits[2] = {0};
+    Assert(2 * 32 >= rspflit_width, "rspflit_width must be less than or equal to 64 bits");
+
+    uint64_t bit_offset = 0;
+
+    auto set_rsp_bits = [&](uint64_t value, int width) {
+        set_bits(value, width, bit_offset, bits);
+    };
+
+    set_rsp_bits(0, rspflit_QoS_width);                       // QoS
+    set_rsp_bits(rsp.TgtID, rspflit_TgtID_width);             // TgtID
+    set_rsp_bits(rsp.SrcID, rspflit_SrcID_width);             // SrcID
+    set_rsp_bits(rsp.TxnID, rspflit_TxnID_width);             // TxnID
+    set_rsp_bits(rsp.Opcode, rspflit_Opcode_width);           // Opcode
+    set_rsp_bits(rsp.Resp, rspflit_Resp_width);               // Resp
+    set_rsp_bits(0, rspflit_RespErr_width);                   // RespErr
+    set_rsp_bits(0, rspflit_FwdState_DataPull_width);         // FwdState_DataPull
+    set_rsp_bits(rsp.DBID, rspflit_DBID_width);               // DBID
+    set_rsp_bits(0, rspflit_PCrdType_width);                  // PCrdType
+    set_rsp_bits(0, rspflit_TraceTag_width);                  // TraceTag
+
+    for (int i = 0; i < 2; ++i) {
+        dut->RXRSPFLIT[i] = bits[i];
+    }
 }
