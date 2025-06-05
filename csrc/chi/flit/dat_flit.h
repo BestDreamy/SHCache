@@ -87,7 +87,7 @@ inline datflit_t createCompData_UC(const reqflit_t &req) {
     return flit;
 }
 
-inline void printDataFlit(const datflit_t &flit) {
+inline void printDatFlit(const datflit_t &flit) {
     std::cout << "================ DataFlit ================" << std::endl;
     std::cout << "Data:" << std::endl;
     for (int i = 7; i >= 0; i --) { // 256 bits / 32 = 8

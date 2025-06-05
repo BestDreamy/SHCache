@@ -1,5 +1,6 @@
 #pragma once
 #include "flow_utils.h"
+#include "../flit/rsp_flit.h"
 
 inline rspflit_t chi_issue_CompAck_rsp(
     Vmodule* dut, VerilatedFstC* tfp, 

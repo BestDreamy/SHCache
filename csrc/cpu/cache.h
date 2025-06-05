@@ -173,7 +173,7 @@ struct Cache {
             }
         }
 
-        chi_issue_CompAck_rsp(dut, tfp, const uint32_t &srcID, const uint32_t &Addr, const uint32_t &Size)
+        chi_issue_CompAck_rsp(dut, tfp, data);
     }
 
     void show_cache() const {

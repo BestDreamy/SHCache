@@ -8,6 +8,7 @@ struct Config {
     static constexpr uint32_t numSNs = 1;
     static constexpr uint32_t numCreditsForHNReq[1] = {4};
     static constexpr uint32_t numCreditsForSNReq[1] = {4};
+    static constexpr uint32_t numCreditsForHNRsp[1] = {4};
     static constexpr uint32_t RNId[4] = {0, 1, 2, 3};
     static constexpr uint32_t HNId[1] = {5};
     static constexpr uint32_t SNId[1] = {6};

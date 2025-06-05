@@ -74,6 +74,8 @@ inline void encode_chi_req_flit(Vmodule* dut, const reqflit_t &req) {
     set_req_bits(0, reqflit_TraceTag_width);                  // TraceTag
     set_req_bits(0, reqflit_RSVDC_width);                     // RSVDC
 
+
+    Assert(reqflit_width > 64, "Verilator does not support more than 64 bits in a single svBitVecVal");
     for (int i = 0; i < 4; ++i) {
         dut->RXREQFLIT[i] = bits[i];
     }
@@ -144,7 +146,6 @@ inline void encode_chi_rsp_flit(Vmodule* dut, const rspflit_t &rsp) {
     set_rsp_bits(0, rspflit_PCrdType_width);                  // PCrdType
     set_rsp_bits(0, rspflit_TraceTag_width);                  // TraceTag
 
-    for (int i = 0; i < 2; ++i) {
-        dut->RXRSPFLIT[i] = bits[i];
-    }
+    Assert(rspflit_width < 64, "Verilator supports badly.");
+    dut->RXRSPFLIT = static_cast<uint64_t>(bits[1]) << 32 | bits[0];
 }
