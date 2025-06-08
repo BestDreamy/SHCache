@@ -1,6 +1,8 @@
 module slc(
     input reqflit_t                     slc_sf_req,
     input logic                         slc_sf_req_valid,
+    input rspflit_t                     slc_sf_rsp, // TODO
+    input logic                         slc_sf_rsp_valid, // TODO
 
     input                               sf_hit,
     output [`CHI_CACHE_STATE_RANGE]     sf_hit_state,

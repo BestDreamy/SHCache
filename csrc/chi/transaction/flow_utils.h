@@ -3,26 +3,27 @@
 #include "../../include/utils.h"
 #include "../flit/auto_flit.h"
 #include "../flit/flit.h"
+#include "../rnf_utils.h"
 
-inline void sim_one_cycle(
-    Vmodule* dut, VerilatedFstC* tfp
-) {
-    dut->clock = 1 - dut->clock; // clock = 1
-    dut->eval();
-    tfp->dump(time_counter ++);
+// inline void sim_one_cycle(
+//     Vmodule* dut, VerilatedFstC* tfp
+// ) {
+//     dut->clock = 1 - dut->clock; // clock = 1
+//     dut->eval();
+//     tfp->dump(time_counter ++);
 
-    dut->clock = 1 - dut->clock; // clock = 0
-    dut->eval();
-    tfp->dump(time_counter ++);
-}
+//     dut->clock = 1 - dut->clock; // clock = 0
+//     dut->eval();
+//     tfp->dump(time_counter ++);
+// }
 
-inline void sim_half_cycle(
-    Vmodule* dut, VerilatedFstC* tfp
-) {
-    dut->clock = 1 - dut->clock; // clock = 1
-    dut->eval();
-    tfp->dump(time_counter ++);
-}
+// inline void sim_half_cycle(
+//     Vmodule* dut, VerilatedFstC* tfp
+// ) {
+//     dut->clock = 1 - dut->clock; // clock = 1
+//     dut->eval();
+//     tfp->dump(time_counter ++);
+// }
 
 inline void set_bits(uint64_t value, int width, uint64_t &bit_offset, uint32_t *bits) {
     uint64_t mask = (1ULL << width) - 1;

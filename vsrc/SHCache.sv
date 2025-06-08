@@ -18,6 +18,11 @@ module SHCache(
     input  logic     RXRSPFLITPEND,
     output logic     RXRSPLCRDV,
 
+    input  rspflit_t RXDATFLIT, // rxdat channel
+    input  logic     RXDATFLITV,
+    input  logic     RXDATFLITPEND,
+    output logic     RXDATLCRDV,
+
     input  clock,
     input  reset
 );
@@ -104,6 +109,8 @@ module SHCache(
     slc u_slc (
         .slc_sf_req(slc_sf_req),
         .slc_sf_req_valid(slc_sf_req_valid),
+        .slc_sf_rsp(slc_sf_rsp),
+        .slc_sf_rsp_valid(slc_sf_rsp_valid),
         .sf_hit(sf_hit),
         .sf_hit_state(sf_hit_state),
         .read_no_snp(read_no_snp),
@@ -115,6 +122,8 @@ module SHCache(
     sf u_sf (
         .slc_sf_req(slc_sf_req),
         .slc_sf_req_valid(slc_sf_req_valid),
+        .slc_sf_rsp(slc_sf_rsp),
+        .slc_sf_rsp_valid(slc_sf_rsp_valid),
         .sf_hit(sf_hit),
         .sf_hit_state(sf_hit_state),
         .clock(clock),
@@ -126,6 +135,10 @@ module SHCache(
     ) u_pocq_inst (
         .req_entry_en(pocq_push_rxreq_en),
         .req_entry(rxreq_posq_first_entry),
+        .rsp_entry_en(pocq_push_rxrsp_en),
+        .rsp_entry(rxrsp_posq_first_entry),
+        .read_no_snp(read_no_snp),
+        .read_no_snp_v(read_no_snp_v),
         .clock(clock),
         .reset(reset)
     );

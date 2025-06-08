@@ -27,12 +27,12 @@ module hnf_txreq(
 
     assign txreq_ready = TXREQLCRDV;
 
-    datflit_t CompData_q, CompData_d;
+    reg CompData_q;
     always@(posedge clock) begin: CompData_ff
         if (reset) begin
             CompData_q <= '0;
         end else if (TXREQFLITV) begin
-            CompData_q <= 'b1;
+            CompData_q <= ~CompData_q;
             chi_DMT_ReadNoSnp_req(TXREQFLIT);
         end
     end

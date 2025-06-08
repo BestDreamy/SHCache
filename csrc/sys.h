@@ -29,17 +29,73 @@ inline bool sys_exec_once(Vmodule* dut, VerilatedFstC* tfp, const Operation& op)
     return op_finished;
 }
 
-inline bool wait_exec_finished(Vmodule* dut, VerilatedFstC* tfp, const Operation &lastop, uint32_t &lastop_exec_times) {
-    dut->clock = 1 - dut->clock; // clock = 0
-    dut->eval();
-    DUMP_TIME(time_counter);
-
+inline bool block_rnf_exec_once(Vmodule* dut, VerilatedFstC* tfp, const Operation &lastop, uint32_t &lastop_exec_times) {
     lastop_exec_times ++;
-    Exit(lastop_exec_times < 10, "Execution time exceeded limit");
+    Exit(lastop_exec_times < 50, "Execution time exceeded limit");
 
-    dut->clock = 1 - dut->clock; // clock = 1
-    dut->eval();
-    DUMP_TIME(time_counter);
+    bool ok = 0;
+    int coreId = lastop.core;
+
+    if (RN_req_channel[coreId].size()) ok = 1;
+    if (RN_rsp_channel[coreId].size()) ok = 1;
+    if (RN_dat_channel[coreId].size()) ok = 1;
+
+    if (dut->RXREQLCRDV == 0) ok = 0;
+    if (dut->RXRSPLCRDV == 0) ok = 0;
+    // if (dut->RXDATLCRDV == 0) ok = 0;
+
+    if (ok) {
+        dut->clock = 1 - dut->clock; // clock = 0
+        dut->RXREQFLITPEND = 1;
+        dut->eval();
+        DUMP_TIME(time_counter);
+
+        dut->clock = 1 - dut->clock; // clock = 1
+        dut->eval();
+        DUMP_TIME(time_counter);
+
+        dut->clock = 1 - dut->clock; // clock = 0
+        dut->RXREQFLITPEND = 0;
+        if (!RN_req_channel[coreId].empty()){
+            dut->RXREQFLITV = 1;
+            reqflit_t req = RN_req_channel[coreId].front();
+            encode_chi_req_flit(dut, req);
+            RN_req_channel[coreId].pop();
+        }
+        if (!RN_rsp_channel[coreId].empty()){
+            dut->RXRSPFLITV = 1;
+            rspflit_t rsp = RN_rsp_channel[coreId].front();
+            encode_chi_rsp_flit(dut, rsp);
+            RN_rsp_channel[coreId].pop();
+        }
+        if (!RN_dat_channel[coreId].empty()){
+            dut->RXDATFLITV = 1;
+            // TODO
+        }
+        dut->eval();
+        DUMP_TIME(time_counter);
+
+        dut->clock = 1 - dut->clock; // clock = 1
+        dut->eval();
+        DUMP_TIME(time_counter);
+        
+        dut->clock = 1 - dut->clock; // clock = 0
+        dut->RXREQFLITV = 0;
+        dut->eval();
+        DUMP_TIME(time_counter);
+
+        dut->clock = 1 - dut->clock; // clock = 1
+        dut->eval();
+        DUMP_TIME(time_counter);
+    } else {
+        dut->clock = 1 - dut->clock; // clock = 0
+        dut->eval();
+        DUMP_TIME(time_counter);
+
+        dut->clock = 1 - dut->clock; // clock = 1
+        dut->eval();
+        DUMP_TIME(time_counter);
+    }
     return false;
 }
 
@@ -51,7 +107,7 @@ inline void sys_exec(Vmodule* dut, VerilatedFstC* tfp, std::ifstream& file) {
     std::string line;
     while (true) {
         if (lastop_finished == false) {
-            lastop_finished = wait_exec_finished(dut, tfp, lastop, lastop_exec_times);
+            lastop_finished = block_rnf_exec_once(dut, tfp, lastop, lastop_exec_times);
             continue;
         } else {
             std::getline(file, line);
