@@ -8,7 +8,7 @@
 #include "include/autoconfig.h"
 #include "include/utils.h"
 
-#define FINISH_TIME 1e2
+#define FINISH_TIME 1e4
 #define DUMP_TIME(time_counter) (time_counter < FINISH_TIME)? tfp->dump(time_counter ++): exit(0)
 
 namespace {
