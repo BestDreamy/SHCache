@@ -2,6 +2,7 @@
 #define DBG_H
 #include <stdio.h>
 #include "utils.h"
+#include <assert.h>
 
 #define ANSI_FMT(str, color) color str RESET_TXT
 #define RESET_TXT "\033[0m"

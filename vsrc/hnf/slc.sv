@@ -81,11 +81,10 @@ module slc(
 
     // chi protocal
     // slc miss and sf miss
-    wire [`CHI_SRCID_RANGE] ReturnNID     = slc_sf_req.SrcID;
-    wire [`CHI_TXNID_RANGE] ReturnTxnID   = slc_sf_req.TxnID;
-    wire [`CHI_SRCID_RANGE] SrcID         = slc_sf_req.TgtID;
-    wire [`CHI_TXNID_RANGE] TxnID         = {SrcID[`CHI_MAX_SRCID_RANGE], 
-                                             slc_sf_req.TxnID[`CHI_MAX_TXNID_RANGE]};
+    wire [`CHI_REQ_SRCID_RANGE] ReturnNID     = slc_sf_req.SrcID;
+    wire [`CHI_REQ_TXNID_RANGE] ReturnTxnID   = slc_sf_req.TxnID;
+    wire [`CHI_REQ_SRCID_RANGE] SrcID         = slc_sf_req.TgtID;
+    wire [`CHI_REQ_TXNID_RANGE] TxnID         = slc_sf_req.TxnID;
 
     assign read_no_snp = CreateReadNoSnpReqFlit(
         .Addr(slc_sf_req.Addr),
@@ -99,33 +98,33 @@ module slc(
     assign read_no_snp_v = slc_miss_sf_miss & slc_sf_req_valid;
 
 
-    parameter int rxreq_posq_size = numCreditsForHNReq[0];
-    reg HN_Tracker [`CHI_SRCID_RANGE][rxreq_posq_size];
+    // parameter int rxreq_posq_size = numCreditsForHNReq[0];
+    // reg HN_Tracker [`CHI_REQ_SRCID_RANGE][rxreq_posq_size];
 
-    always @(posedge clock) begin: HN_Tracker_ff
-        if (reset) begin
-            for (int i = 0; i < `CHI_SRCID_W; i++) begin
-                for (int j = 0; j < rxreq_posq_size; j++) begin
-                    HN_Tracker[i][j] <= '0;
-                end
-            end
-        end else begin
-            if (read_no_snp_v) begin
-                int free_txnid = -1;
-                for (int i = 0; i < rxreq_posq_size; i++) begin
-                    if (HN_Tracker[i][slc_sf_req.SrcID] == '0 && free_txnid == -1) begin
-                        free_txnid = i;
-                    end
-                end
+    // always @(posedge clock) begin: HN_Tracker_ff
+    //     if (reset) begin
+    //         for (int i = 0; i < `CHI_SRCID_W; i++) begin
+    //             for (int j = 0; j < rxreq_posq_size; j++) begin
+    //                 HN_Tracker[i][j] <= '0;
+    //             end
+    //         end
+    //     end else begin
+    //         if (read_no_snp_v) begin
+    //             int free_txnid = -1;
+    //             for (int i = 0; i < rxreq_posq_size; i++) begin
+    //                 if (HN_Tracker[i][slc_sf_req.SrcID] == '0 && free_txnid == -1) begin
+    //                     free_txnid = i;
+    //                 end
+    //             end
 
-                if (free_txnid != -1) begin
-                    HN_Tracker[free_txnid][slc_sf_req.SrcID] <= slc_sf_req;
-                end else begin
-                    $error("No free HN Tracker entry available for SrcID %0d", SrcID);
-                end
-            end
-        end
-    end
+    //             if (free_txnid != -1) begin
+    //                 HN_Tracker[free_txnid][slc_sf_req.SrcID] <= slc_sf_req;
+    //             end else begin
+    //                 $error("No free HN Tracker entry available for SrcID %0d", SrcID);
+    //             end
+    //         end
+    //     end
+    // end
 
     /*************************************************************/
 

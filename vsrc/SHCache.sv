@@ -23,6 +23,8 @@ module SHCache(
     input  logic     RXDATFLITPEND,
     output logic     RXDATLCRDV,
 
+    output logic     pocq_is_empty, // pocq is empty when all valid bits are 0
+
     input  clock,
     input  reset
 );
@@ -33,7 +35,7 @@ module SHCache(
     logic     rxreq_posq_first_entry_valid;
     logic     rxreq_posq_first_entry_ready;
 
-    // 1.1 RXREQ Channel: Receive Request Flit
+    // 1.1.1 RXREQ Channel: Receive Request Flit
     hnf_rxreq u_hnf_rxreq (
         .RXREQFLIT(RXREQFLIT),
         .RXREQFLITV(RXREQFLITV),
@@ -52,6 +54,7 @@ module SHCache(
     wire                slc_sf_req_lhs_hs = rxreq_posq_first_entry_valid & 
                                             rxreq_posq_first_entry_ready;
     wire                pocq_push_rxreq_en = slc_sf_req_lhs_hs & slc_sf_req.ExpCompAck;
+    // 1.1.2 REQ2SLC: Pipe RXREQ to SLC SF
     rxreq_slc pipe_rxreq_slc (
         .flush(default_pipe_flush),
         .pin_valid(rxreq_posq_first_entry_valid),
@@ -69,7 +72,7 @@ module SHCache(
     logic     rxrsp_posq_first_entry_valid;
     logic     rxrsp_posq_first_entry_ready;
 
-    // 1.2 RXRSP Channel: Receive Response Flit
+    // 1.2.1 RXRSP Channel: Receive Response Flit
     hnf_rxrsp u_hnf_rxrsp (
         .RXRSPFLIT(RXRSPFLIT),
         .RXRSPFLITV(RXRSPFLITV),
@@ -87,7 +90,8 @@ module SHCache(
     wire                slc_sf_rsp_ready;
     wire                slc_sf_rsp_lhs_hs = rxrsp_posq_first_entry_valid & 
                                             rxrsp_posq_first_entry_ready;
-    wire                pocq_push_rxrsp_en = slc_sf_rsp_lhs_hs & slc_sf_rsp.ExpCompAck;
+    wire                pocq_push_rxrsp_en = slc_sf_rsp_lhs_hs;
+    // 1.2.2 REQ2SLC: Pipe RXRSP to SLC SF
     rxrsp_slc pipe_rxrsp_slc (
         .flush(default_pipe_flush),
         .pin_valid(rxrsp_posq_first_entry_valid),
@@ -101,7 +105,7 @@ module SHCache(
     );
 
 
-    // 2. SLC SF: Main Snoop Filter Logic
+    // 2.1 SLC SF: Main Snoop Filter Logic
     wire                            sf_hit;
     wire [`CHI_CACHE_STATE_RANGE]   sf_hit_state;
     reqflit_t                       read_no_snp;
@@ -119,6 +123,7 @@ module SHCache(
         .reset(reset)
     );
 
+    // 2.2 Snoop Filter: Handle Snoop Requests
     sf u_sf (
         .slc_sf_req(slc_sf_req),
         .slc_sf_req_valid(slc_sf_req_valid),
@@ -130,15 +135,17 @@ module SHCache(
         .reset(reset)
     );
 
+    // 2.3 POCQ: Push Read No Snoop Requests and Responses
     pocq #(
         .DEPTH(16)
-    ) u_pocq_inst (
+    ) u_hnf_pocq (
         .req_entry_en(pocq_push_rxreq_en),
         .req_entry(rxreq_posq_first_entry),
         .rsp_entry_en(pocq_push_rxrsp_en),
         .rsp_entry(rxrsp_posq_first_entry),
         .read_no_snp(read_no_snp),
         .read_no_snp_v(read_no_snp_v),
+        .pocq_is_empty(pocq_is_empty),
         .clock(clock),
         .reset(reset)
     );
@@ -147,6 +154,7 @@ module SHCache(
     reqflit_t               txreqflit;
     wire                    txreq_ready;
     wire                    txreq_rhs_hs = txreq_valid & txreq_ready;
+    // 3.1.1 TXREQ Channel: Create Request Flit
     slc_txreq pipe_slc_txreq (
         .flush(default_pipe_flush),
         .pin_valid(read_no_snp_v),
@@ -159,7 +167,7 @@ module SHCache(
         .reset(reset)
     );
 
-    // 3. TXREQ Channel: Transmit Request Flit
+    // 3.1.2 TXREQ Channel: Transmit Request Flit
     hnf_txreq u_hnf_txreq (
         .TXREQFLIT(TXREQFLIT),
         .TXREQFLITV(TXREQFLITV),

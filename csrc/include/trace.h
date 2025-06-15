@@ -111,6 +111,7 @@ inline Operation read_trace_one_line(std::string &line) {
             }
         }
     }
+
     // dbg_operation(op);
     return op;
 }

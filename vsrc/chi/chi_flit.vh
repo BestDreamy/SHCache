@@ -132,102 +132,28 @@
 `define SIZE_64             3'b110
 
 
-
-// typedef struct packed {
-//     logic [3:0] RSVDC;
-//     logic TraceTag;
-//     logic ExpCompAck;
-//     logic Excl;
-//     logic [4:0] LPID;
-//     logic SnpAttr;
-//     logic [3:0] MemAttr;
-//     logic [3:0] PCrdType;
-//     logic [1:0] Order;
-//     logic AllowRetry;
-//     logic LikelyShared;
-//     logic NS;
-//     logic [47:0] Addr;
-//     logic [2:0] Size;
-//     logic [5:0] Opcode;
-//     logic [7:0] ReturnTxnID;
-//     logic StashNIDValid;
-//     logic [6:0] StashNID_ReturnNID;
-//     logic [7:0] TxnID;
-//     logic [6:0] SrcID;
-//     logic [6:0] TgtID;
-//     logic [3:0] QoS;
-// } reqflit_t;
-
-// typedef struct packed {
-//     logic TraceTag;
-//     logic [3:0] PCrdType;
-//     logic [7:0] DBID;
-//     logic [2:0] FwdState_DataPull;
-//     logic [2:0] Resp;
-//     logic [1:0] RespErr;
-//     logic [3:0] Opcode;
-//     logic [7:0] TxnID;
-//     logic [6:0] SrcID;
-//     logic [6:0] TgtID;
-//     logic [3:0] QoS;
-// } rspflit_t;
-
-// typedef struct packed {
-//     logic [255:0] Data;
-//     logic [31:0] BE;
-//     logic [3:0] RSVDC;
-//     logic TraceTag;
-//     logic [1:0] DataID;
-//     logic [1:0] CCID;
-//     logic [7:0] DBID;
-//     logic [2:0] FwdState_DataPull;
-//     logic [2:0] Resp;
-//     logic [1:0] RespErr;
-//     logic [2:0] Opcode;
-//     logic [6:0] HomeNID;
-//     logic [7:0] TxnID;
-//     logic [6:0] SrcID;
-//     logic [6:0] TgtID;
-//     logic [3:0] QoS;
-// } datflit_t;
-
-// typedef struct packed {
-//     logic TraceTag;
-//     logic RetToSrc;
-//     logic DoNotDataPull;
-//     logic NS;
-//     logic [47:0] Addr;
-//     logic [4:0] Opcode;
-//     logic [7:0] FwdTxnID;
-//     logic [6:0] FwdNID;
-//     logic [7:0] TxnID;
-//     logic [6:0] SrcID;
-//     logic [3:0] QoS;
-// } snpflit_t;
-
-
 // CHI protocol just allow 1024 transactions in flight when txnid is 10 bits
 // In order to ensure the transaction ID is unique, {SrcID[3: 0], TxnID[3 :0]} is the real transaction ID
 // In other words, the max value SrcID and TxnID cannot exceed 15
-`define CHI_MAX_TXNID_W                  4   
-`define CHI_MAX_TXNID                    1 << `CHI_MAX_TXNID_W
-`define CHI_MAX_TXNID_RANGE              `CHI_MAX_TXNID_W-1 :0
+// `define CHI_MAX_TXNID_W                  4   
+// `define CHI_MAX_TXNID                    1 << `CHI_MAX_TXNID_W
+// `define CHI_MAX_TXNID_RANGE              `CHI_MAX_TXNID_W-1 :0
 
-`define CHI_MAX_SRCID_W                  4
-`define CHI_MAX_SRCID                    1 << `CHI_MAX_SRCID_W
-`define CHI_MAX_SRCID_RANGE              `CHI_MAX_SRCID_W-1 :0
+// `define CHI_MAX_SRCID_W                  4
+// `define CHI_MAX_SRCID                    1 << `CHI_MAX_SRCID_W
+// `define CHI_MAX_SRCID_RANGE              `CHI_MAX_SRCID_W-1 :0
 
 // Tgt fields in  reqflit_t
-`define CHI_TGTID_W                        7
-`define CHI_TGTID_RANGE                    `CHI_TGTID_W-1 :0
+`define CHI_REQ_TGTID_W                        reqflit_TgtID_width
+`define CHI_REQ_TGTID_RANGE                    `CHI_REQ_TGTID_W-1 :0
 
 // Src fields in  reqflit_t
-`define CHI_SRCID_W                        `CHI_TGTID_W
-`define CHI_SRCID_RANGE                    `CHI_TGTID_W-1 :0
+`define CHI_REQ_SRCID_W                        reqflit_SrcID_width
+`define CHI_REQ_SRCID_RANGE                    `CHI_REQ_SRCID_W-1 :0
 
 // TxnID fields in  reqflit_t
-`define CHI_TXNID_W                      8
-`define CHI_TXNID_RANGE                  `CHI_TXNID_W-1 :0
+`define CHI_REQ_TXNID_W                        reqflit_TxnID_width
+`define CHI_REQ_TXNID_RANGE                    `CHI_REQ_TXNID_W-1 :0
 
 function reqflit_t CreateReadNoSnpReqFlit (
     logic       [47:0]   Addr,

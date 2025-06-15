@@ -62,11 +62,6 @@ module hnf_txreq(
     wire [6:0]  TgtID              = TXREQFLIT.TgtID;
     wire [3:0]  QoS                = TXREQFLIT.QoS;
 
-    // always_comb begin
-    //     assert(txreqflit_recv_en & (TgtID[CHI_MAX_SRCID_RANGE] == HNId[0][CHI_MAX_SRCID_RANGE])) else
-    //         $error("HNF RXREQ: Received a request with TgtID != HNF");
-    // end
-
 // always_comb begin
 //     if (TXREQFLITV) begin 
 //         $display("******************verilog debug******************");
