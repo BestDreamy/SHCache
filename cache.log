@@ -1,0 +1,36 @@
+core: 0, operation: store, rs: , address: 0x1004, result: 1
+Cache state for CPU 0:
+Number of Sets: 80
+Block Size (numBlock): 10 bytes per set.
+Set   0: Tag = 0x2, State = 2, Data = [0x1, 0x0, 0x0, 0x0, 0x11, 0x22, 0x33, 0x44, 0x11, 0x22, 0x33, 0x44, 0x11, 0x22, 0x33, 0x44]
+
+core: 0, operation: store, rs: , address: 0x1008, result: 2
+core: 0, operation: load, rs: a1 , address: 0x1004
+core: 0, operation: load, rs: a2 , address: 0x1008
+core: 0, operation: compute, rs: a1 a2 , result: a0, compute_type: 1
+core: 0, operation: store, rs: a0 , address: 0x1000
+core: 1, operation: store, rs: , address: 0x2004, result: 3
+Cache state for CPU 1:
+Number of Sets: 80
+Block Size (numBlock): 10 bytes per set.
+Set   0: Tag = 0x4, State = 2, Data = [0x3, 0x0, 0x0, 0x0, 0x11, 0x22, 0x33, 0x44, 0x11, 0x22, 0x33, 0x44, 0x11, 0x22, 0x33, 0x44]
+
+core: 1, operation: store, rs: , address: 0x2008, result: 4
+core: 1, operation: load, rs: a1 , address: 0x2004
+core: 1, operation: load, rs: a2 , address: 0x2008
+core: 1, operation: compute, rs: a1 a2 , result: a0, compute_type: 1
+core: 1, operation: store, rs: a0 , address: 0x2000
+core: 0, operation: load, rs: a1 , address: 0x2000
+Cache state for CPU 0:
+Number of Sets: 80
+Block Size (numBlock): 10 bytes per set.
+Set   0: Tag = 0x4, State = 2, Data = [0x11, 0x22, 0x33, 0x44, 0x11, 0x22, 0x33, 0x44, 0x11, 0x22, 0x33, 0x44, 0x11, 0x22, 0x33, 0x44]
+
+core: 1, operation: load, rs: a1 , address: 0x1000
+Cache state for CPU 1:
+Number of Sets: 80
+Block Size (numBlock): 10 bytes per set.
+Set   0: Tag = 0x2, State = 2, Data = [0x11, 0x22, 0x33, 0x44, 0x11, 0x22, 0x33, 0x44, 0x11, 0x22, 0x33, 0x44, 0x11, 0x22, 0x33, 0x44]
+
+core: 0, operation: compute, rs: a1 a0 , result: a0, compute_type: 1
+core: 1, operation: compute, rs: a1 a0 , result: a0, compute_type: 1

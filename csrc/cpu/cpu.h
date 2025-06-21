@@ -15,24 +15,32 @@ struct CPU {
     // Cache
     Cache<NumCacheSets, CacheBlockSize> cache;
 
+    int RN_id;
+
     CPU() {
         reg.clear();
         op_finished = true;
     }
 
+    CPU(int RN_id): RN_id(RN_id) {
+        CPU();
+    }
+
     bool op_finished;
 
     // Read from memory (via cache)
-    bool read_memory(const uint32_t &address, uint32_t& data) {
-        return cache.access(address, data);
+    bool read_memory(
+        const uint32_t &address, uint32_t& data
+    ) {
+        return cache.access(RN_id, address, data);
     }
 
     // Write to memory (via cache)
-    void write_memory(
+    bool write_memory(
         Vmodule* dut, VerilatedFstC* tfp, 
-        const int &coreId, const uint32_t &address, const uint32_t& data
+        const uint32_t &address, const uint32_t& data
     ) {
-        cache.update(dut, tfp, coreId, address, data);
+        return cache.update(RN_id, address, data);
     }
 
     // Append data to cache
@@ -50,23 +58,18 @@ struct CPU {
         OperationType opType = op.operation;
         Assert(this->op_finished == true, "Last operation must be finished");
 
-        dbg_operation(op);
         switch (opType) {
             case OperationType::LOAD: {
-                this->op_finished = false;
-
                 uint32_t address = op.address.value();
                 uint32_t data = 0;
                 // Load operation
-                this->read_memory(address, data);
+                this->op_finished = this->read_memory(address, data);
                 Assert(op.rs.size() == 1, "Load operation should have only one rs");
                 std::string rs = op.rs[0];
                 reg[rs] = data;
                 break;
             }
             case OperationType::STORE: {
-                this->op_finished = false;
-
                 uint32_t address = op.address.value();
                 uint32_t data = 0;
                 if (op.result.has_value()) {
@@ -78,7 +81,7 @@ struct CPU {
                     data = reg[rs];
                 }
                 // Store operation
-                this->write_memory(dut, tfp, op.core, address, data);
+                this->op_finished = this->write_memory(dut, tfp, address, data);
                 break;
             }
             case OperationType::COMPUTE: {
@@ -92,41 +95,47 @@ struct CPU {
                 // -- Get data and check data.
                 switch (op.compute_type.value()) {
                     case ComputeType::ADD:
-                        reg[op.result.value()] = data1 + data2;
-                        break;
+                    reg[op.result.value()] = data1 + data2;
+                    break;
                     case ComputeType::SUB:
-                        reg[op.result.value()] = data1 - data2;
-                        break;
+                    reg[op.result.value()] = data1 - data2;
+                    break;
                     case ComputeType::AND:
-                        reg[op.result.value()] = data1 & data2;
-                        break;
+                    reg[op.result.value()] = data1 & data2;
+                    break;
                     case ComputeType::OR:
-                        reg[op.result.value()] = data1 | data2;
-                        break;
+                    reg[op.result.value()] = data1 | data2;
+                    break;
                     case ComputeType::XOR:
-                        reg[op.result.value()] = data1 ^ data2;
-                        break;
+                    reg[op.result.value()] = data1 ^ data2;
+                    break;
                     case ComputeType::SLL:
-                        reg[op.result.value()] = data1 << data2;
-                        break;
+                    reg[op.result.value()] = data1 << data2;
+                    break;
                     case ComputeType::SRL:
-                        reg[op.result.value()] = data1 >> data2;
-                        break;
+                    reg[op.result.value()] = data1 >> data2;
+                    break;
                     case ComputeType::SRA:
-                        reg[op.result.value()] = (int32_t)data1 >> (int32_t)data2;
-                        break;
+                    reg[op.result.value()] = (int32_t)data1 >> (int32_t)data2;
+                    break;
                     case ComputeType::SLT:
-                        reg[op.result.value()] = (int32_t)data1 < (int32_t)data2 ? 1 : 0;
-                        break;
+                    reg[op.result.value()] = (int32_t)data1 < (int32_t)data2 ? 1 : 0;
+                    break;
                     case ComputeType::SLTU:
-                        reg[op.result.value()] = data1 < data2 ? 1 : 0;
+                    reg[op.result.value()] = data1 < data2 ? 1 : 0;
                     default: Assert(0, "Unknown compute type");
                 }
             }
             default: break;
         }
-
+        
         return this->op_finished;
+    }
+
+    void show_cache() const {
+        logFile << "Cache state for CPU " << RN_id << ":\n";
+        cache.show_cache();
+        logFile << "\n";
     }
 };
 

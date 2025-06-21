@@ -97,7 +97,7 @@ module SHCache(
         .pin_valid(rxrsp_posq_first_entry_valid),
         .pin_ready(rxrsp_posq_first_entry_ready),
         .pout_valid(slc_sf_rsp_valid),
-        .pout_ready(slc_sf_rsp_ready), // to be determined
+        .pout_ready(slc_sf_req_ready), // to be determined
         .rxrsp_posq_first_entry_i(rxrsp_posq_first_entry),
         .rxrsp_posq_first_entry_o(slc_sf_rsp),
         .clock(clock),

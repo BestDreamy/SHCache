@@ -143,8 +143,17 @@ inline void sys_exec(Vmodule* dut, VerilatedFstC* tfp, std::ifstream& file) {
     while (true) {
         if (lastop_finished == false) {
             lastop_finished = block_rnf_exec_once(dut, tfp, lastop);
+
             
-            if (lastop_finished) unfinished_table.reset(nullptr);
+            if (lastop_finished) {
+                unfinished_table.reset(nullptr);
+
+                // Just update cache line
+                sys_exec_once(dut, tfp, lastop);
+
+                devLog("Last cpu cache state:");
+                cpu[lastop.core].show_cache();
+            }
             
             continue;
         } else {
@@ -152,6 +161,7 @@ inline void sys_exec(Vmodule* dut, VerilatedFstC* tfp, std::ifstream& file) {
             if (line.empty()) continue;
 
             Operation op = read_trace_one_line(line);
+            dbg_operation(op, logFile);
             Assert(op.operation != OperationType::OTHER, "Invalid operation type in trace line");
     
             lastop_finished = sys_exec_once(dut, tfp, op);

@@ -14,7 +14,9 @@ enum CPU_Cache_State {
     SC = 1,
     UC = 2,
     UD = 6,
-    SD = 7
+    SD = 7,
+
+    Save = 3
 };
 
 // Direct-Map Local Cache
@@ -62,7 +64,7 @@ struct Cache {
     }
 
     int RN_Tracker_pop(const datflit_t &data) {
-        devLog("RN Tracker pop");
+        devLog("RN Req Tracker pop");
         int id = find_RN_Tracker_from_CompData(data);
         Exit(id != -1, "No available RN_Tracker");
         
@@ -71,7 +73,7 @@ struct Cache {
     }
 
     int RN_Tracker_push(const reqflit_t &req) {
-        devLog("RN Tracker push");
+        devLog("RN Req Tracker push");
         int id = find_first_empty_RN_Tracker();
         Exit(id != -1, "No available RN_Tracker");
         
@@ -100,7 +102,9 @@ struct Cache {
         return ((val_array[index] == UC or val_array[index] == UD) and tag_array[index] == tag);
     }
     
-    bool access(const uint64_t &addr, uint32_t& data) const {
+    bool access(
+        const int &coreId, const uint64_t &addr, uint32_t& data
+    ) {
         uint32_t aligned_addr = addr & ~(numBlock - 1);
 
         size_t index = (aligned_addr / numBlock) % numSet; // Extract index from address
@@ -111,12 +115,15 @@ struct Cache {
             return true;
         }
         
-        // Cache miss
-        return false;
+        // Same as cache.update()
+        if (!is_unique(aligned_addr)) {
+            reqflit_t req = chi_issue_ReadUnique_req(dut, tfp, coreId, aligned_addr, BlockSize);
+            
+            RN_Tracker_push(req);
 
-        /*
-        return mem.read_memory(address, data);
-        */
+            return false;
+        }
+        Assert(0, "Other states are not supported yet");
     }
 
     void update_cacheline(const uint64_t &addr, const uint8_t& data, const CPU_Cache_State &state) {
@@ -126,25 +133,29 @@ struct Cache {
         
         // Update the cache line
         tag_array[index] = tag;
-        val_array[index] = state; // Assume we update to Unique Cache state
+        if (state != Save) val_array[index] = state;
         memcpy(&data_array[index][offset], &data, sizeof(uint32_t));
-
-        // devLog("Set %3d: Tag = 0x%x, State = %d, Data = 0x%02x",
-        //         index, tag_array[index], val_array[index], data);
     }
 
     // If the cache line is not valid
     // issue a ReadUnique request
-    void update(
-        Vmodule* dut, VerilatedFstC* tfp,
+    bool update(
         const int &coreId, const uint64_t &addr, const uint32_t& new_data
     ) {
         uint32_t aligned_addr = addr & ~(numBlock - 1);
+        if (is_hit(aligned_addr)) {
+            update_cacheline(aligned_addr, new_data, Save);
+            return true;
+        }
+
         if (!is_unique(aligned_addr)) {
             reqflit_t req = chi_issue_ReadUnique_req(dut, tfp, coreId, aligned_addr, BlockSize);
             
             RN_Tracker_push(req);
+
+            return false;
         }
+        Assert(0, "Other states are not supported yet");
     }
 
     void update(const datflit_t &data) {
@@ -177,20 +188,19 @@ struct Cache {
     }
 
     void show_cache() const {
-        std::cout << "Cache Information:" << std::endl;
-        std::cout << "Number of Sets: " << numSet << std::endl;
-        std::cout << "Block Size (numBlock): " << numBlock << " entries per set." << std::endl;
+        logFile << "Number of Sets: " << numSet << std::endl;
+        logFile << "Block Size (numBlock): " << numBlock << " bytes per set." << std::endl;
         for (size_t set = 0; set < numSet; set++) {
             if (val_array[set] == I) continue; // Skip invalid sets
-            std::cout << "Set " << std::setw(3) << set << ": ";
-            std::cout << "Tag = 0x" << std::hex << tag_array[set] << std::dec << ", ";
-            std::cout << "State = " << val_array[set] << ", Data = [";
+            logFile << "Set " << std::setw(3) << set << ": ";
+            logFile << "Tag = 0x" << std::hex << tag_array[set] << std::dec << ", ";
+            logFile << "State = " << val_array[set] << ", Data = [";
             for (size_t blk = 0; blk < numBlock; blk++) {
-                printf("0x%02x", data_array[set][blk]);
+                logFile << "0x" << std::hex << static_cast<int>(data_array[set][blk]) << std::dec;
                 if (blk != numBlock - 1)
-                    std::cout << ", ";
+                    logFile << ", ";
             }
-            std::cout << "]" << std::endl;
+            logFile << "]" << std::endl;
         }
     }
 

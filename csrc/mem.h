@@ -14,8 +14,8 @@ struct Memory {
     bool read_memory(const uint64_t &addr, uint32_t& data) {
         auto it = mem.find(addr);
         if (it == mem.end()) {
-            // mem[addr] = 0x44332211; // Test Mem Data
-            mem[addr] = 0;
+            mem[addr] = 0x44332211; // Test Mem Data
+            // mem[addr] = 0;
         }
         data = mem[addr];
         return true;

@@ -1,4 +1,5 @@
 #include "sys.h"
+#include "chi/rnf_utils.h"
 #include "mem.h"
 
 Config config;
@@ -10,6 +11,10 @@ std::queue<snpflit_t> RN_snp_channel[NUMCORES];
 Memory mem;
 
 void sys_init(Vmodule* dut, VerilatedFstC* tfp) {
+    for (int i = 0; i < NUMCORES; i ++) {
+        cpu[i] = CPU<>(config.RNId[i]);
+    }
+
     dut->clock = 0; dut->reset = 1; dut->eval();
     DUMP_TIME(time_counter);
 

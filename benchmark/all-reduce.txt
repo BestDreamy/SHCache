@@ -4,3 +4,15 @@ core: 0, operation: load, reg: a1, address: 0x1004
 core: 0, operation: load, reg: a2, address: 0x1008
 core: 0, operation: compute, add: a1 a2, result: a0
 core: 0, operation: store, address: 0x1000, reg: a0
+
+core: 1, operation: store, address: 0x2004, value: 3
+core: 1, operation: store, address: 0x2008, value: 4
+core: 1, operation: load, reg: a1, address: 0x2004
+core: 1, operation: load, reg: a2, address: 0x2008
+core: 1, operation: compute, add: a1 a2, result: a0
+core: 1, operation: store, address: 0x2000, reg: a0
+
+core: 0, operation: load, reg: a1, address: 0x2000
+core: 1, operation: load, reg: a1, address: 0x1000
+core: 0, operation: compute, add: a1 a0, result: a0
+core: 1, operation: compute, add: a1 a0, result: a0

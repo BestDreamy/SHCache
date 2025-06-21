@@ -39,9 +39,9 @@ extern "C" void chi_DMT_ReadNoSnp_req(const svBitVecVal* req_bits) {
         }
     }
 
-    devLog("print req and data");
-    printReqFlit(req);
-    printDatFlit(data);
+    // devLog("print req and data");
+    // printReqFlit(req);
+    // printDatFlit(data);
     Exit(validTgtID, "Invalid TgtID");
     // 3. RN receive the DataFlit and update its cache
     cpu[data.TgtID].update_cache(data);

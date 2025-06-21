@@ -12,3 +12,4 @@
 !benchmark/**
 !config/
 !config/**
+!cache.log

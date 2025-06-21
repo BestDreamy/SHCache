@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include "utils.h"
 #include <assert.h>
+#include <fstream>
 
 #define ANSI_FMT(str, color) color str RESET_TXT
 #define RESET_TXT "\033[0m"
@@ -10,6 +11,8 @@
 #define GREEN_TXT "\033[1;32m"
 #define BLUE_TXT "\033[1;34m"
 #define YELLOW_TXT "\033[1;33m"
+
+extern std::fstream logFile;
 
 #define dbg(a) std::cout << __FILE__ << __LINE__ << " " << #a << " : " << static_cast<unsigned>(a) << std::endl
 
@@ -55,6 +58,7 @@ inline void assert_fail_msg(const char* msg) {
         if (!(cond)) { \
             assert_fail_msg(msg); \
             tfp -> close(); \
+            logFile.close(); \
         } \
         if (!(cond)) exit(0); \
     } while(0)

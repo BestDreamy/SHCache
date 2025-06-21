@@ -5,6 +5,7 @@
 #include <optional>
 #include <iostream>
 #include <sstream>
+#include <fstream>
 
 enum OperationType {
     OTHER,
@@ -50,28 +51,28 @@ struct Operation {
     std::optional<ComputeType> compute_type; // Just for compute (optional)
 };
 
-inline void dbg_operation(const Operation& op) {
-    std::cout << "core: " << op.core << ", operation: ";
+inline void dbg_operation(const Operation& op, std::fstream& logFile) {
+    logFile << "core: " << op.core << ", operation: ";
     switch (op.operation) {
-        case STORE: std::cout << "store"; break;
-        case LOAD: std::cout << "load"; break;
-        case COMPUTE: std::cout << "compute"; break;
-        default: std::cout << "other"; break;
+        case STORE: logFile << "store"; break;
+        case LOAD: logFile << "load"; break;
+        case COMPUTE: logFile << "compute"; break;
+        default: logFile << "other"; break;
     }
-    std::cout << ", rs: ";
+    logFile << ", rs: ";
     for (const auto& r : op.rs) {
-        std::cout << r << " ";
+        logFile << r << " ";
     }
     if (op.address) {
-        std::cout << ", address: 0x" << std::hex << *op.address;
+        logFile << ", address: 0x" << std::hex << *op.address;
     }
     if (op.result) {
-        std::cout << ", result: " << *op.result;
+        logFile << ", result: " << *op.result;
     }
     if (op.compute_type) {
-        std::cout << ", compute_type: " << *op.compute_type;
+        logFile << ", compute_type: " << *op.compute_type;
     }
-    std::cout << std::endl;
+    logFile << std::endl;
 }
 
 inline Operation read_trace_one_line(std::string &line) {

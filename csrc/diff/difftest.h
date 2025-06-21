@@ -13,7 +13,8 @@ inline bool check_all_reduce() {
     if (cpu[1].reg["a1"] != 3 or cpu[1].reg["a2"] != 4 or cpu[0].reg["a0"] != 10) {
         ok = false;
     }
-    assert(ok);
+    
+    Exit(ok, "All-reduce does not match");
     return ok;
 }
 

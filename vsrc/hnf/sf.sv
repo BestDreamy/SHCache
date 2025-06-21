@@ -24,12 +24,11 @@ module sf(
   //   |     | |                    | |
   //   ⌊_____⌋ ⌊____________________⌋ --
 
-    localparam int ADDR_W = 48, BYTE_W = 8, STATE_W = `CHI_CACHE_STATE_W, SET_W = 7;
+    localparam int ADDR_W = 48, STATE_W = `CHI_CACHE_STATE_W, SET_W = 7;
     localparam int OFFSET_W = RNsOffset[0], SET_NUM = 1 << SET_W;
     localparam int TAG_W = ADDR_W - OFFSET_W - $clog2(SET_NUM);
     localparam int RNF_W = $clog2(numRNs);
     reg [TAG_W-1: 0]                    tagArray [SET_NUM];
-    // reg [BYTE_W-1: 0]                   dataArray[SET_NUM][OFFSET_NUM];
     reg [STATE_W-1: 0]                  stateArray[SET_NUM]; // (U|S), (D|C), I
     reg [RNF_W-1: 0]                    rnfVec[SET_NUM][numRNs];
 
