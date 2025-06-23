@@ -60,7 +60,7 @@ module SHCache(
         .pin_valid(rxreq_posq_first_entry_valid),
         .pin_ready(rxreq_posq_first_entry_ready),
         .pout_valid(slc_sf_req_valid),
-        .pout_ready(slc_sf_req_ready), // to be determined
+        .pout_ready(slc_sf_req_ready), // TODO
         .rxreq_posq_first_entry_i(rxreq_posq_first_entry),
         .rxreq_posq_first_entry_o(slc_sf_req),
         .clock(clock),
@@ -97,7 +97,7 @@ module SHCache(
         .pin_valid(rxrsp_posq_first_entry_valid),
         .pin_ready(rxrsp_posq_first_entry_ready),
         .pout_valid(slc_sf_rsp_valid),
-        .pout_ready(slc_sf_req_ready), // to be determined
+        .pout_ready(slc_sf_req_ready), // TODO
         .rxrsp_posq_first_entry_i(rxrsp_posq_first_entry),
         .rxrsp_posq_first_entry_o(slc_sf_rsp),
         .clock(clock),
@@ -110,11 +110,16 @@ module SHCache(
     wire [`CHI_CACHE_STATE_RANGE]   sf_hit_state;
     reqflit_t                       read_no_snp;
     wire                            read_no_snp_v;
+    
+    reqflit_t                       pocq_req;
+    logic                           pocq_req_valid;
     slc u_slc (
         .slc_sf_req(slc_sf_req),
         .slc_sf_req_valid(slc_sf_req_valid),
         .slc_sf_rsp(slc_sf_rsp),
         .slc_sf_rsp_valid(slc_sf_rsp_valid),
+        .pocq_req(pocq_req),
+        .pocq_req_valid(pocq_req_valid),
         .sf_hit(sf_hit),
         .sf_hit_state(sf_hit_state),
         .read_no_snp(read_no_snp),
@@ -129,6 +134,8 @@ module SHCache(
         .slc_sf_req_valid(slc_sf_req_valid),
         .slc_sf_rsp(slc_sf_rsp),
         .slc_sf_rsp_valid(slc_sf_rsp_valid),
+        .pocq_req(pocq_req),
+        .pocq_req_valid(pocq_req_valid),
         .sf_hit(sf_hit),
         .sf_hit_state(sf_hit_state),
         .clock(clock),
@@ -145,7 +152,10 @@ module SHCache(
         .rsp_entry(rxrsp_posq_first_entry),
         .read_no_snp(read_no_snp),
         .read_no_snp_v(read_no_snp_v),
+
         .pocq_is_empty(pocq_is_empty),
+        .pocq_pop_req_en(pocq_req_valid),
+        .pocq_pop_req(pocq_req),
         .clock(clock),
         .reset(reset)
     );
@@ -160,7 +170,7 @@ module SHCache(
         .pin_valid(read_no_snp_v),
         .pin_ready(slc_sf_req_ready),
         .pout_valid(txreq_valid),
-        .pout_ready(txreq_ready), // to be determined
+        .pout_ready(txreq_ready), // TODO
         .txreq_in(read_no_snp),
         .txreq_out(txreqflit),
         .clock(clock),

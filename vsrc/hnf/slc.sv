@@ -3,6 +3,8 @@ module slc(
     input logic                         slc_sf_req_valid,
     input rspflit_t                     slc_sf_rsp, // TODO
     input logic                         slc_sf_rsp_valid, // TODO
+    input reqflit_t                     pocq_req,
+    input logic                         pocq_req_valid,
 
     input                               sf_hit,
     output [`CHI_CACHE_STATE_RANGE]     sf_hit_state,
@@ -35,12 +37,6 @@ module slc(
     reg [BYTE_W-1: 0]                   dataArray[SET_NUM][OFFSET_NUM];
     reg [STATE_W-1: 0]                  stateArray[SET_NUM] ; // (U|S), (D|C), I
 
-    // wire [47:0] Addr               = read_no_snp.Addr;
-    // wire [2:0]  Size               = read_no_snp.Size;
-    // wire [5:0]  Opcode             = read_no_snp.Opcode;
-    // wire [7:0]  TxnID              = read_no_snp.TxnID;
-    // wire [6:0]  SrcID              = read_no_snp.SrcID;
-    // wire [6:0]  TgtID              = read_no_snp.TgtID;
 
     `define SLC_TAG_RANGE (ADDR_W-1) : (ADDR_W - TAG_W)
     `define SLC_SET_RANGE (ADDR_W - TAG_W - 1) : (ADDR_W - TAG_W - SET_W)
@@ -97,60 +93,5 @@ module slc(
 
     assign read_no_snp_v = slc_miss_sf_miss & slc_sf_req_valid;
 
-
-    // parameter int rxreq_posq_size = numCreditsForHNReq[0];
-    // reg HN_Tracker [`CHI_REQ_SRCID_RANGE][rxreq_posq_size];
-
-    // always @(posedge clock) begin: HN_Tracker_ff
-    //     if (reset) begin
-    //         for (int i = 0; i < `CHI_SRCID_W; i++) begin
-    //             for (int j = 0; j < rxreq_posq_size; j++) begin
-    //                 HN_Tracker[i][j] <= '0;
-    //             end
-    //         end
-    //     end else begin
-    //         if (read_no_snp_v) begin
-    //             int free_txnid = -1;
-    //             for (int i = 0; i < rxreq_posq_size; i++) begin
-    //                 if (HN_Tracker[i][slc_sf_req.SrcID] == '0 && free_txnid == -1) begin
-    //                     free_txnid = i;
-    //                 end
-    //             end
-
-    //             if (free_txnid != -1) begin
-    //                 HN_Tracker[free_txnid][slc_sf_req.SrcID] <= slc_sf_req;
-    //             end else begin
-    //                 $error("No free HN Tracker entry available for SrcID %0d", SrcID);
-    //             end
-    //         end
-    //     end
-    // end
-
-    /*************************************************************/
-
-    /*
-    wire [3:0]  RSVDC              = read_no_snp.RSVDC;
-    wire        TraceTag           = read_no_snp.TraceTag;
-    wire        ExpCompAck         = read_no_snp.ExpCompAck;
-    wire        Excl               = read_no_snp.Excl;
-    wire [4:0]  LPID               = read_no_snp.LPID;
-    wire        SnpAttr            = read_no_snp.SnpAttr;
-    wire [3:0]  MemAttr            = read_no_snp.MemAttr;
-    wire [3:0]  PCrdType           = read_no_snp.PCrdType;
-    wire [1:0]  Order              = read_no_snp.Order;
-    wire        AllowRetry         = read_no_snp.AllowRetry;
-    wire        LikelyShared       = read_no_snp.LikelyShared;
-    wire        NS                 = read_no_snp.NS;
-    wire [47:0] Addr               = read_no_snp.Addr;
-    wire [2:0]  Size               = read_no_snp.Size;
-    wire [5:0]  Opcode             = read_no_snp.Opcode;
-    // wire [7:0]  StashLPID          = read_no_snp.StashLPID;
-    // wire        StashNIDValid      = read_no_snp.StashNIDValid;
-    wire [6:0]  StashNID_ReturnNID = read_no_snp.StashNID_ReturnNID;
-    wire [7:0]  TxnID              = read_no_snp.TxnID;
-    wire [6:0]  SrcID              = read_no_snp.SrcID;
-    wire [6:0]  TgtID              = read_no_snp.TgtID;
-    wire [3:0]  QoS                = read_no_snp.QoS;
-    */
 
 endmodule

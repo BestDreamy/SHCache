@@ -9,6 +9,8 @@ module pocq #(
     input reqflit_t         read_no_snp,
 
     output logic            pocq_is_empty, // Check whether transaction is finished
+    output logic            pocq_pop_req_en,
+    output reqflit_t        pocq_pop_req,
 
     input                   clock,
     input                   reset
@@ -18,6 +20,9 @@ module pocq #(
     // reg                                 sleep  [DEPTH-1:0];
 
     assign pocq_is_empty = (valid == '0); // pocq is empty when all valid bits are 0
+
+    assign pocq_pop_req_en = rsp_entry_en;
+    assign pocq_pop_req = buffer[pocq_release_entry];
 
     // To push the req_entry into this pocq, find first empty entry
     reg [$clog2(DEPTH)-1:0] pocq_first_valid_entry;

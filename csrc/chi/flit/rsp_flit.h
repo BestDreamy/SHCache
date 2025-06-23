@@ -4,7 +4,7 @@
 enum CHI_RspFlit_Opcode {
     RespLCrdReturn = 0x0,
     SnpResp = 0x1,
-    CompAck = 0x2,
+    CompAck = 0x2, // Just used for RspFlit Opcode is CompAck
     RetryAck = 0x3,
     Comp = 0x4,
     CompDBIDResp = 0x5,
@@ -40,8 +40,8 @@ inline rspflit_t createCompAck(
     flit.SrcID = SrcID;
     flit.TxnID = TxnID;
     flit.Opcode = CompAck;
-    flit.Resp = Resp; // Use the provided response
-    flit.DBID = DBID; // Use the provided DBID
+    flit.Resp = Resp;
+    flit.DBID = DBID;
     return flit;
 }
 
