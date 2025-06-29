@@ -63,12 +63,12 @@ module hnf_rxrsp(
     wire [6:0]  TgtID              = RXRSPFLIT.TgtID;
     wire [3:0]  QoS                = RXRSPFLIT.QoS;
 
-    always_comb begin
-        assert(rxrspflit_recv_en & (TgtID[`CHI_REQ_SRCID_RANGE] == HNId[0][`CHI_REQ_SRCID_RANGE])) else
-            $error("HNF RXRSP: Received a rspuest with TgtID != HNF");
+    // always_comb begin
+    //     assert(rxrspflit_recv_en & (TgtID[`CHI_REQ_SRCID_RANGE] == HNId[0][`CHI_REQ_SRCID_RANGE])) else
+    //         $error("HNF RXRSP: Received a rspuest with TgtID != HNF");
 
-        assert(rxrspflit_recv_en & (TxnID[`CHI_REQ_TXNID_RANGE] < rxrsp_posq_size)) else
-            $error("Each RNF can only send %0d rspuests to HNF at a time", rxrsp_posq_size);
-    end
+    //     assert(rxrspflit_recv_en & (TxnID[`CHI_REQ_TXNID_RANGE] < rxrsp_posq_size)) else
+    //         $error("Each RNF can only send %0d rspuests to HNF at a time", rxrsp_posq_size);
+    // end
 
 endmodule

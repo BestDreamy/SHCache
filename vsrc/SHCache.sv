@@ -25,6 +25,11 @@ module SHCache(
 
     output logic     pocq_is_empty, // pocq is empty when all valid bits are 0
 
+    output snpflit_t TXSNPFLIT, // txsnp channel
+    output logic     TXSNPFLITV,
+    output logic     TXSNPFLITPEND,
+    input  logic     TXSNPLCRDV,
+
     input  clock,
     input  reset
 );

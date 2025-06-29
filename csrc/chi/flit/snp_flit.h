@@ -1,3 +1,6 @@
+#pragma once
+#include "auto_flit.h"
+
 enum CHI_SnpFlit_Opcode {
     SnpLCrdReturn = 0x0,
     SnpShared = 0x1,
@@ -14,3 +17,17 @@ enum CHI_SnpFlit_Opcode {
     SnpStashShared = 0xC,
     SnpDVMOp = 0xD
 };
+
+inline snpflit_t createSnpUniqueFwd(
+    const int &SrcID,
+    const int &TxnID,
+    const int &FwdNID,
+    const int &FwdTxnID,
+    const uint64_t &Addr, 
+    const int RetToSrc
+) {
+    snpflit_t flit;
+    flit.RetToSrc = 0;
+
+    return flit;
+}

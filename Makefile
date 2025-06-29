@@ -35,7 +35,7 @@ run: $(BIN) $(TEST-SRC)
 	@$(BIN) $(TEST-SRC)
 
 gtk: run
-	gtkwave wave.fst &
+	gtkwave wave.fst
 
 $(OBJ_DIR):
 	mkdir -p $(OBJ_DIR)

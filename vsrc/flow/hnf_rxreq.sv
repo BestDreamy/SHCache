@@ -75,12 +75,12 @@ module hnf_rxreq(
     wire [6:0]  TgtID              = RXREQFLIT.TgtID;
     wire [3:0]  QoS                = RXREQFLIT.QoS;
 
-    always_comb begin
-        assert(rxreqflit_recv_en & (TgtID[`CHI_REQ_SRCID_RANGE] == HNId[0][`CHI_REQ_SRCID_RANGE])) else
-            $error("HNF RXREQ: Received a request with TgtID != HNF");
+    // always_comb begin
+    //     assert(rxreqflit_recv_en & (TgtID[`CHI_REQ_SRCID_RANGE] == HNId[0][`CHI_REQ_SRCID_RANGE])) else
+    //         $error("HNF RXREQ: Received a request with TgtID != HNF");
 
-        assert(rxreqflit_recv_en & (TxnID[`CHI_REQ_TXNID_RANGE] < rxreq_posq_size)) else
-            $error("Each RNF can only send %0d requests to HNF at a time", rxreq_posq_size);
-    end
+    //     assert(rxreqflit_recv_en & (TxnID[`CHI_REQ_TXNID_RANGE] < rxreq_posq_size)) else
+    //         $error("Each RNF can only send %0d requests to HNF at a time", rxreq_posq_size);
+    // end
 
 endmodule

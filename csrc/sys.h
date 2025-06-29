@@ -115,6 +115,7 @@ inline bool block_rnf_exec_once(Vmodule* dut, VerilatedFstC* tfp, const Operatio
         dut->clock = 1 - dut->clock; // clock = 0
         dut->RXREQFLITV = 0;
         dut->RXRSPFLITV = 0;
+        dut->RXDATFLITV = 0;
         dut->eval();
         DUMP_TIME(time_counter);
 
@@ -132,6 +133,7 @@ inline bool block_rnf_exec_once(Vmodule* dut, VerilatedFstC* tfp, const Operatio
     }
 
     return dut->pocq_is_empty == 1 and unfinished_table.is_finished();
+    // return false;
 }
 
 inline void sys_exec(Vmodule* dut, VerilatedFstC* tfp, std::ifstream& file) {

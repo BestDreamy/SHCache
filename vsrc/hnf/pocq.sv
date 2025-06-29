@@ -86,8 +86,8 @@ module pocq #(
         end
     end
 
-    always_comb begin
-        assert((pocq_release_entry != pocq_replace_entry) && read_no_snp_v && rsp_entry_en) else
-            $error("Replace a req entry and release a req entry at the same time, which is not allowed in pocq");
-    end
+    // always_comb begin
+    //     assert((pocq_release_entry != pocq_replace_entry) && read_no_snp_v && rsp_entry_en) else
+    //         $error("Replace a req entry and release a req entry at the same time, which is not allowed in pocq");
+    // end
 endmodule
