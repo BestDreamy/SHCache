@@ -33,9 +33,9 @@ module slc(
     localparam int ADDR_W = 48, BYTE_W = 8, STATE_W = `CHI_CACHE_STATE_W, SET_W = 7, OFFSET_W = 4;
     localparam int OFFSET_NUM = 1 << OFFSET_W, SET_NUM = 1 << SET_W;
     localparam int TAG_W = ADDR_W - $clog2(OFFSET_NUM) - $clog2(SET_NUM);
-    reg [TAG_W-1: 0]                    tagArray [SET_NUM];
-    reg [BYTE_W-1: 0]                   dataArray[SET_NUM][OFFSET_NUM];
-    reg [STATE_W-1: 0]                  stateArray[SET_NUM] ; // (U|S), (D|C), I
+    reg [TAG_W-1: 0]                    tagArray [SET_NUM-1:0];
+    reg [BYTE_W-1: 0]                   dataArray[SET_NUM-1:0][OFFSET_NUM-1:0];
+    reg [STATE_W-1: 0]                  stateArray[SET_NUM-1:0] ; // (U|S), (D|C), I
 
 
     `define SLC_TAG_RANGE (ADDR_W-1) : (ADDR_W - TAG_W)

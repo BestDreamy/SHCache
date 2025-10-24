@@ -8,7 +8,7 @@ std::fstream logFile("cache.log");
 
 int main(int argc, char** argv) {
     Verilated::traceEverOn(true);
-    dut->trace(tfp, 0);
+    dut->trace(tfp, 99);
     tfp->open("wave.fst");
 
     sim(dut, tfp, argv[1]);

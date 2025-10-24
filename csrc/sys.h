@@ -52,9 +52,7 @@ inline bool sys_exec_once(Vmodule* dut, VerilatedFstC* tfp, const Operation& op)
     return op_finished;
 }
 
-// bool check_flow_finished(Vmodule* dut, VerilatedFstC* tfp) {
-//     return dut->pocq_is_finished == 1;
-// }
+#define SIM_CYCLE 2
 
 inline bool block_rnf_exec_once(Vmodule* dut, VerilatedFstC* tfp, const Operation &lastop) {
     unfinished_table.lastop_exec_times ++;
@@ -122,14 +120,14 @@ inline bool block_rnf_exec_once(Vmodule* dut, VerilatedFstC* tfp, const Operatio
         dut->clock = 1 - dut->clock; // clock = 1
         dut->eval();
         DUMP_TIME(time_counter);
-    } else {
-        dut->clock = 1 - dut->clock; // clock = 0
-        dut->eval();
-        DUMP_TIME(time_counter);
 
-        dut->clock = 1 - dut->clock; // clock = 1
-        dut->eval();
-        DUMP_TIME(time_counter);
+        for (int i = 0; i < 2 * SIM_CYCLE; i ++) {
+            dut->clock = 1 - dut->clock;
+            dut->eval();
+            DUMP_TIME(time_counter);
+        }
+    } else {
+        Exit(0, "No request or response flit in RN channel, but still in block_rnf_exec_once");
     }
 
     return dut->pocq_is_empty == 1 and unfinished_table.is_finished();

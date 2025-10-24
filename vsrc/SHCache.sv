@@ -73,7 +73,7 @@ module SHCache(
     );
 
 
-    reqflit_t rxrsp_posq_first_entry;
+    rspflit_t rxrsp_posq_first_entry;
     logic     rxrsp_posq_first_entry_valid;
     logic     rxrsp_posq_first_entry_ready;
 
@@ -91,7 +91,7 @@ module SHCache(
     );
 
     wire                slc_sf_rsp_valid;
-    reqflit_t           slc_sf_rsp;
+    rspflit_t           slc_sf_rsp;
     wire                slc_sf_rsp_ready;
     wire                slc_sf_rsp_lhs_hs = rxrsp_posq_first_entry_valid & 
                                             rxrsp_posq_first_entry_ready;

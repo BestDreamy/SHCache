@@ -1,5 +1,7 @@
 #pragma once
 #include "auto_flit.h"
+#include <iostream>
+#include "../../include/dbg.h"
 
 enum CHI_RspFlit_Opcode {
     RespLCrdReturn = 0x0,
@@ -28,6 +30,19 @@ enum CHI_RspFlit_Resp {
     CompAck_SD_PD = 7,
 };
 
+inline void printRspFlit(const rspflit_t &flit) {
+    std::cout << "================ RspFlit ================" << std::endl;
+    std::cout << "TraceTag : " << static_cast<unsigned>(flit.TraceTag) << std::endl;
+    std::cout << "Resp     : " << static_cast<unsigned>(flit.Resp) << std::endl;
+    std::cout << "RespErr  : " << static_cast<unsigned>(flit.RespErr) << std::endl;
+    std::cout << "Opcode   : " << static_cast<unsigned>(flit.Opcode) << std::endl;
+    std::cout << "TxnID    : " << static_cast<unsigned>(flit.TxnID) << std::endl;
+    std::cout << "SrcID    : " << static_cast<unsigned>(flit.SrcID) << std::endl;
+    std::cout << "TgtID    : " << static_cast<unsigned>(flit.TgtID) << std::endl;
+    std::cout << "QoS      : " << static_cast<unsigned>(flit.QoS) << std::endl;
+    std::cout << "==========================================" << std::endl;
+}
+
 inline rspflit_t createCompAck(
     const int &TgtID,
     const int &SrcID,
@@ -42,6 +57,9 @@ inline rspflit_t createCompAck(
     flit.Opcode = CompAck;
     flit.Resp = Resp;
     flit.DBID = DBID;
+
+    devLog("Ready to create CompAck RspFlit");
+    printRspFlit(flit);
     return flit;
 }
 

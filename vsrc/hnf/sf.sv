@@ -26,7 +26,7 @@ module sf(
     //   |     | |                    | |
     //   ⌊_____⌋ ⌊____________________⌋ --
 
-    localparam int ADDR_W = 48, STATE_W = `CHI_CACHE_STATE_W, SET_W = 7;
+    localparam int ADDR_W = 48, STATE_W = `CHI_CACHE_STATE_W, SET_W = 2; // 7;
     localparam int SET_NUM = 1 << SET_W;
     localparam int TAG_W = ADDR_W - $clog2(SET_NUM);
     localparam int RNF_W = $clog2(numRNs) + 1;
@@ -47,10 +47,9 @@ module sf(
                                            pocq_req.Addr[`SF_TAG_RANGE] & {TAG_W{pocq_req_valid}};
     assign                sf_hit_state   = rnfState[sf_set_addr];
 
-
     assign                sf_hit         = (tagArray[sf_set_addr] == sf_tag) & (sf_hit_state != `SF_I);
 
-    always @(posedge clock) begin
+    always @(posedge clock) begin: sf_tagArray_ff
         if (reset) begin
             for (int i = 0; i < SET_NUM; i ++) begin
                 tagArray[i] = 'b0;
@@ -72,25 +71,41 @@ module sf(
     //     end
     // end
 
-    always @(posedge clock) begin
+    always @(posedge clock) begin: sf_rnfState_ff
         if (reset) begin
             for (int i = 0; i < SET_NUM; i ++) begin
                 rnfState[i] = 'b0;
             end
-        end else if (pocq_req_valid) begin
+        end else if (slc_sf_rsp_valid) begin
             rnfState[sf_set_addr] <= slc_sf_rsp.Resp;
         end
     end
 
-    always @(posedge clock) begin
+    always @(posedge clock) begin: sf_rnfId_ff
         if (reset) begin
             for (int i = 0; i < SET_NUM; i ++) begin
                 rnfId[i] = 'b0;
             end
-        end else if (pocq_req_valid) begin
+        end else if (slc_sf_rsp_valid) begin
             rnfId[sf_set_addr] <= slc_sf_rsp.SrcID;
         end
     end
+
+    // genvar i;
+    // generate
+    // for (i = 0; i < SET_NUM; i = i + 1) begin : flat_array_gen
+    //     logic [TAG_W-1:0]   tagArray_flat;
+    //     logic [STATE_W-1:0] rnfState_flat;
+    //     logic [RNF_W-1:0]   rnfId_flat;
+
+    //     always_comb begin
+    //     tagArray_flat   = tagArray[i];
+    //     rnfState_flat   = rnfState[i];
+    //     rnfId_flat      = rnfId[i];
+    //     end
+    // end
+    // endgenerate
+
 
 
 endmodule

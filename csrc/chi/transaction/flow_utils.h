@@ -140,8 +140,8 @@ inline void encode_chi_rsp_flit(Vmodule* dut, const rspflit_t &rsp) {
     set_rsp_bits(rsp.SrcID, rspflit_SrcID_width);             // SrcID
     set_rsp_bits(rsp.TxnID, rspflit_TxnID_width);             // TxnID
     set_rsp_bits(rsp.Opcode, rspflit_Opcode_width);           // Opcode
-    set_rsp_bits(rsp.Resp, rspflit_Resp_width);               // Resp
     set_rsp_bits(0, rspflit_RespErr_width);                   // RespErr
+    set_rsp_bits(rsp.Resp, rspflit_Resp_width);               // Resp
     set_rsp_bits(0, rspflit_FwdState_DataPull_width);         // FwdState_DataPull
     set_rsp_bits(rsp.DBID, rspflit_DBID_width);               // DBID
     set_rsp_bits(0, rspflit_PCrdType_width);                  // PCrdType
