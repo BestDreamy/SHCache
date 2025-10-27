@@ -1,53 +1,34 @@
-TOP_NAME = SHCache
-
-VERILATOR_INC_PATH  = $(addprefix -I, $(abspath ./vsrc/chi) \
-									  $(abspath ./vsrc/include) \
-									  $(abspath ./vsrc/flow) \
-									  $(abspath ./vsrc/cbb) \
-									  $(abspath ./vsrc/hnf) \
-									  $(abspath ./vsrc/pipe) )
-VERILATOR_FLAGS = -cc --exe --build --trace-fst --top-module $(TOP_NAME) $(VERILATOR_INC_PATH)
-VERILATOR_FLAGS += -Wno-WIDTHEXPAND -Wno-WIDTHTRUNC # TODO
+CXX = g++
+CXXFLAGS = -std=c++17
+INCLUDES_DIR = $(addprefix -I, $(abspath ./csrc) \
+							   $(abspath ./csrc/include) \
+							   $(abspath ./csrc/chi) \
+							   $(abspath ./csrc/cpu) \
+							   $(abspath ./csrc/diff))
 
 CSRCS = $(shell find $(abspath .) -name "*.c" -or -name "*.cc" -or -name "*.cpp")
-VSRCS = $(shell find $(abspath ./vsrc) -name "$(TOP_NAME).*v")
+BIN := sim
 
-BUILD_DIR = ./build
-OBJ_DIR = $(BUILD_DIR)/obj_dir
-BIN = $(BUILD_DIR)/$(TOP_NAME)
-
-DEBUG ?= Y
-CXXFLAGS = -MMD -MP -D${DEBUG}
-
-# Just for testing
 TEST_DIR = $(abspath ./benchmark)
 test ?= all-reduce
-TEST-SRC = $(TEST_DIR)/$(test).txt
+TEST_SRC = $(TEST_DIR)/$(test).txt
 
 default: run
 
-$(BIN): $(CSRCS) $(VSRCS) | $(OBJ_DIR)
-	@rm -rf $(OBJ_DIR)
-	verilator $(VERILATOR_FLAGS) $(CXXFLAGS) $^ \
-	--Mdir $(OBJ_DIR) -o $(abspath $(BIN))
+$(BIN): $(CSRCS)
+	$(CXX) $(CXXFLAGS) $(INCLUDES_DIR) -o $@ $^
 
-run: $(BIN) $(TEST-SRC)
-	@$(BIN) $(TEST-SRC)
-
-gtk: run
-	gtkwave wave.fst
-
-$(OBJ_DIR):
-	mkdir -p $(OBJ_DIR)
+run: $(BIN) $(TEST_SRC)
+	@$(BIN) $(TEST_SRC)
 
 clean:
-	rm -rf $(BUILD_DIR) wave.fst*
+	rm -rf $(BIN)
 
 commit ?= update
 git:
 	git add .
 	git commit -m "$(commit)"
-	git push
+	git push -u origin dev
 
 config:
 	python config/psrc/config_sys.py

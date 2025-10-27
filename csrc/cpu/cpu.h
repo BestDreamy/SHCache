@@ -1,13 +1,16 @@
 #ifndef CPU_H
 #define CPU_H
 #include "../include/utils.h"
-#include "verilated_fst_c.h"
 #include "cache.h"
 #include <memory>
 #include "../include/dbg.h"
 #include "../chi/rnf_utils.h"
 
-template <size_t NumRegisters = 32, size_t NumCacheSets = 128, size_t CacheBlockSize = 4>
+template <
+    size_t NumRegisters = 32, 
+    size_t NumCacheSets = 128, // 128 sets
+    size_t CacheBlockSize = 4  // 2^4 bytes per cacheline
+>
 struct CPU {
     // Registers
     std::map<std::string, uint32_t> reg;
@@ -30,15 +33,14 @@ struct CPU {
 
     // Read from memory (via cache)
     bool read_memory(
-        const uint32_t &address, uint32_t& data
+        const paddr_t &address, uint32_t& data
     ) {
         return cache.access(RN_id, address, data);
     }
 
     // Write to memory (via cache)
     bool write_memory(
-        Vmodule* dut, VerilatedFstC* tfp, 
-        const uint32_t &address, const uint32_t& data
+        const paddr_t &address, const uint32_t& data
     ) {
         return cache.update(RN_id, address, data);
     }
@@ -52,7 +54,6 @@ struct CPU {
     }
 
     bool exec_once(
-        Vmodule* dut, VerilatedFstC* tfp, 
         const Operation &op
     ) {
         OperationType opType = op.operation;
@@ -60,7 +61,7 @@ struct CPU {
 
         switch (opType) {
             case OperationType::LOAD: {
-                uint32_t address = op.address.value();
+                paddr_t address = op.address.value();
                 uint32_t data = 0;
                 // Load operation
                 this->op_finished = this->read_memory(address, data);
@@ -70,7 +71,7 @@ struct CPU {
                 break;
             }
             case OperationType::STORE: {
-                uint32_t address = op.address.value();
+                paddr_t address = op.address.value();
                 uint32_t data = 0;
                 if (op.result.has_value()) {
                     data = std::stoi(op.result.value(), nullptr, 16);
@@ -81,7 +82,7 @@ struct CPU {
                     data = reg[rs];
                 }
                 // Store operation
-                this->op_finished = this->write_memory(dut, tfp, address, data);
+                this->op_finished = this->write_memory(address, data);
                 break;
             }
             case OperationType::COMPUTE: {

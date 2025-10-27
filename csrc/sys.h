@@ -9,7 +9,14 @@
 #include "include/utils.h"
 
 #define FINISH_TIME 1e4
-#define DUMP_TIME(time_counter) (time_counter < FINISH_TIME)? tfp->dump(time_counter ++): exit(0)
+#define DUMP_TIME(t) do { \
+    if ((t) < FINISH_TIME) { \
+        (t)++; \
+    } else { \
+        exit(0); \
+    } \
+} while (0)
+
 
 namespace {
     struct checkTable {
@@ -33,28 +40,22 @@ namespace {
     } unfinished_table;
 }
 
-void sim(Vmodule* dut, VerilatedFstC* tfp, const char *filepath);
+void sim(const char *filepath);
 
-void sys_init(Vmodule* dut, VerilatedFstC* tfp);
+void sys_init();
 
-inline bool sys_exec_once(Vmodule* dut, VerilatedFstC* tfp, const Operation& op) {
-    dut->clock = 1 - dut->clock; // clock = 0
-    dut->eval();
+inline bool sys_exec_once(const Operation& op) {
     DUMP_TIME(time_counter);
 
     int core_id = op.core;
-    bool op_finished = cpu[core_id].exec_once(dut, tfp, op);
-
-    dut->clock = 1 - dut->clock; // clock = 1
-    dut->eval();
-    DUMP_TIME(time_counter);
+    bool op_finished = cpu[core_id].exec_once(op);
 
     return op_finished;
 }
 
-#define SIM_CYCLE 2
+// #define SIM_CYCLE 2
 
-inline bool block_rnf_exec_once(Vmodule* dut, VerilatedFstC* tfp, const Operation &lastop) {
+inline bool block_rnf_exec_once(const Operation &lastop) {
     unfinished_table.lastop_exec_times ++;
     Exit(unfinished_table.lastop_exec_times < 50, "Execution time exceeded limit");
 
@@ -65,76 +66,48 @@ inline bool block_rnf_exec_once(Vmodule* dut, VerilatedFstC* tfp, const Operatio
     if (RN_rsp_channel[coreId].size()) ok = 1;
     if (RN_dat_channel[coreId].size()) ok = 1;
 
-    if (dut->RXREQLCRDV == 0) ok = 0;
-    if (dut->RXRSPLCRDV == 0) ok = 0;
+    // if (dut->RXREQLCRDV == 0) ok = 0;
+    // if (dut->RXRSPLCRDV == 0) ok = 0;
     // if (dut->RXDATLCRDV == 0) ok = 0;
 
     if (ok) {
-        dut->clock = 1 - dut->clock; // clock = 0
-        dut->RXREQFLITPEND = 1;
-        dut->RXRSPFLITPEND = 1;
-        dut->eval();
-        DUMP_TIME(time_counter);
+        // dut->RXREQFLITPEND = 1;
+        // dut->RXRSPFLITPEND = 1;
 
-        dut->clock = 1 - dut->clock; // clock = 1
-        dut->eval();
-        DUMP_TIME(time_counter);
-
-        dut->clock = 1 - dut->clock; // clock = 0
-        dut->RXREQFLITPEND = 0;
-        dut->RXRSPFLITPEND = 0;
+        // dut->RXREQFLITPEND = 0;
+        // dut->RXRSPFLITPEND = 0;
         if (!RN_req_channel[coreId].empty()){
-            dut->RXREQFLITV = 1;
+            // dut->RXREQFLITV = 1;
             reqflit_t req = RN_req_channel[coreId].front();
-            encode_chi_req_flit(dut, req);
             RN_req_channel[coreId].pop();
 
             unfinished_table.req_issued = true;
         }
         if (!RN_rsp_channel[coreId].empty()){
-            dut->RXRSPFLITV = 1;
+            // dut->RXRSPFLITV = 1;
             rspflit_t rsp = RN_rsp_channel[coreId].front();
-            encode_chi_rsp_flit(dut, rsp);
             RN_rsp_channel[coreId].pop();
 
             unfinished_table.rsp_issued = true;
         }
         if (!RN_dat_channel[coreId].empty()){
-            dut->RXDATFLITV = 1;
+            // dut->RXDATFLITV = 1;
             // TODO
         }
-        dut->eval();
-        DUMP_TIME(time_counter);
 
-        dut->clock = 1 - dut->clock; // clock = 1
-        dut->eval();
-        DUMP_TIME(time_counter);
+        // dut->RXREQFLITV = 0;
+        // dut->RXRSPFLITV = 0;
+        // dut->RXDATFLITV = 0;
         
-        dut->clock = 1 - dut->clock; // clock = 0
-        dut->RXREQFLITV = 0;
-        dut->RXRSPFLITV = 0;
-        dut->RXDATFLITV = 0;
-        dut->eval();
-        DUMP_TIME(time_counter);
-
-        dut->clock = 1 - dut->clock; // clock = 1
-        dut->eval();
-        DUMP_TIME(time_counter);
-
-        for (int i = 0; i < 2 * SIM_CYCLE; i ++) {
-            dut->clock = 1 - dut->clock;
-            dut->eval();
-            DUMP_TIME(time_counter);
-        }
     } else {
         Exit(0, "No request or response flit in RN channel, but still in block_rnf_exec_once");
     }
 
-    return dut->pocq_is_empty == 1 and unfinished_table.is_finished();
+    return unfinished_table.is_finished();
     // return false;
 }
 
-inline void sys_exec(Vmodule* dut, VerilatedFstC* tfp, std::ifstream& file) {
+inline void sys_exec(std::ifstream& file) {
     bool lastop_finished = true;
     unfinished_table.reset(nullptr);
     Operation lastop;
@@ -142,14 +115,13 @@ inline void sys_exec(Vmodule* dut, VerilatedFstC* tfp, std::ifstream& file) {
     std::string line;
     while (true) {
         if (lastop_finished == false) {
-            lastop_finished = block_rnf_exec_once(dut, tfp, lastop);
-
+            lastop_finished = block_rnf_exec_once(lastop);
             
             if (lastop_finished) {
                 unfinished_table.reset(nullptr);
 
                 // Just update cache line
-                sys_exec_once(dut, tfp, lastop);
+                sys_exec_once(lastop);
 
                 devLog("Last cpu cache state:");
                 cpu[lastop.core].show_cache();
@@ -164,7 +136,7 @@ inline void sys_exec(Vmodule* dut, VerilatedFstC* tfp, std::ifstream& file) {
             dbg_operation(op, logFile);
             Assert(op.operation != OperationType::OTHER, "Invalid operation type in trace line");
     
-            lastop_finished = sys_exec_once(dut, tfp, op);
+            lastop_finished = sys_exec_once(op);
 
             // When transaction have started, we should not reset lastop_exec_times
             if (!lastop_finished) unfinished_table.reset(&op);

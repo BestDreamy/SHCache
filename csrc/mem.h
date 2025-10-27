@@ -3,15 +3,17 @@
 
 #include <map>
 
+typedef uint32_t paddr_t;
+
 struct Memory {
-    std::map<uint64_t, uint32_t> mem;
+    std::map<paddr_t, uint32_t> mem;
 
     Memory() {
         mem.clear();
     }
 
     // Read from memory
-    bool read_memory(const uint64_t &addr, uint32_t& data) {
+    bool read_memory(const paddr_t &addr, uint32_t& data) {
         auto it = mem.find(addr);
         if (it == mem.end()) {
             mem[addr] = 0x44332211; // Test Mem Data
@@ -22,7 +24,7 @@ struct Memory {
     }
 
     // Write to memory
-    void write_memory(const uint32_t &addr, const uint32_t &data) {
+    void write_memory(const paddr_t &addr, const uint32_t &data) {
         mem[addr] = data;
     }
 };

@@ -57,7 +57,6 @@ inline void assert_fail_msg(const char* msg) {
     do { \
         if (!(cond)) { \
             assert_fail_msg(msg); \
-            tfp -> close(); \
             logFile.close(); \
         } \
         if (!(cond)) exit(0); \
