@@ -1,13 +1,14 @@
 CXX = g++
-CXXFLAGS = -std=c++17
+CXXFLAGS = -std=c++17 -g
 INCLUDES_DIR = $(addprefix -I, $(abspath ./csrc) \
 							   $(abspath ./csrc/include) \
 							   $(abspath ./csrc/chi) \
 							   $(abspath ./csrc/cpu) \
+							   $(abspath ./csrc/slc) \
 							   $(abspath ./csrc/diff))
 
 CSRCS = $(shell find $(abspath .) -name "*.c" -or -name "*.cc" -or -name "*.cpp")
-BIN := sim
+BIN = sim
 
 TEST_DIR = $(abspath ./benchmark)
 test ?= all-reduce
@@ -19,7 +20,10 @@ $(BIN): $(CSRCS)
 	$(CXX) $(CXXFLAGS) $(INCLUDES_DIR) -o $@ $^
 
 run: $(BIN) $(TEST_SRC)
-	@$(BIN) $(TEST_SRC)
+	./$(BIN) $(TEST_SRC)
+
+gdb: $(BIN) $(TEST_SRC)
+	gdb ./$(BIN) $(TEST_SRC)
 
 clean:
 	rm -rf $(BIN)

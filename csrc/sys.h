@@ -7,6 +7,7 @@
 #include "include/dbg.h"
 #include "include/autoconfig.h"
 #include "include/utils.h"
+#include "slc/slc.h"
 
 #define FINISH_TIME 1e4
 #define DUMP_TIME(t) do { \
@@ -66,39 +67,24 @@ inline bool block_rnf_exec_once(const Operation &lastop) {
     if (RN_rsp_channel[coreId].size()) ok = 1;
     if (RN_dat_channel[coreId].size()) ok = 1;
 
-    // if (dut->RXREQLCRDV == 0) ok = 0;
-    // if (dut->RXRSPLCRDV == 0) ok = 0;
-    // if (dut->RXDATLCRDV == 0) ok = 0;
-
     if (ok) {
-        // dut->RXREQFLITPEND = 1;
-        // dut->RXRSPFLITPEND = 1;
-
-        // dut->RXREQFLITPEND = 0;
-        // dut->RXRSPFLITPEND = 0;
         if (!RN_req_channel[coreId].empty()){
-            // dut->RXREQFLITV = 1;
             reqflit_t req = RN_req_channel[coreId].front();
             RN_req_channel[coreId].pop();
+
+            slc.exec_req(req);
 
             unfinished_table.req_issued = true;
         }
         if (!RN_rsp_channel[coreId].empty()){
-            // dut->RXRSPFLITV = 1;
             rspflit_t rsp = RN_rsp_channel[coreId].front();
             RN_rsp_channel[coreId].pop();
 
             unfinished_table.rsp_issued = true;
         }
         if (!RN_dat_channel[coreId].empty()){
-            // dut->RXDATFLITV = 1;
             // TODO
         }
-
-        // dut->RXREQFLITV = 0;
-        // dut->RXRSPFLITV = 0;
-        // dut->RXDATFLITV = 0;
-        
     } else {
         Exit(0, "No request or response flit in RN channel, but still in block_rnf_exec_once");
     }
@@ -114,6 +100,8 @@ inline void sys_exec(std::ifstream& file) {
     
     std::string line;
     while (true) {
+        puts(lastop_finished? "cpu run once": "l3 run once");
+
         if (lastop_finished == false) {
             lastop_finished = block_rnf_exec_once(lastop);
             
@@ -121,9 +109,8 @@ inline void sys_exec(std::ifstream& file) {
                 unfinished_table.reset(nullptr);
 
                 // Just update cache line
-                sys_exec_once(lastop);
+                // sys_exec_once(lastop);
 
-                devLog("Last cpu cache state:");
                 cpu[lastop.core].show_cache();
             }
             
@@ -138,7 +125,7 @@ inline void sys_exec(std::ifstream& file) {
     
             lastop_finished = sys_exec_once(op);
 
-            // When transaction have started, we should not reset lastop_exec_times
+            // When load or store have started, we should not reset lastop_exec_times
             if (!lastop_finished) unfinished_table.reset(&op);
 
             lastop = op;

@@ -1,6 +1,7 @@
 #include "csrc/sys.h"
 
 std::fstream logFile("cache.log");
+std::fstream slcTrace("slcTrace.log");
 
 int main(int argc, char** argv) {
 

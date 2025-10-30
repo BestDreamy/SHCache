@@ -13,6 +13,7 @@
 #define YELLOW_TXT "\033[1;33m"
 
 extern std::fstream logFile;
+extern std::fstream slcTrace;
 
 #define dbg(a) std::cout << __FILE__ << __LINE__ << " " << #a << " : " << static_cast<unsigned>(a) << std::endl
 
