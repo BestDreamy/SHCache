@@ -8,7 +8,7 @@
 
 template <
     size_t NumRegisters = 32, 
-    size_t NumCacheSets = 128, // 128 sets
+    size_t NumCacheSets = 4, // 128 sets
     size_t CacheBlockSize = 4  // 2^4 bytes per cacheline
 >
 struct CPU {
@@ -133,9 +133,10 @@ struct CPU {
     }
 
     void show_cache() const {
-        logFile << "Cache state for CPU " << RN_id << ":\n";
+        std::string log =  "Cache state for CPU " + std::to_string(RN_id);
+        devLog("%s", log.c_str());
+
         cache.show_cache();
-        logFile << "\n";
     }
 };
 

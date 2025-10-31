@@ -18,8 +18,17 @@ enum Snoop_State {
     Stash = 3 // Ready to be modified
 };
 
+static const char* snoopStateToStr(Snoop_State s) {
+    switch (s) {
+        case Invalid: return "Invlid";
+        case Share: return "Share";
+        case Unique: return "Unique";
+        default: return "?";
+    }
+}
+
 // system-level cache handle the memory requests from all CPUs
-template <size_t numSet = 128, size_t BlockSize = 4>
+template <size_t numSet = 4, size_t BlockSize = 4>
 struct SnoopFilter {
 
     static constexpr size_t numBlock = 1 << BlockSize;
@@ -50,8 +59,8 @@ struct SnoopFilter {
 
     inline paddr_t tag_of(paddr_t addr) const {
         paddr_t aligned_addr = aligned_of(addr);
-        paddr_t tag = addr / (numSet * numBlock); // Extract index from address
-        return tag;
+        // paddr_t tag = addr / (numSet * numBlock); // Extract index from address
+        return aligned_addr;
     }
 
     void stash_req_for_rsp(const reqflit_t &req) {
@@ -75,4 +84,31 @@ struct SnoopFilter {
 
         rnfVec[index][rsp.SrcID] = true;
     }
+
+    void show_snoop() const {
+        std::ostringstream oss;
+        oss << "===== Directory Dump =====\n";
+        oss << std::hex << std::setfill('0');
+
+        for (size_t set = 0; set < numSet; ++set) {
+            oss << "[" << std::setw(3) << std::dec << set << "] "
+                << "Tag = 0x" << std::hex << std::setw(sizeof(paddr_t)*2) << tag_array[set];
+
+            oss << "   State = " << snoopStateToStr(val_array[set]);
+
+            oss << "   RNF = [";
+            bool first = true;
+            for (size_t core = 0; core < NUMCORES; core++) {
+                if (rnfVec[set][core]) {
+                    if (!first) oss << ", ";
+                    oss << core;
+                    first = false;
+                }
+            }
+            oss << "]\n";
+        }
+
+        devLog("%s", oss.str().c_str());
+    }
+
 };

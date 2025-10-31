@@ -23,7 +23,7 @@
 // };
 
 // Direct-Map Local Cache
-template <size_t numSet = 128, size_t BlockSize = 4>
+template <size_t numSet = 4, size_t BlockSize = 4>
 struct L1Cache: public Cache<numSet, BlockSize> {
 
     reqflit_t RN_Tracker[config.numCreditsForHNReq[0]];
@@ -159,24 +159,6 @@ struct L1Cache: public Cache<numSet, BlockSize> {
         }
 
         chi_issue_CompAck_rsp(data);
-    }
-
-
-    void show_cache() const {
-        logFile << "Number of Sets: " << numSet << std::endl;
-        logFile << "Block Size (numBlock): " << this->numBlock << " bytes per set." << std::endl;
-        for (size_t set = 0; set < numSet; set++) {
-            if (this->val_array[set] == I) continue; // Skip invalid sets
-            logFile << "Set " << std::setw(3) << set << ": ";
-            logFile << "Tag = 0x" << std::hex << this->tag_array[set] << std::dec << ", ";
-            logFile << "State = " << this->val_array[set] << ", Data = [";
-            for (size_t blk = 0; blk < this->numBlock; blk++) {
-                logFile << "0x" << std::hex << static_cast<int>(this->data_array[set][blk]) << std::dec;
-                if (blk != this->numBlock - 1)
-                    logFile << ", ";
-            }
-            logFile << "]" << std::endl;
-        }
     }
 
     void show_RN_Tracker() const {

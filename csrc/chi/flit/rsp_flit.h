@@ -58,8 +58,8 @@ inline rspflit_t createCompAck(
     flit.Resp = Resp;
     flit.DBID = DBID;
 
-    devLog("Ready to create CompAck RspFlit");
-    printRspFlit(flit);
+    // devLog("Ready to create CompAck RspFlit");
+    // printRspFlit(flit);
     return flit;
 }
 

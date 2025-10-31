@@ -15,8 +15,20 @@ enum Cache_State {
     Save = 3 // save the origin state
 };
 
+static const char* cacheStateToStr(Cache_State s) {
+    switch (s) {
+        case I: return "I";
+        case SC: return "SC";
+        case UC: return "UC";
+        case UD: return "UD";
+        case SD: return "SD";
+        default: return "?";
+    }
+}
+
+
 // Direct-Map Local Cache
-template <size_t numSet = 128, size_t BlockSize = 4>
+template <size_t numSet = 4, size_t BlockSize = 4>
 struct Cache {
     static constexpr size_t numBlock = 1 << BlockSize;
     paddr_t tag_array[numSet];
@@ -49,8 +61,9 @@ struct Cache {
 
     inline paddr_t tag_of(paddr_t addr) const {
         paddr_t aligned_addr = aligned_of(addr);
-        paddr_t tag = addr / (numSet * numBlock); // Extract index from address
-        return tag;
+        // paddr_t tag = addr / (numSet * numBlock); // Extract index from address
+        // return tag;
+        return aligned_addr;
     }
 
     /*
@@ -101,7 +114,26 @@ struct Cache {
         const int &coreId, const paddr_t &addr, const uint32_t& new_data
     );
 
-    void show_cache() const;
+    void show_cache() const {
+        std::ostringstream oss;
+        oss << "===== Cache Dump =====\n";
+        oss << std::hex << std::setfill('0');
+
+        for (size_t set = 0; set < numSet; ++set) {
+            oss << "[" << std::setw(3) << std::dec << set << "] "
+                << "Tag = 0x" << std::hex << std::setw(8) << tag_array[set]
+                << "   Data = ";
+
+            for (size_t b = 0; b < numBlock; ++b) {
+                oss << "0x" << std::setw(2) << (unsigned)data_array[set][b] << " ";
+            }
+
+            oss << "  State = " << cacheStateToStr(val_array[set]) << "\n";
+        }
+
+        devLog("%s", oss.str().c_str());
+    }
+
 };
 
 #endif

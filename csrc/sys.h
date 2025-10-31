@@ -118,6 +118,8 @@ inline void sys_exec(std::ifstream& file) {
                 // sys_exec_once(lastop);
 
                 cpu[lastop.core].show_cache();
+                slc.show_cache();
+                slc.show_snoop();
             }
             
             continue;

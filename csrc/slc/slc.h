@@ -11,7 +11,7 @@
 #include "sf.h"
 
 // system-level cache handle the memory requests from all CPUs
-template <size_t numSet = 128, size_t BlockSize = 4>
+template <size_t numSet = 4, size_t BlockSize = 4>
 struct SystemCache: public Cache<numSet, BlockSize> {
     SnoopFilter<> sf;
     SystemCache() {
@@ -38,6 +38,10 @@ struct SystemCache: public Cache<numSet, BlockSize> {
             return;
         }
         return;
+    }
+
+    void show_snoop() const {
+        sf.show_snoop();
     }
 
     // Lookup
