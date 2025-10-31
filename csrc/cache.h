@@ -1,11 +1,9 @@
 #ifndef CACHE_H
 #define CACHE_H
-#include "../include/utils.h"
-#include "../include/dbg.h"
-#include "../mem.h"
-#include "../include/autoconfig.h"
 #include <cstddef>
 #include <cstring>
+#include "mem.h"
+#include "chi/flit/dat_flit.h"
 
 enum Cache_State {
     I = 0,
@@ -92,6 +90,8 @@ struct Cache {
             memcpy(&data_array[index][offset + i], ((uint8_t*)&data) + i, sizeof(uint8_t));
         }
     }
+
+    void update_cacheline_by_datflit(const datflit_t &data);
 
     bool access(
         const int &coreId, const paddr_t &addr, uint32_t& data

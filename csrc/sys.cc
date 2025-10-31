@@ -14,7 +14,8 @@ SystemCache<> slc;
 
 void sys_init() {
     for (int i = 0; i < NUMCORES; i ++) {
-        cpu[i] = CPU<>(config.RNId[i]);
+        // cpu[i] = CPU<>(config.RNId[i]);
+        cpu[i].set_RN_id(config.RNId[i]);
     }
 
     DUMP_TIME(time_counter);

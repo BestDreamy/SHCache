@@ -49,16 +49,14 @@ inline bool sys_exec_once(const Operation& op) {
     DUMP_TIME(time_counter);
 
     int core_id = op.core;
-    bool op_finished = cpu[core_id].exec_once(op);
-
-    return op_finished;
+    return cpu[core_id].exec_once(op);
 }
 
 // #define SIM_CYCLE 2
 
 inline bool block_rnf_exec_once(const Operation &lastop) {
     unfinished_table.lastop_exec_times ++;
-    Exit(unfinished_table.lastop_exec_times < 50, "Execution time exceeded limit");
+    Assert(unfinished_table.lastop_exec_times < 50, "Execution time exceeded limit");
 
     bool ok = 0;
     int coreId = lastop.core;
@@ -76,17 +74,22 @@ inline bool block_rnf_exec_once(const Operation &lastop) {
 
             unfinished_table.req_issued = true;
         }
+        if (!RN_dat_channel[coreId].empty()){
+            datflit_t dat = RN_dat_channel[coreId].front();
+            RN_dat_channel[coreId].pop();
+
+            cpu[coreId].update_cache(dat);
+        }
         if (!RN_rsp_channel[coreId].empty()){
             rspflit_t rsp = RN_rsp_channel[coreId].front();
             RN_rsp_channel[coreId].pop();
 
+            slc.exec_rsp(rsp);
+
             unfinished_table.rsp_issued = true;
         }
-        if (!RN_dat_channel[coreId].empty()){
-            // TODO
-        }
     } else {
-        Exit(0, "No request or response flit in RN channel, but still in block_rnf_exec_once");
+        Assert(0, "No request or response flit in RN channel, but still in block_rnf_exec_once");
     }
 
     return unfinished_table.is_finished();

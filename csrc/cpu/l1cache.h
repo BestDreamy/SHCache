@@ -59,7 +59,7 @@ struct L1Cache: public Cache<numSet, BlockSize> {
     int RN_Tracker_pop(const datflit_t &data) {
         devLog("RN Req Tracker pop");
         int id = find_RN_Tracker_from_CompData(data);
-        Exit(id != -1, "No available RN_Tracker");
+        Assert(id != -1, "No available RN_Tracker");
         
         RN_Tracker_valid[id] = false;
         return id;
@@ -68,7 +68,7 @@ struct L1Cache: public Cache<numSet, BlockSize> {
     int RN_Tracker_push(const reqflit_t &req) {
         devLog("RN Req Tracker push");
         int id = find_first_empty_RN_Tracker();
-        Exit(id != -1, "No available RN_Tracker");
+        Assert(id != -1, "No available RN_Tracker");
         
         RN_Tracker[id] = req;
         RN_Tracker_valid[id] = true;
@@ -115,7 +115,7 @@ struct L1Cache: public Cache<numSet, BlockSize> {
             return true;
         }
         
-        paddr_t aligned_addr = this->align_of(addr);
+        paddr_t aligned_addr = this->aligned_of(addr);
         if (!this->is_unique(aligned_addr)) {
             reqflit_t req = chi_issue_ReadUnique_req(coreId, aligned_addr, BlockSize);
             
@@ -126,7 +126,7 @@ struct L1Cache: public Cache<numSet, BlockSize> {
         Assert(0, "Other states are not supported yet");
     }
 
-    void update(const datflit_t &data) {
+    void update_cacheline_by_datflit(const datflit_t &data) {
         int id = RN_Tracker_pop(data);    // Pop tracker entry
         const reqflit_t &req = RN_Tracker[id];
         paddr_t base_addr = req.Addr;

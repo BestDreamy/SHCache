@@ -1,67 +1,48 @@
 #pragma once
 #include <cstdint>
-#include <cassert>
+#include "../mem.h"
+#include "../include/utils.h"
+#include "../cache.h"
+#include "../chi/flit/req_flit.h"
+#include "../chi/flit/dat_flit.h"
+#include "../chi/transaction/req_flow.h"
+#include "../chi/transaction/rsp_flow.h"
+#include "flit/auto_flit.h"
+#include "sf.h"
 
-template<size_t SETS, size_t numRNs, size_t ADDR_W = 48, size_t STATE_W = 3>
-struct SF {
+// system-level cache handle the memory requests from all CPUs
+template <size_t numSet = 128, size_t BlockSize = 4>
+struct SnoopFilter {
 
-    // Derived parameters
-    static constexpr size_t SET_W = []{
-        size_t w = 0;
-        while ((1ULL << w) < SETS) w++;
-        return w;
-    }();
-    static_assert((1ULL << SET_W) == SETS, "SETS must be power of 2");
-
-    static constexpr size_t TAG_W = ADDR_W - SET_W;
-    static constexpr size_t RNF_W = []{
-        size_t w = 0;
-        while ((1ULL << w) < numRNs) w++;
-        return w + 1; // +1 same as Verilog
-    }();
-
-    // Storage
-    uint64_t tagArray[SETS];
-    uint8_t  rnfState[SETS]; // STATE_W bits
-    uint16_t rnfId[SETS];    // RNF_W bits
-
-    // Must be called before using
-    void init() {
-        for (size_t i = 0; i < SETS; i++) {
-            tagArray[i] = 0;
-            rnfState[i] = 0; // I
-            rnfId[i] = 0;
+    static constexpr size_t numBlock = 1 << BlockSize;
+    paddr_t tag_array[numSet];
+    Cache_State val_array[numSet];
+    bool rnfVec[numSet][NUMCORES];
+    
+    SnoopFilter() {
+        for (size_t i = 0; i < numSet; ++i) {
+            tag_array[i] = 0;
+            val_array[i] = I;
+            for (size_t c = 0; c < NUMCORES; ++c) {
+                rnfVec[i][c] = false;
+            }
         }
     }
 
-    // Extract SET and TAG
-    inline uint32_t set_of(uint64_t addr) const {
-        return (addr >> (ADDR_W - SET_W)) & (SETS - 1);
+    inline paddr_t aligned_of(paddr_t addr) const {
+        return addr & ~(numBlock - 1);
     }
 
-    inline uint64_t tag_of(uint64_t addr) const {
-        return addr >> (ADDR_W - SET_W - TAG_W);
+    inline paddr_t set_of(paddr_t addr) const {
+        paddr_t aligned_addr = aligned_of(addr);
+        paddr_t index = (addr / numBlock) % numSet; // Extract index from address
+        return index;
     }
 
-    // Query hit
-    inline bool lookup(uint64_t addr, uint8_t& state_out) const {
-        uint32_t set = set_of(addr);
-        uint64_t tag = tag_of(addr);
-
-        state_out = rnfState[set];
-        return (tagArray[set] == tag) && (state_out != 0); // state != I
+    inline paddr_t tag_of(paddr_t addr) const {
+        paddr_t aligned_addr = aligned_of(addr);
+        paddr_t tag = addr / (numSet * numBlock); // Extract index from address
+        return tag;
     }
 
-    // Called when ReadNoSnp arrives (pocq_req_valid)
-    inline void install(uint64_t addr) {
-        uint32_t set = set_of(addr);
-        tagArray[set] = tag_of(addr);
-    }
-
-    // Called when slc_sf_rsp_valid arrives (store state + RN ID)
-    inline void update_state(uint64_t addr, uint8_t newState, uint16_t srcId) {
-        uint32_t set = set_of(addr);
-        rnfState[set] = newState;
-        rnfId[set] = srcId;
-    }
 };

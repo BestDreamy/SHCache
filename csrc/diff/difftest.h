@@ -1,7 +1,7 @@
 #ifndef DIFFTEST_H
 #define DIFFTEST_H
 
-// #include <assert.h>
+// #include <Assert.h>
 #include "../cpu/cpu.h"
 
 inline bool check_all_reduce() {
@@ -14,7 +14,7 @@ inline bool check_all_reduce() {
         ok = false;
     }
     
-    Exit(ok, "All-reduce does not match");
+    Assert(ok, "All-reduce does not match");
     return ok;
 }
 

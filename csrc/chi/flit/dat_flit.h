@@ -56,7 +56,7 @@ inline datflit_t createCompData_UC(const reqflit_t &req) {
 
     uint8_t size = req.Size; // Suppose Size=4
     Assert(req.Addr % 4 == 0, "Address must be aligned to 4 bytes");
-    Exit(size < 6, "Size must be less than 6");
+    Assert(size < 6, "Size must be less than 6");
     
     int num_bytes = 1 << size; // 16 bytes
     int num_words = num_bytes / 4;

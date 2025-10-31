@@ -52,27 +52,27 @@ struct Operation {
 };
 
 inline void dbg_operation(const Operation& op, std::fstream& logFile) {
-    logFile << "core: " << op.core << ", operation: ";
+    std::cout << "core: " << op.core << ", operation: ";
     switch (op.operation) {
-        case STORE: logFile << "store"; break;
-        case LOAD: logFile << "load"; break;
-        case COMPUTE: logFile << "compute"; break;
-        default: logFile << "other"; break;
+        case STORE: std::cout << "store"; break;
+        case LOAD: std::cout << "load"; break;
+        case COMPUTE: std::cout << "compute"; break;
+        default: std::cout << "other"; break;
     }
-    logFile << ", rs: ";
+    std::cout << ", rs: ";
     for (const auto& r : op.rs) {
-        logFile << r << " ";
+        std::cout << r << " ";
     }
     if (op.address) {
-        logFile << ", address: 0x" << std::hex << *op.address;
+        std::cout << ", address: 0x" << std::hex << *op.address;
     }
     if (op.result) {
-        logFile << ", result: " << *op.result;
+        std::cout << ", result: " << *op.result;
     }
     if (op.compute_type) {
-        logFile << ", compute_type: " << *op.compute_type;
+        std::cout << ", compute_type: " << *op.compute_type;
     }
-    logFile << std::endl;
+    std::cout << std::endl;
 }
 
 inline Operation read_trace_one_line(std::string &line) {

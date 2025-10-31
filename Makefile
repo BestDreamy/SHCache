@@ -26,7 +26,7 @@ gdb: $(BIN) $(TEST_SRC)
 	gdb ./$(BIN) $(TEST_SRC)
 
 clean:
-	rm -rf $(BIN)
+	rm -rf $(BIN) cache.log
 
 commit ?= update
 git:

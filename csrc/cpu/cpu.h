@@ -1,7 +1,7 @@
 #ifndef CPU_H
 #define CPU_H
 #include "../include/utils.h"
-#include "cache.h"
+#include "l1cache.h"
 #include <memory>
 #include "../include/dbg.h"
 #include "../chi/rnf_utils.h"
@@ -16,20 +16,20 @@ struct CPU {
     std::map<std::string, uint32_t> reg;
 
     // Cache
-    Cache<NumCacheSets, CacheBlockSize> cache;
+    L1Cache<NumCacheSets, CacheBlockSize> cache;
 
     int RN_id;
+    bool op_finished;
 
     CPU() {
         reg.clear();
         op_finished = true;
+        std::cout << op_finished << std::endl;
     }
 
-    CPU(int RN_id): RN_id(RN_id) {
-        CPU();
+    void set_RN_id(int RN_id) {
+        this->RN_id = RN_id;
     }
-
-    bool op_finished;
 
     // Read from memory (via cache)
     bool read_memory(
@@ -48,7 +48,7 @@ struct CPU {
     // Append data to cache
     // This function is called when a data flit is received
     bool update_cache(const datflit_t &data) {
-        cache.update(data);
+        cache.update_cacheline_by_datflit(data);
         this->op_finished = true;
         return this->op_finished;
     }

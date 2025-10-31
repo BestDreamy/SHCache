@@ -1,6 +1,5 @@
 #pragma once
 #include <cstdint>
-#include <cassert>
 #include "../mem.h"
 #include "../include/utils.h"
 #include "../cache.h"
@@ -9,41 +8,32 @@
 #include "../chi/transaction/req_flow.h"
 #include "../chi/transaction/rsp_flow.h"
 #include "flit/auto_flit.h"
+#include "sf.h"
 
+// system-level cache handle the memory requests from all CPUs
 template <size_t numSet = 128, size_t BlockSize = 4>
 struct SystemCache: public Cache<numSet, BlockSize> {
-
-    static constexpr size_t numBlock = 1 << BlockSize;
-    paddr_t tag_array[numSet];
-    uint8_t data_array[numSet][numBlock];
-    Cache_State val_array[numSet];
-
+    SnoopFilter sf;
     SystemCache() {
         Cache();
     }
 
     void exec_req(reqflit_t req) {
-        paddr_t base_addr = req.Addr;
-        paddr_t index = this->set_of(base_addr);
-        paddr_t tag = this->tag_of(base_addr);
+        paddr_t aligned_addr = req.Addr;
+        paddr_t index = this->set_of(aligned_addr);
+        paddr_t tag = this->tag_of(aligned_addr);
 
-        // For ReadUnique request
-        // if (req.Opcode == ReadUnique) {
-        //     // Install the cache line
-        //     this->tag_array[index] = tag;
-        //     this->val_array[index] = UC;
+        if (req.Opcode == ReadUnique) {
+            mem.chi_read_memory_with_DMT(req);
+            return;
+        }
 
-        //     // Initialize data to zero
-        //     for (size_t i = 0; i < numBlock; ++i) {
-        //         this->data_array[index][i] = 0;
-        //     }
+        Assert(0, "Only ReadUnique is supported in SLC");
+    }
 
-        //     // Issue CompData response
-        //     chi_issue_CompData_rsp(req, this->data_array[index], UC);
-        //     return;
-        // }
-
-        // Assert(0, "Only ReadUnique is supported in SLC");
+    void exec_rsp(rspflit_t rsp) {
+        // Currently, no need to handle rsp flit in SLC
+        return;
     }
 
     // Lookup

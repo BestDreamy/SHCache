@@ -9,7 +9,6 @@
 #include <cstdint>
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
 
 extern int32_t time_counter;
 
