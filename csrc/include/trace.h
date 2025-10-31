@@ -6,6 +6,7 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
+#include "dbg.h"
 
 enum OperationType {
     OTHER,
@@ -52,27 +53,27 @@ struct Operation {
 };
 
 inline void dbg_operation(const Operation& op, std::fstream& logFile) {
-    std::cout << "core: " << op.core << ", operation: ";
+    std::string log = "core: " + std::to_string(op.core) + ", operation: ";
     switch (op.operation) {
-        case STORE: std::cout << "store"; break;
-        case LOAD: std::cout << "load"; break;
-        case COMPUTE: std::cout << "compute"; break;
-        default: std::cout << "other"; break;
+        case STORE: log += "store"; break;
+        case LOAD: log += "load"; break;
+        case COMPUTE: log += "compute"; break;
+        default: log += "other"; break;
     }
-    std::cout << ", rs: ";
+    log += ", rs: ";
     for (const auto& r : op.rs) {
-        std::cout << r << " ";
+        log += r + " ";
     }
     if (op.address) {
-        std::cout << ", address: 0x" << std::hex << *op.address;
+        log += ", address: 0x" + std::to_string(*op.address);;
     }
     if (op.result) {
-        std::cout << ", result: " << *op.result;
+        log += ", result: " + *op.result;
     }
     if (op.compute_type) {
-        std::cout << ", compute_type: " << *op.compute_type;
+        log += ", compute_type: " + std::to_string(*op.compute_type);
     }
-    std::cout << std::endl;
+    devLog("%s", log.c_str());
 }
 
 inline Operation read_trace_one_line(std::string &line) {

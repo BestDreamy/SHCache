@@ -55,7 +55,7 @@ inline bool sys_exec_once(const Operation& op) {
 // #define SIM_CYCLE 2
 
 inline bool block_rnf_exec_once(const Operation &lastop) {
-    unfinished_table.lastop_exec_times ++;
+    DUMP_TIME(unfinished_table.lastop_exec_times);
     Assert(unfinished_table.lastop_exec_times < 50, "Execution time exceeded limit");
 
     bool ok = 0;
@@ -73,12 +73,14 @@ inline bool block_rnf_exec_once(const Operation &lastop) {
             slc.exec_req(req);
 
             unfinished_table.req_issued = true;
+            DUMP_TIME(unfinished_table.lastop_exec_times);
         }
         if (!RN_dat_channel[coreId].empty()){
             datflit_t dat = RN_dat_channel[coreId].front();
             RN_dat_channel[coreId].pop();
 
             cpu[coreId].update_cache(dat);
+            DUMP_TIME(unfinished_table.lastop_exec_times);
         }
         if (!RN_rsp_channel[coreId].empty()){
             rspflit_t rsp = RN_rsp_channel[coreId].front();
@@ -87,6 +89,7 @@ inline bool block_rnf_exec_once(const Operation &lastop) {
             slc.exec_rsp(rsp);
 
             unfinished_table.rsp_issued = true;
+            DUMP_TIME(unfinished_table.lastop_exec_times);
         }
     } else {
         Assert(0, "No request or response flit in RN channel, but still in block_rnf_exec_once");

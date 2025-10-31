@@ -7,23 +7,24 @@
 #include "../chi/flit/dat_flit.h"
 #include "../chi/transaction/req_flow.h"
 #include "../chi/transaction/rsp_flow.h"
-#include "flit/auto_flit.h"
+#include "../chi/flit/auto_flit.h"
 #include "sf.h"
 
 // system-level cache handle the memory requests from all CPUs
 template <size_t numSet = 128, size_t BlockSize = 4>
 struct SystemCache: public Cache<numSet, BlockSize> {
-    SnoopFilter sf;
+    SnoopFilter<> sf;
     SystemCache() {
-        Cache();
+        Cache<>();
     }
 
-    void exec_req(reqflit_t req) {
+    void exec_req(const reqflit_t &req) {
         paddr_t aligned_addr = req.Addr;
         paddr_t index = this->set_of(aligned_addr);
         paddr_t tag = this->tag_of(aligned_addr);
 
         if (req.Opcode == ReadUnique) {
+            sf.stash_req_for_rsp(req);
             mem.chi_read_memory_with_DMT(req);
             return;
         }
@@ -31,8 +32,11 @@ struct SystemCache: public Cache<numSet, BlockSize> {
         Assert(0, "Only ReadUnique is supported in SLC");
     }
 
-    void exec_rsp(rspflit_t rsp) {
-        // Currently, no need to handle rsp flit in SLC
+    void exec_rsp(const rspflit_t &rsp) {
+        if (rsp.Resp == CompAck_UC) {
+            sf.exec_unique_rsp(rsp);
+            return;
+        }
         return;
     }
 

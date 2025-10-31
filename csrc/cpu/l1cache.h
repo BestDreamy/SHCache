@@ -31,7 +31,7 @@ struct L1Cache: public Cache<numSet, BlockSize> {
 
     L1Cache() {
         
-        Cache();
+        Cache<>();
 
         for (int i = 0; i < config.numCreditsForHNReq[0]; i ++) 
             RN_Tracker_valid[i] = false;
@@ -49,7 +49,7 @@ struct L1Cache: public Cache<numSet, BlockSize> {
     int find_RN_Tracker_from_CompData(const datflit_t &data) const {
         for (int i = 0; i < config.numCreditsForHNReq[0]; i ++) {
             if (RN_Tracker_valid[i] == false) continue;
-            if (RN_Tracker[i].TxnID == data.TxnID && RN_Tracker[i].TgtID == data.HomeNID) {
+            if (RN_Tracker[i].TxnID == data.TxnID) {
                 return i;
             }
         }
@@ -57,7 +57,8 @@ struct L1Cache: public Cache<numSet, BlockSize> {
     }
 
     int RN_Tracker_pop(const datflit_t &data) {
-        devLog("RN Req Tracker pop");
+        devLog("RN Tracker pop req [TxnID=%d, TgtID=%d]", data.TxnID, data.HomeNID);
+        printDatFlit(data);
         int id = find_RN_Tracker_from_CompData(data);
         Assert(id != -1, "No available RN_Tracker");
         
@@ -66,12 +67,13 @@ struct L1Cache: public Cache<numSet, BlockSize> {
     }
 
     int RN_Tracker_push(const reqflit_t &req) {
-        devLog("RN Req Tracker push");
         int id = find_first_empty_RN_Tracker();
         Assert(id != -1, "No available RN_Tracker");
         
         RN_Tracker[id] = req;
         RN_Tracker_valid[id] = true;
+        devLog("RN Tracker[%d] push req [TxnID=%d]", id, req.TxnID);
+        printReqFlit(req);
         return id;
     }
 

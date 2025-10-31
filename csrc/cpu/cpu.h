@@ -24,7 +24,6 @@ struct CPU {
     CPU() {
         reg.clear();
         op_finished = true;
-        std::cout << op_finished << std::endl;
     }
 
     void set_RN_id(int RN_id) {

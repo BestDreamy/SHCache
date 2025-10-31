@@ -42,4 +42,40 @@ struct Memory {
 };
 
 extern Memory mem;
+
+inline datflit_t createCompData_UC(const reqflit_t &req) {
+    datflit_t flit;
+
+    uint8_t size = req.Size; // Suppose Size=4
+    Assert(req.Addr % 4 == 0, "Address must be aligned to 4 bytes");
+    Assert(size < 6, "Size must be less than 6");
+    
+    int num_bytes = 1 << size; // 16 bytes
+    int num_words = num_bytes / 4;
+    uint32_t word_data = 0;
+    for (int i = 0; i < num_words; i++) {
+        uint64_t word_addr = static_cast<uint64_t>((req.Addr & ~0x3UL) + i * 4);
+        mem.read_memory(word_addr, word_data);
+        
+        // DataFlit include 256 bits (32 bytes)
+        // Each size < 256 bits req just use 1 DataFlit
+        for (int bit = 0; bit < 32; bit++) {
+            bool bit_val = ((word_data >> bit) & 1) != 0;
+            flit.Data.set(i * 32 + bit, bit_val);
+        }
+        
+        flit.BE |= (0xF << (i * 4));
+    }
+    flit.DataID            = 0;
+    flit.CCID              = 0;
+    flit.DBID              = req.TxnID;
+    flit.Resp              = CompData_UC;
+    flit.Opcode            = CompData;
+    flit.HomeNID           = req.SrcID;
+    flit.TxnID             = req.ReturnTxnID;
+    flit.SrcID             = req.TgtID;
+    flit.TgtID             = req.StashNID_ReturnNID;
+
+    return flit;
+}
 #endif
