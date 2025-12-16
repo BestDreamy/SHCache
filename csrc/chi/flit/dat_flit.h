@@ -74,7 +74,7 @@ inline void printDatFlit(const datflit_t &flit) {
             << std::setw(8) << val << "\n";
     }
 
-    oss << "BE       : 0x"
+    oss << "BE      : 0x"
         << std::setw(8) << static_cast<uint32_t>(flit.BE) << "\n";
 
     log += "\n" + oss.str();

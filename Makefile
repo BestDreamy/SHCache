@@ -1,4 +1,4 @@
-CXX = g++
+CXX = clang++
 CXXFLAGS = -std=c++17 -g
 INCLUDES_DIR = $(addprefix -I, $(abspath ./csrc) \
 							   $(abspath ./csrc/include) \

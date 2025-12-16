@@ -52,3 +52,16 @@ inline void printReqFlit(const reqflit_t &req) {
         " }";
     devLog("%s", log.c_str());
 }
+
+inline reqflit_t createReadNoSnp(
+    const reqflit_t &req
+) {
+    reqflit_t flit;
+    flit.SrcID = req.TgtID;
+    // flit.TgtID = SNID;
+
+    flit.StashNID_ReturnNID = req.SrcID;
+    flit.ReturnTxnID = req.TxnID;
+
+    return flit;
+}

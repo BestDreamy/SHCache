@@ -74,15 +74,22 @@ inline bool block_rnf_exec_once(const Operation &lastop) {
 
             unfinished_table.req_issued = true;
             DUMP_TIME(unfinished_table.lastop_exec_times);
+
+            devLog("RN%d issued req flit\n", coreId);
         }
-        if (!RN_dat_channel[coreId].empty()){
+        // Data from memory or L3 cache put in RN_dat_channel
+        else if (!RN_dat_channel[coreId].empty()) {
             datflit_t dat = RN_dat_channel[coreId].front();
             RN_dat_channel[coreId].pop();
 
             cpu[coreId].update_cache(dat);
             DUMP_TIME(unfinished_table.lastop_exec_times);
+
+            devLog("RN%d reveive dat flit\n", coreId);
         }
-        if (!RN_rsp_channel[coreId].empty()){
+        // 1. Already reveive data
+        // 2. Data belong RN
+        else {
             rspflit_t rsp = RN_rsp_channel[coreId].front();
             RN_rsp_channel[coreId].pop();
 
@@ -90,6 +97,8 @@ inline bool block_rnf_exec_once(const Operation &lastop) {
 
             unfinished_table.rsp_issued = true;
             DUMP_TIME(unfinished_table.lastop_exec_times);
+
+            devLog("RN%d issued rsp flit\n", coreId);
         }
     } else {
         Assert(0, "No request or response flit in RN channel, but still in block_rnf_exec_once");
@@ -123,7 +132,7 @@ inline void sys_exec(std::ifstream& file) {
             }
             
             continue;
-        } else {
+        } else { // cpu run once
             if (!std::getline(file, line)) break;
             if (line.empty()) continue;
 

@@ -14,7 +14,7 @@ inline bool check_all_reduce() {
         ok = false;
     }
     
-    Assert(ok, "All-reduce does not match");
+    Exit(ok, "All-reduce does not match");
     return ok;
 }
 

@@ -36,8 +36,10 @@ struct Memory {
     // AMBA5 CHI
 
     void chi_read_memory_with_DMT(const reqflit_t &req) {
+        reqflit_t req2sn =  createReadNoSnp(req);
         datflit_t dat = createCompData_UC(req);
-        RN_dat_channel[req.StashNID_ReturnNID].push(dat);
+        RN_dat_channel[req2sn.StashNID_ReturnNID].push(dat);
+        devLog("RN dat channel[%d] push dat", req2sn.StashNID_ReturnNID);
     }
 };
 

@@ -5,6 +5,7 @@
 #include <memory>
 #include "../include/dbg.h"
 #include "../chi/rnf_utils.h"
+#include "../include/autoconfig.h"
 
 template <
     size_t NumRegisters = 32, 

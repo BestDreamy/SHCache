@@ -69,6 +69,8 @@ struct SnoopFilter {
         paddr_t tag = this->tag_of(aligned_addr);
 
         rsp_stash.push(aligned_addr);
+
+        devLog("SF stash push req [TxnID=%d]", req.TxnID);
     }
 
     void exec_unique_rsp(const rspflit_t &rsp) {

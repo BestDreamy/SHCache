@@ -65,7 +65,9 @@ inline void dbg_operation(const Operation& op, std::fstream& logFile) {
         log += r + " ";
     }
     if (op.address) {
-        log += ", address: 0x" + std::to_string(*op.address);;
+        std::stringstream ss;
+        ss << ", address: 0x" << std::hex << *op.address;
+        log += ss.str();
     }
     if (op.result) {
         log += ", result: " + *op.result;
