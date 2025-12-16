@@ -3,11 +3,9 @@ L3 Cache with CHI_b protocol
 
 # Pre-Install
 ```
-verilator 5.034
 make
 python 3.12
 c++
-gtkwave
 pyjson
 ```
 
@@ -17,6 +15,6 @@ pyjson
 make config
 
 make
-
-gtkwave wave.fst
 ```
+
+docker run -it -p 3333:22  -v /Users/aric/work:/work --name SHCache antrea/antrea-ubuntu-arm:latest bash
