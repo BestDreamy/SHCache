@@ -1,15 +1,13 @@
 #ifndef CPU_H
 #define CPU_H
-#include "../include/utils.h"
 #include "l1cache.h"
 #include <memory>
-#include "../include/dbg.h"
-#include "../chi/rnf_utils.h"
+#include "../include/trace.h" 
 #include "../include/autoconfig.h"
 
 template <
     size_t NumRegisters = 32, 
-    size_t NumCacheSets = 4, // 128 sets
+    size_t NumCacheSets = 4, // 128 sets in the future
     size_t CacheBlockSize = 4  // 2^4 bytes per cacheline
 >
 struct CPU {
@@ -42,6 +40,7 @@ struct CPU {
     bool write_memory(
         const paddr_t &address, const uint32_t& data
     ) {
+        // devLog("CPU[%d] write_memory addr=0x%08x data=0x%08x", RN_id, address, data);
         return cache.update(RN_id, address, data);
     }
 
@@ -51,6 +50,16 @@ struct CPU {
         cache.update_cacheline_by_datflit(data);
         this->op_finished = true;
         return this->op_finished;
+    }
+
+    void show_reg() const {
+        std::string log = "CPU " +  std::to_string(RN_id) + " Registers:\n";
+        for (const auto& [key, value] : reg) {
+            std::stringstream ss;
+            ss << key << ", value: 0x" << std::hex << value << std::dec << "\n";
+            log += ss.str();
+        }
+        regLog("%s", log.c_str());
     }
 
     bool exec_once(
@@ -68,6 +77,7 @@ struct CPU {
                 Assert(op.rs.size() == 1, "Load operation should have only one rs");
                 std::string rs = op.rs[0];
                 reg[rs] = data;
+                show_reg();
                 break;
             }
             case OperationType::STORE: {
@@ -126,6 +136,7 @@ struct CPU {
                     reg[op.result.value()] = data1 < data2 ? 1 : 0;
                     default: Assert(0, "Unknown compute type");
                 }
+                show_reg();
             }
             default: break;
         }
@@ -134,7 +145,7 @@ struct CPU {
     }
 
     void show_cache() const {
-        std::string log =  "Cache state for CPU " + std::to_string(RN_id);
+        std::string log =  "Local Cache state for CPU " + std::to_string(RN_id);
         devLog("%s", log.c_str());
 
         cache.show_cache();

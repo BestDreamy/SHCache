@@ -41,6 +41,26 @@ extern std::fstream logFile;
         } while(0)
 #endif
 
+#ifdef DEBUG
+    #define opLog(format, ...) ((void)0)
+#else
+    #define opLog(format, ...) \
+        do { \
+            printf(ANSI_FMT("[%s:%d %s] " format, GREEN_TXT) "\n", \
+            __FILE__, __LINE__, __func__, ## __VA_ARGS__); \
+        } while(0)
+#endif
+
+#ifdef DEBUG
+    #define regLog(format, ...) ((void)0)
+#else
+    #define regLog(format, ...) \
+        do { \
+            printf(ANSI_FMT("[%s:%d %s] " format, RED_TXT) "\n", \
+            __FILE__, __LINE__, __func__, ## __VA_ARGS__); \
+        } while(0)
+#endif
+
 inline void assert_fail_msg(const char* msg) {
     printf(RED_TXT "%s\n" RESET_TXT, msg);
 }

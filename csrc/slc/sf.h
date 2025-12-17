@@ -5,8 +5,6 @@
 #include "../cache.h"
 #include "../chi/flit/req_flit.h"
 #include "../chi/flit/dat_flit.h"
-#include "../chi/transaction/req_flow.h"
-#include "../chi/transaction/rsp_flow.h"
 #include "../chi/flit/auto_flit.h"
 #include "sf.h"
 #include <stack>
@@ -70,11 +68,11 @@ struct SnoopFilter {
 
         rsp_stash.push(aligned_addr);
 
-        devLog("SF stash push req [TxnID=%d]", req.TxnID);
+        devLog("SF stash push req [Opcode=%d]", req.Opcode);
     }
 
-    void exec_unique_rsp(const rspflit_t &rsp) {
-        Assert(!rsp_stash.empty(), "Rsp stash is empty when exec_unique_rsp");
+    void exec_rsp(const rspflit_t &rsp) {
+        Assert(!rsp_stash.empty(), "Rsp stash is empty when exec_rsp");
 
         paddr_t aligned_addr = rsp_stash.top();
         rsp_stash.pop();
@@ -82,7 +80,7 @@ struct SnoopFilter {
         paddr_t tag = this->tag_of(aligned_addr);
 
         this->tag_array[index] = tag;
-        this->val_array[index] = Unique;
+        this->val_array[index] = rsp.Resp == CompAck_UC ? Unique : Share;
 
         rnfVec[index][rsp.SrcID] = true;
     }

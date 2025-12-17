@@ -116,7 +116,6 @@ struct Cache {
 
     void show_cache() const {
         std::ostringstream oss;
-        oss << "===== Cache Dump =====\n";
         oss << std::hex << std::setfill('0');
 
         for (size_t set = 0; set < numSet; ++set) {

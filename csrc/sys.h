@@ -6,7 +6,6 @@
 #include <vector>
 #include "include/dbg.h"
 #include "include/autoconfig.h"
-#include "include/utils.h"
 #include "slc/slc.h"
 
 #define FINISH_TIME 1e4
@@ -61,14 +60,14 @@ inline bool block_rnf_exec_once(const Operation &lastop) {
     bool ok = 0;
     int coreId = lastop.core;
 
-    if (RN_req_channel[coreId].size()) ok = 1;
-    if (RN_rsp_channel[coreId].size()) ok = 1;
-    if (RN_dat_channel[coreId].size()) ok = 1;
+    if (cpu[coreId].cache.req_channel.size()) ok = 1;
+    if (cpu[coreId].cache.rsp_channel.size()) ok = 1;
+    if (cpu[coreId].cache.dat_channel.size()) ok = 1;
 
     if (ok) {
-        if (!RN_req_channel[coreId].empty()){
-            reqflit_t req = RN_req_channel[coreId].front();
-            RN_req_channel[coreId].pop();
+        if (!cpu[coreId].cache.req_channel.empty()){
+            reqflit_t req = cpu[coreId].cache.req_channel.front();
+            cpu[coreId].cache.req_channel.pop();
 
             slc.exec_req(req);
 
@@ -78,9 +77,9 @@ inline bool block_rnf_exec_once(const Operation &lastop) {
             devLog("RN%d issued req flit\n", coreId);
         }
         // Data from memory or L3 cache put in RN_dat_channel
-        else if (!RN_dat_channel[coreId].empty()) {
-            datflit_t dat = RN_dat_channel[coreId].front();
-            RN_dat_channel[coreId].pop();
+        else if (!cpu[coreId].cache.dat_channel.empty()) {
+            datflit_t dat = cpu[coreId].cache.dat_channel.front();
+            cpu[coreId].cache.dat_channel.pop();
 
             cpu[coreId].update_cache(dat);
             DUMP_TIME(unfinished_table.lastop_exec_times);
@@ -90,8 +89,8 @@ inline bool block_rnf_exec_once(const Operation &lastop) {
         // 1. Already reveive data
         // 2. Data belong RN
         else {
-            rspflit_t rsp = RN_rsp_channel[coreId].front();
-            RN_rsp_channel[coreId].pop();
+            rspflit_t rsp = cpu[coreId].cache.rsp_channel.front();
+            cpu[coreId].cache.rsp_channel.pop();
 
             slc.exec_rsp(rsp);
 
@@ -123,15 +122,8 @@ inline void sys_exec(std::ifstream& file) {
             if (lastop_finished) {
                 unfinished_table.reset(nullptr);
 
-                // Just update cache line
-                // sys_exec_once(lastop);
-
-                cpu[lastop.core].show_cache();
-                slc.show_cache();
-                slc.show_snoop();
+                sys_exec_once(lastop); // Load or Store complete, update Local Cache
             }
-            
-            continue;
         } else { // cpu run once
             if (!std::getline(file, line)) break;
             if (line.empty()) continue;
@@ -146,7 +138,14 @@ inline void sys_exec(std::ifstream& file) {
             if (!lastop_finished) unfinished_table.reset(&op);
 
             lastop = op;
+
+            // dbg_operation(lastop, logFile);
         }
+
+        cpu[lastop.core].show_cache();
+
+        slc.show_cache();
+        slc.show_snoop();
     }
 }
 

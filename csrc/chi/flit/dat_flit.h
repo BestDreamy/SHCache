@@ -51,13 +51,13 @@ enum CHI_DataFlit_Resp {
 //     return flit;
 // }
 
-inline datflit_t createCompData_UC(const reqflit_t &req);
+datflit_t createCompData_UC(const reqflit_t &req);
 
 inline void printDatFlit(const datflit_t &flit) {
     std::string log = "DataFlit: ";
     log += "TgtID=" + std::to_string(flit.TgtID) +
         " SrcID=" + std::to_string(flit.SrcID) +
-        " TxnID=" + std::to_string(flit.TxnID) +
+        // " TxnID=" + std::to_string(flit.TxnID) +
         " HomeNID=" + std::to_string(flit.HomeNID) +
         " Opcode=" + std::to_string(flit.Opcode) +
         " Resp=" + std::to_string(flit.Resp);

@@ -1,6 +1,5 @@
 #ifndef L1CACHE_H
 #define L1CACHE_H
-#include "../include/utils.h"
 #include "../include/dbg.h"
 #include "../mem.h"
 #include "../include/autoconfig.h"
@@ -8,9 +7,8 @@
 #include <cstring>
 #include "../chi/flit/req_flit.h"
 #include "../chi/flit/dat_flit.h"
-#include "../chi/transaction/req_flow.h"
-#include "../chi/transaction/rsp_flow.h"
 #include "../cache.h"
+#include <queue>
 
 // enum CPU_Cache_State {
 //     I = 0,
@@ -25,6 +23,10 @@
 // Direct-Map Local Cache
 template <size_t numSet = 4, size_t BlockSize = 4>
 struct L1Cache: public Cache<numSet, BlockSize> {
+    std::queue<reqflit_t> req_channel;
+    std::queue<datflit_t> dat_channel;
+    std::queue<rspflit_t> rsp_channel;
+    std::queue<snpflit_t> snp_channel;
 
     reqflit_t RN_Tracker[config.numCreditsForHNReq[0]];
     bool RN_Tracker_valid[config.numCreditsForHNReq[0]];
@@ -49,7 +51,7 @@ struct L1Cache: public Cache<numSet, BlockSize> {
     int find_RN_Tracker_from_CompData(const datflit_t &data) const {
         for (int i = 0; i < config.numCreditsForHNReq[0]; i ++) {
             if (RN_Tracker_valid[i] == false) continue;
-            if (RN_Tracker[i].TxnID == data.TxnID) {
+            if (RN_Tracker[i].SrcID == data.TgtID) {
                 return i;
             }
         }
@@ -57,7 +59,7 @@ struct L1Cache: public Cache<numSet, BlockSize> {
     }
 
     int RN_Tracker_pop(const datflit_t &data) {
-        devLog("RN Tracker pop req [TxnID=%d, TgtID=%d]", data.TxnID, data.HomeNID);
+        devLog("RN Tracker pop req [TgtID=%d]", data.TgtID);
         printDatFlit(data);
         int id = find_RN_Tracker_from_CompData(data);
         Assert(id != -1, "No available RN_Tracker");
@@ -72,7 +74,7 @@ struct L1Cache: public Cache<numSet, BlockSize> {
         
         RN_Tracker[id] = req;
         RN_Tracker_valid[id] = true;
-        devLog("RN Tracker[%d] push req [TxnID=%d]", id, req.TxnID);
+        devLog("RN Tracker[%d] push req [SrcID=%d]", id, req.SrcID);
         printReqFlit(req);
         return id;
     }
@@ -90,15 +92,21 @@ struct L1Cache: public Cache<numSet, BlockSize> {
 
         paddr_t index = this->set_of(addr);
         paddr_t tag = this->tag_of(addr);
+        paddr_t offset = this->offset_of(addr);
 
         if (this->is_hit(aligned_addr)) {
-            memcpy(&data, this->data_array[index], sizeof(uint32_t));
+            // memcpy(&data, this->data_array[index], sizeof(uint32_t));
+            for (int i = offset; i < offset + sizeof(data); i ++) {
+                data |= this->data_array[index][i] << (i * 8);
+            }
             return true;
         }
         
         // Same as cache.update()
         if (!this->is_unique(aligned_addr)) {
-            reqflit_t req = chi_issue_ReadUnique_req(coreId, aligned_addr, BlockSize);
+            reqflit_t req = createReadUnique(config.HNId[0], coreId, aligned_addr, BlockSize);
+
+            req_channel.push(req);
             
             RN_Tracker_push(req);
 
@@ -119,7 +127,9 @@ struct L1Cache: public Cache<numSet, BlockSize> {
         
         paddr_t aligned_addr = this->aligned_of(addr);
         if (!this->is_unique(aligned_addr)) {
-            reqflit_t req = chi_issue_ReadUnique_req(coreId, aligned_addr, BlockSize);
+            reqflit_t req = createReadUnique(config.HNId[0], coreId, aligned_addr, BlockSize);
+
+            req_channel.push(req);
             
             RN_Tracker_push(req);
 
@@ -158,15 +168,15 @@ struct L1Cache: public Cache<numSet, BlockSize> {
             }
         }
 
-        chi_issue_CompAck_rsp(data);
+        rsp_channel.push(createCompAck(data));
     }
 
     void show_RN_Tracker() const {
         std::cout << "RN_Tracker Information:" << std::endl;
         for (int i = 0; i < config.numCreditsForHNReq[0]; i ++) {
             if (RN_Tracker_valid[i]) {
-                std::cout << "ID: " << i << ", TxnID: " << static_cast<unsigned>(RN_Tracker[i].TxnID)
-                          << ", SrcID: " << static_cast<unsigned>(RN_Tracker[i].SrcID) << std::endl;
+                std::cout << "ID: " << i << ", SrcID: " << static_cast<unsigned>(RN_Tracker[i].SrcID)
+                                << ", Opcode: " << static_cast<unsigned>(RN_Tracker[i].Opcode) << std::endl;
             }
         }
         std::cout << "----------------------------------------" << std::endl;

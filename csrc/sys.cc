@@ -1,5 +1,4 @@
 #include "sys.h"
-#include "chi/rnf_utils.h"
 #include "mem.h"
 #include "slc/slc.h"
 #include "include/autoconfig.h"

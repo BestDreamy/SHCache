@@ -66,7 +66,7 @@ inline void dbg_operation(const Operation& op, std::fstream& logFile) {
     }
     if (op.address) {
         std::stringstream ss;
-        ss << ", address: 0x" << std::hex << *op.address;
+        ss << ", address: 0x" << std::hex << *op.address << std::dec;
         log += ss.str();
     }
     if (op.result) {
@@ -75,7 +75,7 @@ inline void dbg_operation(const Operation& op, std::fstream& logFile) {
     if (op.compute_type) {
         log += ", compute_type: " + std::to_string(*op.compute_type);
     }
-    devLog("%s", log.c_str());
+    opLog("%s", log.c_str());
 }
 
 inline Operation read_trace_one_line(std::string &line) {

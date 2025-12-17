@@ -1,5 +1,6 @@
 #pragma once
 #include "auto_flit.h"
+#include "../../include/autoconfig.h"
 #include <iostream>
 
 enum CHI_ReqFlit_Opcode {
@@ -26,18 +27,19 @@ enum CHI_ReqFlit_Size {
 inline reqflit_t createReadUnique(
     const int &TgtID,
     const int &SrcID,
-    const int &TxnID,
+    // const int &TxnID,
     const uint64_t &Addr, 
     const uint32_t &Size=4
 ) {
     reqflit_t flit;
     flit.TgtID = TgtID;
     flit.SrcID = SrcID;
-    flit.TxnID = TxnID;
+    // flit.TxnID = TxnID;
     flit.Opcode = ReadUnique;
     flit.Addr = Addr;
     flit.Size = Size;
-    flit.ExpCompAck = 1;
+    flit.StashNID_ReturnNID = 99; // Dummy value
+    // flit.ExpCompAck = 1;
 
     return flit;
 }
@@ -45,10 +47,11 @@ inline reqflit_t createReadUnique(
 inline void printReqFlit(const reqflit_t &req) {
     std::string log = "ResFlit: TgtID=" + std::to_string(req.TgtID) +
         " SrcID=" + std::to_string(req.SrcID) +
-        " TxnID=" + std::to_string(req.TxnID) +
+        // " TxnID=" + std::to_string(req.TxnID) +
         " Opcode=" + std::to_string(req.Opcode) +
         " Addr=" + std::to_string(req.Addr) +
         " Size=" + std::to_string(req.Size) +
+        " StashNID_ReturnNID=" + std::to_string(req.StashNID_ReturnNID) +
         " }";
     devLog("%s", log.c_str());
 }
@@ -58,10 +61,12 @@ inline reqflit_t createReadNoSnp(
 ) {
     reqflit_t flit;
     flit.SrcID = req.TgtID;
-    // flit.TgtID = SNID;
-
+    flit.TgtID = config.SNId[0];
     flit.StashNID_ReturnNID = req.SrcID;
-    flit.ReturnTxnID = req.TxnID;
+    flit.Opcode = ReadNoSnp;
+    flit.Addr = req.Addr;
+    flit.Size = req.Size;
+    // flit.ReturnTxnID = req.TxnID;
 
     return flit;
 }

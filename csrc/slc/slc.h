@@ -5,8 +5,6 @@
 #include "../cache.h"
 #include "../chi/flit/req_flit.h"
 #include "../chi/flit/dat_flit.h"
-#include "../chi/transaction/req_flow.h"
-#include "../chi/transaction/rsp_flow.h"
 #include "../chi/flit/auto_flit.h"
 #include "sf.h"
 
@@ -34,7 +32,7 @@ struct SystemCache: public Cache<numSet, BlockSize> {
 
     void exec_rsp(const rspflit_t &rsp) {
         if (rsp.Resp == CompAck_UC) {
-            sf.exec_unique_rsp(rsp);
+            sf.exec_rsp(rsp);
             return;
         }
         return;
@@ -42,6 +40,11 @@ struct SystemCache: public Cache<numSet, BlockSize> {
 
     void show_snoop() const {
         sf.show_snoop();
+    }
+
+    void show_cache() const {
+        devLog("===== SLC Cache Dump =====");
+        Cache<numSet, BlockSize>::show_cache();
     }
 
     // Lookup

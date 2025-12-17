@@ -4,7 +4,6 @@
 #include <fstream>
 #include <sstream>
 #include <string>
-#include "trace.h"
 
 #include <cstdint>
 #include <stdio.h>

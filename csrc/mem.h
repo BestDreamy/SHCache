@@ -6,46 +6,29 @@
 #include "chi/flit/req_flit.h"
 #include "chi/flit/dat_flit.h"
 #include "chi/flit/rsp_flit.h"
-#include "chi/rnf_utils.h"
 
 typedef uint32_t paddr_t;
 
 struct Memory {
     std::map<paddr_t, uint32_t> mem;
 
-    Memory() {
-        mem.clear();
-    }
+    Memory();
 
     // Read from memory
-    bool read_memory(const paddr_t &addr, uint32_t& data) {
-        auto it = mem.find(addr);
-        if (it == mem.end()) {
-            mem[addr] = 0x44332211; // Test Mem Data
-            // mem[addr] = 0;
-        }
-        data = mem[addr];
-        return true;
-    }
+    bool read_memory(const paddr_t &addr, uint32_t& data);
 
     // Write to memory
-    void write_memory(const paddr_t &addr, const uint32_t &data) {
-        mem[addr] = data;
-    }
+    void write_memory(const paddr_t &addr, const uint32_t &data);
 
     // AMBA5 CHI
-
-    void chi_read_memory_with_DMT(const reqflit_t &req) {
-        reqflit_t req2sn =  createReadNoSnp(req);
-        datflit_t dat = createCompData_UC(req);
-        RN_dat_channel[req2sn.StashNID_ReturnNID].push(dat);
-        devLog("RN dat channel[%d] push dat", req2sn.StashNID_ReturnNID);
-    }
+    void chi_read_memory_with_DMT(const reqflit_t &req);
 };
 
 extern Memory mem;
 
 inline datflit_t createCompData_UC(const reqflit_t &req) {
+    Assert(req.Opcode == ReadNoSnp, "Opcode must be ReadNoSnp");
+
     datflit_t flit;
 
     uint8_t size = req.Size; // Suppose Size=4
@@ -68,13 +51,12 @@ inline datflit_t createCompData_UC(const reqflit_t &req) {
         
         flit.BE |= (0xF << (i * 4));
     }
-    flit.DataID            = 0;
-    flit.CCID              = 0;
-    flit.DBID              = req.TxnID;
+    // flit.CCID              = 0;
+    // flit.DBID              = req.TxnID;
     flit.Resp              = CompData_UC;
     flit.Opcode            = CompData;
     flit.HomeNID           = req.SrcID;
-    flit.TxnID             = req.ReturnTxnID;
+    // flit.TxnID             = req.ReturnTxnID;
     flit.SrcID             = req.TgtID;
     flit.TgtID             = req.StashNID_ReturnNID;
 

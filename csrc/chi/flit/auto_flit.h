@@ -5,99 +5,102 @@
 
 
 struct reqflit_t {
-    uint8_t RSVDC;
-    uint8_t TraceTag;
-    uint8_t ExpCompAck;
-    uint8_t Excl;
-    uint8_t LPID;
-    uint8_t SnpAttr;
-    uint8_t MemAttr;
-    uint8_t PCrdType;
-    uint8_t Order;
-    uint8_t AllowRetry;
-    uint8_t LikelyShared;
-    uint8_t NS;
+    // uint8_t RSVDC;
+    // uint8_t TraceTag;
+    // uint8_t ExpCompAck;
+    // uint8_t Excl;
+    // uint8_t LPID;
+    // uint8_t SnpAttr;
+    // uint8_t MemAttr;
+    // uint8_t PCrdType;
+    // uint8_t Order;
+    // uint8_t AllowRetry;
+    // uint8_t LikelyShared;
+    // uint8_t NS;
     uint64_t Addr;
     uint8_t Size;
     uint8_t Opcode;
-    uint8_t ReturnTxnID;
-    uint8_t StashNIDValid;
-    uint8_t StashNID_ReturnNID;
-    uint8_t TxnID;
+    // uint8_t ReturnTxnID;
+    // uint8_t StashNIDValid;
+    uint8_t StashNID_ReturnNID; // Only ReadNoSnp
+    // uint8_t TxnID;
     uint8_t SrcID;
     uint8_t TgtID;
-    uint8_t QoS;
+    // uint8_t QoS;
+
     reqflit_t() noexcept
-        : RSVDC(uint8_t()),
-          TraceTag(uint8_t()),
-          ExpCompAck(uint8_t()),
-          Excl(uint8_t()),
-          LPID(uint8_t()),
-          SnpAttr(uint8_t()),
-          MemAttr(uint8_t()),
-          PCrdType(uint8_t()),
-          Order(uint8_t()),
-          AllowRetry(uint8_t()),
-          LikelyShared(uint8_t()),
-          NS(uint8_t()),
+        : // RSVDC(uint8_t()),
+          // TraceTag(uint8_t()),
+          // ExpCompAck(uint8_t()),
+          // Excl(uint8_t()),
+          // LPID(uint8_t()),
+          // SnpAttr(uint8_t()),
+          // MemAttr(uint8_t()),
+          // PCrdType(uint8_t()),
+          // Order(uint8_t()),
+          // AllowRetry(uint8_t()),
+          // LikelyShared(uint8_t()),
+          // NS(uint8_t()),
           Addr(uint64_t()),
           Size(uint8_t()),
           Opcode(uint8_t()),
-          ReturnTxnID(uint8_t()),
-          StashNIDValid(uint8_t()),
+          // ReturnTxnID(uint8_t()),
+          // StashNIDValid(uint8_t()),
           StashNID_ReturnNID(uint8_t()),
-          TxnID(uint8_t()),
+          // TxnID(uint8_t()),
           SrcID(uint8_t()),
-          TgtID(uint8_t()),
-          QoS(uint8_t()) {}
+          TgtID(uint8_t()) {}
+          // QoS(uint8_t()) {}
+
     reqflit_t(const reqflit_t& other) noexcept {
-        RSVDC = other.RSVDC;
-        TraceTag = other.TraceTag;
-        ExpCompAck = other.ExpCompAck;
-        Excl = other.Excl;
-        LPID = other.LPID;
-        SnpAttr = other.SnpAttr;
-        MemAttr = other.MemAttr;
-        PCrdType = other.PCrdType;
-        Order = other.Order;
-        AllowRetry = other.AllowRetry;
-        LikelyShared = other.LikelyShared;
-        NS = other.NS;
+        // RSVDC = other.RSVDC;
+        // TraceTag = other.TraceTag;
+        // ExpCompAck = other.ExpCompAck;
+        // Excl = other.Excl;
+        // LPID = other.LPID;
+        // SnpAttr = other.SnpAttr;
+        // MemAttr = other.MemAttr;
+        // PCrdType = other.PCrdType;
+        // Order = other.Order;
+        // AllowRetry = other.AllowRetry;
+        // LikelyShared = other.LikelyShared;
+        // NS = other.NS;
         Addr = other.Addr;
         Size = other.Size;
         Opcode = other.Opcode;
-        ReturnTxnID = other.ReturnTxnID;
-        StashNIDValid = other.StashNIDValid;
+        // ReturnTxnID = other.ReturnTxnID;
+        // StashNIDValid = other.StashNIDValid;
         StashNID_ReturnNID = other.StashNID_ReturnNID;
-        TxnID = other.TxnID;
+        // TxnID = other.TxnID;
         SrcID = other.SrcID;
         TgtID = other.TgtID;
-        QoS = other.QoS;
+        // QoS = other.QoS;
     }
+
     reqflit_t& operator=(const reqflit_t& other) noexcept {
         if (this != &other) {
-            RSVDC = other.RSVDC;
-            TraceTag = other.TraceTag;
-            ExpCompAck = other.ExpCompAck;
-            Excl = other.Excl;
-            LPID = other.LPID;
-            SnpAttr = other.SnpAttr;
-            MemAttr = other.MemAttr;
-            PCrdType = other.PCrdType;
-            Order = other.Order;
-            AllowRetry = other.AllowRetry;
-            LikelyShared = other.LikelyShared;
-            NS = other.NS;
+            // RSVDC = other.RSVDC;
+            // TraceTag = other.TraceTag;
+            // ExpCompAck = other.ExpCompAck;
+            // Excl = other.Excl;
+            // LPID = other.LPID;
+            // SnpAttr = other.SnpAttr;
+            // MemAttr = other.MemAttr;
+            // PCrdType = other.PCrdType;
+            // Order = other.Order;
+            // AllowRetry = other.AllowRetry;
+            // LikelyShared = other.LikelyShared;
+            // NS = other.NS;
             Addr = other.Addr;
             Size = other.Size;
             Opcode = other.Opcode;
-            ReturnTxnID = other.ReturnTxnID;
-            StashNIDValid = other.StashNIDValid;
+            // ReturnTxnID = other.ReturnTxnID;
+            // StashNIDValid = other.StashNIDValid;
             StashNID_ReturnNID = other.StashNID_ReturnNID;
-            TxnID = other.TxnID;
+            // TxnID = other.TxnID;
             SrcID = other.SrcID;
             TgtID = other.TgtID;
-            QoS = other.QoS;
+            // QoS = other.QoS;
         }
         return *this;
     }
@@ -130,55 +133,58 @@ constexpr size_t reqflit_QoS_width = 4;
 
 
 struct rspflit_t {
-    uint8_t TraceTag;
-    uint8_t PCrdType;
-    uint8_t DBID;
-    uint8_t FwdState_DataPull;
+    // uint8_t TraceTag;
+    // uint8_t PCrdType;
+    // uint8_t DBID;
+    // uint8_t FwdState_DataPull;
     uint8_t Resp;
-    uint8_t RespErr;
+    // uint8_t RespErr;
     uint8_t Opcode;
-    uint8_t TxnID;
+    // uint8_t TxnID;
     uint8_t SrcID;
     uint8_t TgtID;
-    uint8_t QoS;
+    // uint8_t QoS;
+
     rspflit_t() noexcept
-        : TraceTag(uint8_t()),
-          PCrdType(uint8_t()),
-          DBID(uint8_t()),
-          FwdState_DataPull(uint8_t()),
+        : // TraceTag(uint8_t()),
+          // PCrdType(uint8_t()),
+          // DBID(uint8_t()),
+          // FwdState_DataPull(uint8_t()),
           Resp(uint8_t()),
-          RespErr(uint8_t()),
+          // RespErr(uint8_t()),
           Opcode(uint8_t()),
-          TxnID(uint8_t()),
+          // TxnID(uint8_t()),
           SrcID(uint8_t()),
-          TgtID(uint8_t()),
-          QoS(uint8_t()) {}
+          TgtID(uint8_t()) {}
+          // QoS(uint8_t()) {}
+
     rspflit_t(const rspflit_t& other) noexcept {
-        TraceTag = other.TraceTag;
-        PCrdType = other.PCrdType;
-        DBID = other.DBID;
-        FwdState_DataPull = other.FwdState_DataPull;
+        // TraceTag = other.TraceTag;
+        // PCrdType = other.PCrdType;
+        // DBID = other.DBID;
+        // FwdState_DataPull = other.FwdState_DataPull;
         Resp = other.Resp;
-        RespErr = other.RespErr;
+        // RespErr = other.RespErr;
         Opcode = other.Opcode;
-        TxnID = other.TxnID;
+        // TxnID = other.TxnID;
         SrcID = other.SrcID;
         TgtID = other.TgtID;
-        QoS = other.QoS;
+        // QoS = other.QoS;
     }
+
     rspflit_t& operator=(const rspflit_t& other) noexcept {
         if (this != &other) {
-            TraceTag = other.TraceTag;
-            PCrdType = other.PCrdType;
-            DBID = other.DBID;
-            FwdState_DataPull = other.FwdState_DataPull;
+            // TraceTag = other.TraceTag;
+            // PCrdType = other.PCrdType;
+            // DBID = other.DBID;
+            // FwdState_DataPull = other.FwdState_DataPull;
             Resp = other.Resp;
-            RespErr = other.RespErr;
+            // RespErr = other.RespErr;
             Opcode = other.Opcode;
-            TxnID = other.TxnID;
+            // TxnID = other.TxnID;
             SrcID = other.SrcID;
             TgtID = other.TgtID;
-            QoS = other.QoS;
+            // QoS = other.QoS;
         }
         return *this;
     }
@@ -202,73 +208,76 @@ constexpr size_t rspflit_QoS_width = 4;
 struct datflit_t {
     std::bitset<256> Data;
     uint32_t BE;
-    uint8_t RSVDC;
-    uint8_t TraceTag;
-    uint8_t DataID;
-    uint8_t CCID;
-    uint8_t DBID;
-    uint8_t FwdState_DataPull;
+    // uint8_t RSVDC;
+    // uint8_t TraceTag;
+    // uint8_t DataID;
+    // uint8_t CCID;
+    // uint8_t DBID;
+    // uint8_t FwdState_DataPull;
     uint8_t Resp;
-    uint8_t RespErr;
+    // uint8_t RespErr;
     uint8_t Opcode;
     uint8_t HomeNID;
-    uint8_t TxnID;
+    // uint8_t TxnID;
     uint8_t SrcID;
     uint8_t TgtID;
-    uint8_t QoS;
+    // uint8_t QoS;
+
     datflit_t() noexcept
         : Data(std::bitset<256>()),
           BE(uint32_t()),
-          RSVDC(uint8_t()),
-          TraceTag(uint8_t()),
-          DataID(uint8_t()),
-          CCID(uint8_t()),
-          DBID(uint8_t()),
-          FwdState_DataPull(uint8_t()),
+        //   RSVDC(uint8_t()),
+        //   TraceTag(uint8_t()),
+        //   DataID(uint8_t()),
+        //   CCID(uint8_t()),
+        //   DBID(uint8_t()),
+        //   FwdState_DataPull(uint8_t()),
           Resp(uint8_t()),
-          RespErr(uint8_t()),
+        //   RespErr(uint8_t()),
           Opcode(uint8_t()),
           HomeNID(uint8_t()),
-          TxnID(uint8_t()),
+        //   TxnID(uint8_t()),
           SrcID(uint8_t()),
-          TgtID(uint8_t()),
-          QoS(uint8_t()) {}
+          TgtID(uint8_t()) {}
+        //   QoS(uint8_t()) {}
+
     datflit_t(const datflit_t& other) noexcept {
         Data = other.Data;
         BE = other.BE;
-        RSVDC = other.RSVDC;
-        TraceTag = other.TraceTag;
-        DataID = other.DataID;
-        CCID = other.CCID;
-        DBID = other.DBID;
-        FwdState_DataPull = other.FwdState_DataPull;
+        // RSVDC = other.RSVDC;
+        // TraceTag = other.TraceTag;
+        // DataID = other.DataID;
+        // CCID = other.CCID;
+        // DBID = other.DBID;
+        // FwdState_DataPull = other.FwdState_DataPull;
         Resp = other.Resp;
-        RespErr = other.RespErr;
+        // RespErr = other.RespErr;
         Opcode = other.Opcode;
         HomeNID = other.HomeNID;
-        TxnID = other.TxnID;
+        // TxnID = other.TxnID;
         SrcID = other.SrcID;
         TgtID = other.TgtID;
-        QoS = other.QoS;
+        // QoS = other.QoS;
     }
+
     datflit_t& operator=(const datflit_t& other) noexcept {
         if (this != &other) {
             Data = other.Data;
             BE = other.BE;
-            RSVDC = other.RSVDC;
-            TraceTag = other.TraceTag;
-            DataID = other.DataID;
-            CCID = other.CCID;
-            DBID = other.DBID;
-            FwdState_DataPull = other.FwdState_DataPull;
+            // RSVDC = other.RSVDC;
+            // TraceTag = other.TraceTag;
+            // DataID = other.DataID;
+            // CCID = other.CCID;
+            // DBID = other.DBID;
+            // FwdState_DataPull = other.FwdState_DataPull;
             Resp = other.Resp;
-            RespErr = other.RespErr;
+            // RespErr = other.RespErr;
             Opcode = other.Opcode;
             HomeNID = other.HomeNID;
-            TxnID = other.TxnID;
+            // TxnID = other.TxnID;
             SrcID = other.SrcID;
             TgtID = other.TgtID;
-            QoS = other.QoS;
+            // QoS = other.QoS;
         }
         return *this;
     }

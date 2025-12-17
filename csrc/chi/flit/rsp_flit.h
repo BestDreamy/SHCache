@@ -32,31 +32,29 @@ enum CHI_RspFlit_Resp {
 
 inline void printRspFlit(const rspflit_t &flit) {
     std::cout << "================ RspFlit ================" << std::endl;
-    std::cout << "TraceTag : " << static_cast<unsigned>(flit.TraceTag) << std::endl;
+    // std::cout << "TraceTag : " << static_cast<unsigned>(flit.TraceTag) << std::endl;
     std::cout << "Resp     : " << static_cast<unsigned>(flit.Resp) << std::endl;
-    std::cout << "RespErr  : " << static_cast<unsigned>(flit.RespErr) << std::endl;
+    // std::cout << "RespErr  : " << static_cast<unsigned>(flit.RespErr) << std::endl;
     std::cout << "Opcode   : " << static_cast<unsigned>(flit.Opcode) << std::endl;
-    std::cout << "TxnID    : " << static_cast<unsigned>(flit.TxnID) << std::endl;
+    // std::cout << "TxnID    : " << static_cast<unsigned>(flit.TxnID) << std::endl;
     std::cout << "SrcID    : " << static_cast<unsigned>(flit.SrcID) << std::endl;
     std::cout << "TgtID    : " << static_cast<unsigned>(flit.TgtID) << std::endl;
-    std::cout << "QoS      : " << static_cast<unsigned>(flit.QoS) << std::endl;
+    // std::cout << "QoS      : " << static_cast<unsigned>(flit.QoS) << std::endl;
     std::cout << "==========================================" << std::endl;
 }
 
 inline rspflit_t createCompAck(
     const int &TgtID,
     const int &SrcID,
-    const int &TxnID,
-    const int &Resp,
-    const int &DBID
+    // const int &TxnID,
+    const int &Resp
 ) {
     rspflit_t flit;
     flit.TgtID = TgtID;
     flit.SrcID = SrcID;
-    flit.TxnID = TxnID;
+    // flit.TxnID = TxnID;
     flit.Opcode = CompAck;
     flit.Resp = Resp;
-    flit.DBID = DBID;
 
     // devLog("Ready to create CompAck RspFlit");
     // printRspFlit(flit);
@@ -68,8 +66,6 @@ inline rspflit_t createCompAck(
 ) {
     int TgtID = data.HomeNID;
     int SrcID = data.TgtID;
-    int TxnID = data.DBID;
     int Resp = data.Resp; // Use the response from the data flit
-    int DBID = 0; // Arbitrary value, can be set as needed
-    return createCompAck(TgtID, SrcID, TxnID, Resp, DBID);
+    return createCompAck(TgtID, SrcID, Resp);
 }
