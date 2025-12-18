@@ -8,6 +8,7 @@ INCLUDES_DIR = $(addprefix -I, $(abspath ./csrc) \
 							   $(abspath ./csrc/diff))
 
 CSRCS = $(shell find $(abspath .) -name "*.c" -or -name "*.cc" -or -name "*.cpp")
+# HDRS = $(shell find $(abspath .) -name "*.h")
 BIN = sim
 
 TEST_DIR = $(abspath ./benchmark)
@@ -17,6 +18,7 @@ TEST_SRC = $(TEST_DIR)/$(test).txt
 default: run
 
 $(BIN): $(CSRCS)
+	make clean
 	$(CXX) $(CXXFLAGS) $(INCLUDES_DIR) -o $@ $^
 
 run: $(BIN) $(TEST_SRC)
